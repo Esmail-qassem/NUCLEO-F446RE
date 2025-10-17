@@ -1,0 +1,1 @@
+del full_image.hex

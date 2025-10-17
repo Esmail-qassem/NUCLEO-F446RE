@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "std_types.h": "c",
+        "rcc.h": "c",
+        "gpio_private.h": "c",
+        "uart.h": "c",
+        "bit_math.h": "c",
+        "gpio_interface.h": "c"
+    }
+}
