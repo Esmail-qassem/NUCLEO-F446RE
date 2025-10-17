@@ -5,6 +5,8 @@
         "gpio_private.h": "c",
         "uart.h": "c",
         "bit_math.h": "c",
-        "gpio_interface.h": "c"
+        "gpio_interface.h": "c",
+        "systick_interface.h": "c",
+        "nvic_private.h": "c"
     }
 }

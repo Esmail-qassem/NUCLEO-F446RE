@@ -75,5 +75,6 @@ void UART_SendByte(UART_HardWare_t base, uint8 data);
 void UART_SendString(UART_HardWare_t base, const char *str);
 uint8 UART_ReceiveByte(UART_HardWare_t base);
 uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout);
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number);
 
 #endif

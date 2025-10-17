@@ -19,12 +19,53 @@ UART_Config_t Uart_configuration={
   UART_WORDLEN_8B
 };
 
+/**************************************************************/
+/*           function prototype              */
+void GPIO_PIN_CONFIG(void);
+void APP_init(void);
+/**************************************************************/
+/**************************************************************/
+
+void LED (void)
+{
+   GPIO_TogglePin(GPIO_PORTA, PIN5);
+}
+void UART (void)
+{
+  static uint32 counter=0;
+   UART_voidSendNumber(UART2,counter);
+   UART_SendByte(UART2,'\n');
+   counter++;
+  
+}
 
 void main (void)
 {
+APP_init();
+GPIO_PIN_CONFIG();
+RTOS_voidCreateTask(0,100,LED);
+RTOS_voidCreateTask(1,10,UART);
+
+/*Synchronous function*/
+// Blink loop
+while(1) {}
+}
 
 
+
+void APP_init(void)
+{
+ RTOS_voidStart(); 
+ UART_Init(UART1, &Uart_configuration, 16000000);
+ UART_Init(UART2, &Uart_configuration, 16000000);
+ UART_Init(UART3, &Uart_configuration, 16000000);
+}
+
+void GPIO_PIN_CONFIG(void)
+{
+/*IN BOARD LED*/
 GPIO_InitPin(GPIO_PORTA, PIN5,GPIO_MODE_OUTPUT,GPIO_OTYPE_PP,GPIO_SPEED_FAST,GPIO_NO_PULL);
+/* MSO PIN*/
 GPIO_InitPin(GPIO_PORTA, PIN8,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 /*UART1*/
 GPIO_InitPin(GPIO_PORTA, PIN9,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
@@ -32,28 +73,11 @@ GPIO_InitPin(GPIO_PORTA, PIN9,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO
 GPIO_InitPin(GPIO_PORTA, PIN2,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 /*UART3*/
 GPIO_InitPin(GPIO_PORTB, PIN10,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
- GPIO_SetAF(GPIO_PORTA, PIN9, 7);
- GPIO_SetAF(GPIO_PORTA, PIN2, 7);
- GPIO_SetAF(GPIO_PORTB, PIN10, 7);
-
- UART_Init(UART1, &Uart_configuration, 16000000);
- UART_Init(UART2, &Uart_configuration, 16000000);
- UART_Init(UART3, &Uart_configuration, 16000000);
-
-
-
-// Blink loop
-while (1) {
-   
-   //UART_SendByte(UART2, 101);
-   UART_SendString(UART2, "Esmail\n");
-     //GPIO_TogglePin(GPIO_PORTA, PIN5);
-
-    for (volatile uint32 i = 0; i < 10000; i++); // delay
+GPIO_SetAF(GPIO_PORTA, PIN9, 7);
+GPIO_SetAF(GPIO_PORTA, PIN2, 7);
+GPIO_SetAF(GPIO_PORTB, PIN10, 7);  
 }
 
-
-}
 
 void SystemInit(void)
 {

@@ -21,7 +21,7 @@ void UsageFault_Handler                (void) __attribute__ ((alias ("Default_Ha
 void SVC_Handler                       (void) __attribute__ ((alias ("Default_Handler")));
 void DebugMon_Handler                  (void) __attribute__ ((alias ("Default_Handler")));
 void PendSV_Handler                    (void) __attribute__ ((alias ("Default_Handler")));
-void SysTick_Handler                   (void) __attribute__ ((alias ("Default_Handler")));
+void SysTick_Handler                   (void);
 
 /*======================
  * Peripheral IRQs (STM32F446xx)

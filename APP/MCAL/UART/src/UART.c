@@ -94,3 +94,28 @@ uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout)
     if (timeout == 0) return 0xFF; // Timeout
     return (uint8)USART_DR(Add);
 }
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number)
+{
+	if(Copy_sint32Number<0)
+	{
+		UART_SendByte(HardWare_Unit,'-');
+		Copy_sint32Number= -Copy_sint32Number;
+	}
+	if(Copy_sint32Number==0)
+	{
+ UART_SendByte(HardWare_Unit,'0');
+		return;
+	}
+uint8 NUM[10];
+uint8 Local_uint8Counter=0;
+while(Copy_sint32Number>0)
+{
+	NUM[Local_uint8Counter++]=(Copy_sint32Number%10)+'0';
+	Copy_sint32Number/=10;
+}
+/*reverse*/
+for(uint8 i=Local_uint8Counter;i>0;i--)
+{
+    UART_SendByte(HardWare_Unit,(NUM[i-1]));
+}
+}
