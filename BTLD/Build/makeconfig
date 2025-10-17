@@ -1,0 +1,16 @@
+OBJDIR =$(realpath ./Object)
+LinkerDir =$(realpath ./Linker)
+Images =$(realpath .././Tools)
+CC=arm-none-eabi-gcc
+CPU := cortex-m4
+FPU := fpv4-sp-d16
+FLOAT_ABI := hard
+CFLAGS := -mcpu=$(CPU) -mthumb -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
+CFLAGS += -O0 -g3 -Wall -std=gnu11 -ffunction-sections -fdata-sections
+CFLAGS += -specs=nano.specs -lc -lm -lnosys
+LD=arm-none-eabi-ld
+BIN=arm-none-eabi-objcopy
+STL="C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+MCAL_path := ../MCAL
+HAL_path := ../HAL
+SIZE=arm-none-eabi-size

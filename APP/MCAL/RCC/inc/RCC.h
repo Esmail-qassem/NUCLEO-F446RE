@@ -33,6 +33,16 @@
 #define RCC_DCKCFGR     (*(volatile uint32*)(RCC_BASE + 0x8C))
 
 
+    #define LSION 0
+    #define LSIRDY 1
+    #define RMVF 24
+    #define BOR_RSTF 25
+    #define PIN_RSTF 26
+    #define POR_RSTF 27
+    #define SFT_RSTF 28
+    #define IWDG_RSTF 29
+    #define WWDG_RSTF 30
+    #define LPWR_RSTF 31
 
 typedef enum {
     AHB1_GPIOA = 0,

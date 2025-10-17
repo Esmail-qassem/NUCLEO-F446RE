@@ -1,11 +1,12 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
+#include "RTOS.h"
 #include "GPIO_interface.h"
 #include "UART.h"
-RCC_Config_t RCC_Configuration=
+RCC_Config_t RCC_Configuration =
 {
   RCC_CLK_HSI,
-  0,
+  {0,0,0,0,0},
   AHB_PRE_1,
   APB_PRE_1,
   APB_PRE_1
