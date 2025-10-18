@@ -20,6 +20,7 @@ uint32 Get_BASE_ADD(uint8 base)
     return x;
 
 }
+uint8 rx_test;
 /* ---------------- Initialization ---------------- */
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
 {
@@ -53,6 +54,9 @@ void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
     /* ---------------- Stop Bits ---------------- */
     USART_CR2(Add) &= ~(0x3 << 12);
     USART_CR2(Add) |= (cfg->StopBits << 12);
+
+    /* ---------------- INTERRUPT (Tx/Rx) ---------------- */
+    USART_CR1(Add) |= cfg->Sync_Mode;
 
     /* ---------------- Mode (Tx/Rx) ---------------- */
     USART_CR1(Add) |= cfg->Mode;
@@ -94,7 +98,7 @@ uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout)
     if (timeout == 0) return 0xFF; // Timeout
     return (uint8)USART_DR(Add);
 }
-void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number)
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,uint32 Copy_sint32Number)
 {
 	if(Copy_sint32Number<0)
 	{
@@ -118,4 +122,10 @@ for(uint8 i=Local_uint8Counter;i>0;i--)
 {
     UART_SendByte(HardWare_Unit,(NUM[i-1]));
 }
+}
+
+
+void USART2_IRQHandler(void)
+{   
+
 }

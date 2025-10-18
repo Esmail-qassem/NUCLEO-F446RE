@@ -17,7 +17,8 @@ UART_Config_t Uart_configuration={
   UART_MODE_TX,
   UART_PARITY_NONE,
   UART_STOPBITS_1,
-  UART_WORDLEN_8B
+  UART_WORDLEN_8B,
+  Polling
 };
 
 /**************************************************************/
@@ -45,7 +46,7 @@ void main (void)
 APP_init();
 GPIO_PIN_CONFIG();
 RTOS_voidCreateTask(0,100,LED);
-RTOS_voidCreateTask(1,10,UART);
+RTOS_voidCreateTask(1,500,UART);
 
 /*Synchronous function*/
 // Blink loop

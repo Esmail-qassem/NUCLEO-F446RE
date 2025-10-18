@@ -1,0 +1,4 @@
+C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o: \
+ ../MCAL/FLASH/src/FLASH.c ../MCAL/FLASH/inc/FLASH.h ../Inc/STD_TYPES.h
+../MCAL/FLASH/inc/FLASH.h:
+../Inc/STD_TYPES.h:

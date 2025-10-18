@@ -15,25 +15,15 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/AFIO/src \
            $(MCAL_path)/SPI/src \
            $(MCAL_path)/UART/src \
-           $(MCAL_path)/FPEC/src \
-           $(MCAL_path)/PwrMD/src \
-           $(MCAL_path)/DMA/src \
-           $(MCAL_path)/IWDG/src \
-           $(MCAL_path)/TIMERS/src\
-           $(MCAL_path)/I2C/src\
-           $(HAL_path)/LCD/src\
-           $(HAL_path)/EEPROM/src\
-           $(HAL_path)/OLED_SH1106/src\
-		   ../RTOS\
+           $(MCAL_path)/FLASH/src \
+		   ../Parse\
            ../Startup\
-           ../P1/flappy_bird\
 		   ../Src\
 		   
 
 # Include directories
 INC_DIRS = ../Inc/ \
-		   ../RTOS\
-		   ../P1/flappy_bird\
+		   ../Parse\
            $(wildcard $(MCAL_path)/*/inc/) \
            $(wildcard $(HAL_path)/*/inc/)
 

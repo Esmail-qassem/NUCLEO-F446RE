@@ -13,7 +13,7 @@ _Min_Stack_Size = 0x1000 ; /* Required amount of stack */
 /* Memories definition -> Label_Name(AttributeList) : ORIGIN = StartMemoryAddress,   LENGTH = MemoryLength */
 MEMORY
 {
-  FLASH (rx)  : ORIGIN = 0x0800A000, LENGTH = 472K
+  FLASH (rx)  : ORIGIN = 0x08008000, LENGTH = 480K
   RAM (xrw)   : ORIGIN = 0x20000000, LENGTH = 128K
 }
 

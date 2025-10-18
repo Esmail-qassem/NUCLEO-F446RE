@@ -17,7 +17,8 @@ UART_Config_t Uart_configuration={
   UART_MODE_TX,
   UART_PARITY_NONE,
   UART_STOPBITS_1,
-  UART_WORDLEN_8B
+  UART_WORDLEN_8B,
+  Polling
 };
 #define VTOR  *((volatile uint32*)0xE000ED08)
 void(*Jump_toApplication)(void)=NULL;
@@ -46,8 +47,8 @@ while(1)
 UART_SendString(UART2, "\n BM \n");
 if(PowerReset || SwReset)
 {
-  VTOR=0x800A000;
-  Jump_toApplication=*((volatile uint32*)0x800A004);
+  VTOR=0x08008000;
+  Jump_toApplication=*((volatile uint32*)0x08008004);
   Jump_toApplication();
 
 
@@ -55,8 +56,8 @@ if(PowerReset || SwReset)
 }
 else if (PinReset)
 {
-  VTOR=0x8005000;
-  Jump_toBootLoader= *((volatile uint32*)0x8005004);
+  VTOR=0x08004000;
+  Jump_toBootLoader= *((volatile uint32*)0x08004004);
   Jump_toBootLoader();
 
 

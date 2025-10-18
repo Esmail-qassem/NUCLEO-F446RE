@@ -60,6 +60,11 @@ typedef enum {
     UART_WORDLEN_9B
 } UART_WordLength_t;
 
+
+typedef enum {
+    Polling = 0,
+    Interrupt =32
+} UART_Synch_t;
 /* ---------------- Configuration Struct ---------------- */
 typedef struct {
     uint32 BaudRate;
@@ -67,6 +72,7 @@ typedef struct {
     UART_Parity_t Parity;
     UART_StopBits_t StopBits;
     UART_WordLength_t WordLength;
+    UART_Synch_t Sync_Mode
 } UART_Config_t;
 
 /* ---------------- API ---------------- */
@@ -75,6 +81,5 @@ void UART_SendByte(UART_HardWare_t base, uint8 data);
 void UART_SendString(UART_HardWare_t base, const char *str);
 uint8 UART_ReceiveByte(UART_HardWare_t base);
 uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout);
-void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number);
-
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,uint32 Copy_sint32Number);
 #endif
