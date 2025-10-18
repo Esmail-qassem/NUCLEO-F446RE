@@ -123,9 +123,40 @@ for(uint8 i=Local_uint8Counter;i>0;i--)
     UART_SendByte(HardWare_Unit,(NUM[i-1]));
 }
 }
-
-
 void USART2_IRQHandler(void)
 {   
-
+    uint32 Add = Get_BASE_ADD(UART2);
+    uint32 status = USART_SR(Add);
+    
+    /* RX Data Available */
+    if (status & (1 << 5))  // RXNE
+    {
+         (uint8)USART_DR(Add);  // Reading DR clears RXNE
+         rx_test ++;
+    }
+    
+    /* Overrun Error */
+    if (status & (1 << 3))  // ORE
+    {
+        // Clear by reading SR then DR
+        volatile uint32 temp = USART_SR(Add);
+        temp = USART_DR(Add);
+        (void)temp;
+    }
+    
+    /* Framing Error */
+    if (status & (1 << 2))  // FE
+    {
+        // Clear by reading SR
+        volatile uint32 temp = USART_SR(Add);
+        (void)temp;
+    }
+    
+    /* Noise Error */
+    if (status & (1 << 1))  // NE  
+    {
+        // Clear by reading SR
+        volatile uint32 temp = USART_SR(Add);
+        (void)temp;
+    }
 }

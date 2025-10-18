@@ -72,7 +72,7 @@ typedef struct {
     UART_Parity_t Parity;
     UART_StopBits_t StopBits;
     UART_WordLength_t WordLength;
-    UART_Synch_t Sync_Mode
+    UART_Synch_t Sync_Mode;
 } UART_Config_t;
 
 /* ---------------- API ---------------- */
