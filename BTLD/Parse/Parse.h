@@ -8,14 +8,14 @@
 
 #define MAX_LINE_LENGTH 64
 
-uint8 lineBufferA[MAX_LINE_LENGTH];
-uint8 lineBufferB[MAX_LINE_LENGTH];
 
-uint8* processing_buffer=lineBufferA;
-uint8* current_buffer=lineBufferB;
-
-uint8 Receive_Uart=0;
-uint8 line_ready =0;
+typedef enum
+{
+    EMPTY,
+    FILLING,
+    READY,
+    PROCESSING
+}Buffrer_state_t;
 
 static const uint8 asciiToHex[105] = {
     ['0']=0, ['1']=1, ['2']=2, ['3']=3, ['4']=4, ['5']=5, ['6']=6, ['7']=7, 

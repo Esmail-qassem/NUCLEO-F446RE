@@ -37,10 +37,13 @@ void main (void)
   APP_init();
   NVIC_EnableInterrupt(38);
   UART_SendString(UART2, "\n BTLD \n");
+  FlashDrv_EraseSector(2);
+   UART_SendString(UART2, "\n done \n");
+  UART2_CALLBACK(BootLoader_Handler);
 while(1) 
   {
-     UART_voidSendNumber(UART2,rx_test);
-     for(int i=0;i<50000;i++);
+   
+ BootLoader_MainFunction();
   }
 }
 

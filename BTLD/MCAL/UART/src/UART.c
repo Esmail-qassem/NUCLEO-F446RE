@@ -1,4 +1,6 @@
 #include "UART.h"
+uint8 rx_test;
+void (*funcPtr)(uint8)=NULL;
 
 uint32 Get_BASE_ADD(uint8 base)
 {
@@ -20,7 +22,7 @@ uint32 Get_BASE_ADD(uint8 base)
     return x;
 
 }
-uint8 rx_test;
+
 /* ---------------- Initialization ---------------- */
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
 {
@@ -123,6 +125,15 @@ for(uint8 i=Local_uint8Counter;i>0;i--)
     UART_SendByte(HardWare_Unit,(NUM[i-1]));
 }
 }
+
+void UART2_CALLBACK(void(*p2function)(uint8))
+{
+    if(p2function!= NULL)
+    {
+         funcPtr = p2function;
+    }
+}
+
 void USART2_IRQHandler(void)
 {   
     uint32 Add = Get_BASE_ADD(UART2);
@@ -131,8 +142,8 @@ void USART2_IRQHandler(void)
     /* RX Data Available */
     if (status & (1 << 5))  // RXNE
     {
-         (uint8)USART_DR(Add);  // Reading DR clears RXNE
-         rx_test ++;
+        rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
+        funcPtr(rx_test);
     }
     
     /* Overrun Error */

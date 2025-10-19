@@ -75,6 +75,7 @@ typedef struct {
     UART_Synch_t Sync_Mode
 } UART_Config_t;
 
+
 /* ---------------- API ---------------- */
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk);
 void UART_SendByte(UART_HardWare_t base, uint8 data);
@@ -82,4 +83,6 @@ void UART_SendString(UART_HardWare_t base, const char *str);
 uint8 UART_ReceiveByte(UART_HardWare_t base);
 uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout);
 void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,uint32 Copy_sint32Number);
+void UART2_CALLBACK(void(*p2function)(uint8));
+
 #endif
