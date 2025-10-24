@@ -12,6 +12,7 @@
         "parse.h": "c",
         "bit": "c",
         "cstddef": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "nvic_interface.h": "c"
     }
 }

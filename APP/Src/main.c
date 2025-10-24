@@ -35,9 +35,9 @@ void LED (void)
 void UART (void)
 {
   static uint32 counter=0;
-   UART_voidSendNumber(UART2,counter);
+  UART_voidSendNumber(UART2,counter);
    UART_SendByte(UART2,'\n');
-   counter++;
+   counter+=10;
   
 }
 
@@ -45,8 +45,8 @@ void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
-RTOS_voidCreateTask(0,100,LED);
-RTOS_voidCreateTask(1,500,UART);
+RTOS_voidCreateTask(0,500,LED);
+RTOS_voidCreateTask(1,100,UART);
 
 /*Synchronous function*/
 // Blink loop
