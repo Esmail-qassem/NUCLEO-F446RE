@@ -1,5 +1,6 @@
 #include "Parse.h"
 
+#ifdef HEX_MODE
 volatile uint8 lineBufferA[MAX_LINE_LENGTH];
 volatile uint8 lineBufferB[MAX_LINE_LENGTH];
 
@@ -9,15 +10,30 @@ volatile uint8* processing_buffer=lineBufferB;
 volatile uint8 current_index = 0;
 volatile uint8 active_buffer = 0; // 0 -> A, 1 -> B
 volatile Buffrer_state_t buffer_state[2] = {EMPTY, EMPTY};
+#endif
+
+#ifdef BIN_MODE
+#define APP_START_ADDRESS   0x08008000UL
+#define BIN_BUFFER_SIZE     1024
+uint8 bin_buffer[BIN_BUFFER_SIZE];
+uint32 bin_index = 0;
+uint32 flash_address = APP_START_ADDRESS;
+#endif
+
+#define UART_TIMEOUT_MS  10000  // 10 seconds
+extern  uint32 ms_ticks;
+#ifdef HEX_MODE
 void swap_pointer(void)
 {
     uint8* temp=processing_buffer;
     processing_buffer=filling_buffer;
     filling_buffer=temp;
 }
+#endif
 
 uint8 processRecord(uint8 *recordBuffer)
 {
+    #ifdef HEX_MODE
     uint8 number_of_data = parseByte(recordBuffer[1], recordBuffer[2]);
     uint8 address_high  = parseByte(recordBuffer[3], recordBuffer[4]);
     uint8 address_low   = parseByte(recordBuffer[5], recordBuffer[6]);
@@ -50,6 +66,12 @@ uint8 processRecord(uint8 *recordBuffer)
     {
         return 0x00; // Ignore other record types but continue
     }
+    #endif
+    #ifdef BIN_MODE
+
+
+
+    #endif
 }
 
 
@@ -61,6 +83,7 @@ uint8 parseByte(uint8 high, uint8 low)
 
 void BootLoader_Handler(uint8 byte)
 {
+    #ifdef HEX_MODE
     if (byte == '\n' || byte == '\r') // End of line (accept CR or LF)
     {
         if (current_index > 0) // only if we actually received data
@@ -96,10 +119,28 @@ void BootLoader_Handler(uint8 byte)
             current_index = 0;
         }
     }
+    #endif
+
+    #ifdef BIN_MODE
+    bin_buffer[bin_index++] = byte;
+
+    // When buffer fills, write to flash
+    #endif
 }
 
 void BootLoader_MainFunction(void)
 {
+if ((ms_ticks) > UART_TIMEOUT_MS)
+{
+                UART_SendString(UART2, "\nms_ticks!\n");
+
+    UART_voidSendNumber(UART2,ms_ticks);
+    UART_SendString(UART2, "\n");
+    // 10 seconds have passed
+     SCB_AIRCR = 0x5FA0004; /* generate soft reset */
+
+}
+    #ifdef HEX_MODE
   // Check both buffers
     for (uint8 i = 0; i < 2; i++)
     {
@@ -111,5 +152,20 @@ void BootLoader_MainFunction(void)
             buffer_state[i] = EMPTY; // Done
         }
     }
+    #endif
+    #ifdef BIN_MODE
+if ((ms_ticks - last_uart_rx_tick) > UART_TIMEOUT_MS)
+{
+    // 10 seconds have passed
+     SCB_AIRCR = 0x5FA0004; /* generate soft reset */
+
+}
+if (bin_index >= BIN_BUFFER_SIZE)
+{
+    FlashDrv_ProgramBufferAligned(flash_address,&bin_buffer, BIN_BUFFER_SIZE);
+    flash_address += BIN_BUFFER_SIZE;
+    bin_index = 0;
+}
+    #endif
 }
 

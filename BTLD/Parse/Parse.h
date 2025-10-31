@@ -8,6 +8,9 @@
 
 #define MAX_LINE_LENGTH 64
 
+#define HEX_MODE
+//#define BIN_MODE
+
 
 typedef enum
 {

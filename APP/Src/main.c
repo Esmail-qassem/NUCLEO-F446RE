@@ -37,8 +37,7 @@ void UART (void)
   static uint32 counter=0;
   UART_voidSendNumber(UART2,counter);
    UART_SendByte(UART2,'\n');
-   counter+=10;
-  
+   counter++;  
 }
 
 void main (void)

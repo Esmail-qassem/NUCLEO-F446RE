@@ -30,37 +30,24 @@ UART_Config_t Uart_configuration={
 /*           function prototype              */
 void GPIO_PIN_CONFIG(void);
 void APP_init(void);
-/**************************************************************/
-/**************************************************************/
-// uint8 jump_to_app_flag=0;
-// void BackToApp(void)
-// {  
-//   SysTick_voidStopTimer();
-//   jump_to_app_flag=1;
-
-// }
-
-extern uint8 rx_test;
+ uint32 ms_ticks = 0;
+void systick_handler(void)
+{
+  ms_ticks++;
+}
 void main (void)
 {
- // SysTick_voidInit();
   GPIO_PIN_CONFIG();
   APP_init();
+  SysTick_voidInit();
   NVIC_EnableInterrupt(38);
-  //(void)SysTick_voidSetIntervalSingle(TICKS_PER_MS*5000,&BackToApp);
+  SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
   UART_SendString(UART2, "\n BTLD \n");
   FlashDrv_EraseSector(2);
   UART2_CALLBACK(BootLoader_Handler);
 while(1) 
   {
     BootLoader_MainFunction();
-    // if(jump_to_app_flag==1)
-    // {
-    //   jump_to_app_flag=0;
-    //         VTOR =0x08008000;
-    //         Pt2Func_App = *((volatile uint32*)0x08008004);
-    //         Pt2Func_App();
-    // }
   }
 }
 

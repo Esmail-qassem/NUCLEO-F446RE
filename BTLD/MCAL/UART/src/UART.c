@@ -133,6 +133,8 @@ void UART2_CALLBACK(void(*p2function)(uint8))
          funcPtr = p2function;
     }
 }
+uint32 last_uart_rx_tick=0;
+extern uint32 ms_ticks;
 
 void USART2_IRQHandler(void)
 {   
@@ -144,6 +146,7 @@ void USART2_IRQHandler(void)
     {
         rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
         funcPtr(rx_test);
+        ms_ticks=0;
     }
     
     /* Overrun Error */
