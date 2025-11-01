@@ -1,5 +1,6 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
+#include "FLASH.h"
 #include "RTOS.h"
 #include "GPIO_interface.h"
 #include "UART.h"
@@ -44,6 +45,7 @@ void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
+FlashDrv_ProgramWord(0x800A100,0x5A5A5A5A);
 RTOS_voidCreateTask(0,500,LED);
 RTOS_voidCreateTask(1,100,UART);
 

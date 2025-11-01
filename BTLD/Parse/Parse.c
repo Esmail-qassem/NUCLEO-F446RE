@@ -14,7 +14,7 @@ volatile Buffrer_state_t buffer_state[2] = {EMPTY, EMPTY};
 
 #ifdef BIN_MODE
 #define APP_START_ADDRESS   0x08008000UL
-#define BIN_BUFFER_SIZE     1024
+#define BIN_BUFFER_SIZE     4
 uint8 bin_buffer[BIN_BUFFER_SIZE];
 uint32 bin_index = 0;
 uint32 flash_address = APP_START_ADDRESS;
@@ -22,7 +22,10 @@ uint32 flash_address = APP_START_ADDRESS;
 
 #define UART_TIMEOUT_MS  10000  // 10 seconds
 extern  uint32 ms_ticks;
+uint8 APP_FLAG[BIN_BUFFER_SIZE]={0x00,0x00,0x00,0x00};
+
 #ifdef HEX_MODE
+
 void swap_pointer(void)
 {
     uint8* temp=processing_buffer;
@@ -127,18 +130,14 @@ void BootLoader_Handler(uint8 byte)
     // When buffer fills, write to flash
     #endif
 }
-
+uint8 flag=5;
 void BootLoader_MainFunction(void)
 {
+
 if ((ms_ticks) > UART_TIMEOUT_MS)
 {
-                UART_SendString(UART2, "\nms_ticks!\n");
-
-    UART_voidSendNumber(UART2,ms_ticks);
-    UART_SendString(UART2, "\n");
     // 10 seconds have passed
      SCB_AIRCR = 0x5FA0004; /* generate soft reset */
-
 }
     #ifdef HEX_MODE
   // Check both buffers
@@ -154,17 +153,16 @@ if ((ms_ticks) > UART_TIMEOUT_MS)
     }
     #endif
     #ifdef BIN_MODE
-if ((ms_ticks - last_uart_rx_tick) > UART_TIMEOUT_MS)
-{
-    // 10 seconds have passed
-     SCB_AIRCR = 0x5FA0004; /* generate soft reset */
-
-}
 if (bin_index >= BIN_BUFFER_SIZE)
 {
     FlashDrv_ProgramBufferAligned(flash_address,&bin_buffer, BIN_BUFFER_SIZE);
     flash_address += BIN_BUFFER_SIZE;
     bin_index = 0;
+}
+flag=FlashDrv_Verify(0x08009D98, &APP_FLAG, BIN_BUFFER_SIZE);
+if(flag==0)
+{
+    SCB_AIRCR = 0x5FA0004; /* generate soft reset */
 }
     #endif
 }

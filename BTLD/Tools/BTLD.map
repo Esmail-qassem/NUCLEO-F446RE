@@ -94,7 +94,7 @@ Linker script and memory map
                 0x08004000                Vector_Table
                 0x08004178                . = ALIGN (0x4)
 
-.text           0x08004178     0x1c58
+.text           0x08004178     0x1a08
                 0x08004178                . = ALIGN (0x4)
  *(.text)
  .text          0x08004178        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -290,169 +290,165 @@ Linker script and memory map
  .text.FlashDrv_ProgramWordSafe
                 0x080058cc       0x28 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
                 0x080058cc                FlashDrv_ProgramWordSafe
- .text.swap_pointer
-                0x080058f4       0x30 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x080058f4                swap_pointer
  .text.processRecord
-                0x08005924      0x190 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x08005924                processRecord
+                0x080058f4       0x16 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x080058f4                processRecord
+ *fill*         0x0800590a        0x2 
  .text.parseByte
-                0x08005ab4       0x38 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x08005ab4                parseByte
+                0x0800590c       0x38 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x0800590c                parseByte
  .text.BootLoader_Handler
-                0x08005aec       0xc4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x08005aec                BootLoader_Handler
+                0x08005944       0x30 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x08005944                BootLoader_Handler
  .text.BootLoader_MainFunction
-                0x08005bb0       0x98 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x08005bb0                BootLoader_MainFunction
+                0x08005974       0x84 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x08005974                BootLoader_MainFunction
  .text.Reset_Handler
-                0x08005c48       0x94 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08005c48                Reset_Handler
+                0x080059f8       0x94 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x080059f8                Reset_Handler
  .text.Default_Handler
-                0x08005cdc        0x6 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08005cdc                RTC_Alarm_IRQHandler
-                0x08005cdc                EXTI2_IRQHandler
-                0x08005cdc                TIM8_CC_IRQHandler
-                0x08005cdc                DebugMon_Handler
-                0x08005cdc                SPI4_IRQHandler
-                0x08005cdc                TIM1_CC_IRQHandler
-                0x08005cdc                DMA2_Stream5_IRQHandler
-                0x08005cdc                HardFault_Handler
-                0x08005cdc                DMA1_Stream5_IRQHandler
-                0x08005cdc                PVD_IRQHandler
-                0x08005cdc                SDIO_IRQHandler
-                0x08005cdc                TAMP_STAMP_IRQHandler
-                0x08005cdc                PendSV_Handler
-                0x08005cdc                NMI_Handler
-                0x08005cdc                CAN2_RX1_IRQHandler
-                0x08005cdc                EXTI3_IRQHandler
-                0x08005cdc                TIM8_TRG_COM_TIM14_IRQHandler
-                0x08005cdc                TIM1_UP_TIM10_IRQHandler
-                0x08005cdc                TIM8_UP_TIM13_IRQHandler
-                0x08005cdc                I2C3_ER_IRQHandler
-                0x08005cdc                EXTI0_IRQHandler
-                0x08005cdc                I2C2_EV_IRQHandler
-                0x08005cdc                DMA1_Stream2_IRQHandler
-                0x08005cdc                CAN1_RX0_IRQHandler
-                0x08005cdc                FPU_IRQHandler
-                0x08005cdc                UsageFault_Handler
-                0x08005cdc                CAN2_SCE_IRQHandler
-                0x08005cdc                DMA2_Stream2_IRQHandler
-                0x08005cdc                SPI1_IRQHandler
-                0x08005cdc                TIM6_DAC_IRQHandler
-                0x08005cdc                TIM1_BRK_TIM9_IRQHandler
-                0x08005cdc                CAN2_RX0_IRQHandler
-                0x08005cdc                DMA2_Stream3_IRQHandler
-                0x08005cdc                USART6_IRQHandler
-                0x08005cdc                USART3_IRQHandler
-                0x08005cdc                CAN1_RX1_IRQHandler
-                0x08005cdc                UART5_IRQHandler
-                0x08005cdc                DMA2_Stream0_IRQHandler
-                0x08005cdc                TIM4_IRQHandler
-                0x08005cdc                I2C1_EV_IRQHandler
-                0x08005cdc                DMA1_Stream6_IRQHandler
-                0x08005cdc                DMA1_Stream1_IRQHandler
-                0x08005cdc                UART4_IRQHandler
-                0x08005cdc                TIM3_IRQHandler
-                0x08005cdc                RCC_IRQHandler
-                0x08005cdc                TIM8_BRK_TIM12_IRQHandler
-                0x08005cdc                Default_Handler
-                0x08005cdc                EXTI15_10_IRQHandler
-                0x08005cdc                ADC_IRQHandler
-                0x08005cdc                DMA1_Stream7_IRQHandler
-                0x08005cdc                SPI5_IRQHandler
-                0x08005cdc                TIM7_IRQHandler
-                0x08005cdc                CAN2_TX_IRQHandler
-                0x08005cdc                TIM5_IRQHandler
-                0x08005cdc                DMA2_Stream7_IRQHandler
-                0x08005cdc                I2C3_EV_IRQHandler
-                0x08005cdc                EXTI9_5_IRQHandler
-                0x08005cdc                RTC_WKUP_IRQHandler
-                0x08005cdc                SPI2_IRQHandler
-                0x08005cdc                MemManage_Handler
-                0x08005cdc                DMA1_Stream0_IRQHandler
-                0x08005cdc                CAN1_TX_IRQHandler
-                0x08005cdc                SVC_Handler
-                0x08005cdc                EXTI4_IRQHandler
-                0x08005cdc                WWDG_IRQHandler
-                0x08005cdc                SPI6_IRQHandler
-                0x08005cdc                TIM2_IRQHandler
-                0x08005cdc                OTG_FS_WKUP_IRQHandler
-                0x08005cdc                TIM1_TRG_COM_TIM11_IRQHandler
-                0x08005cdc                DMA2D_IRQHandler
-                0x08005cdc                EXTI1_IRQHandler
-                0x08005cdc                I2C2_ER_IRQHandler
-                0x08005cdc                DMA2_Stream1_IRQHandler
-                0x08005cdc                CAN1_SCE_IRQHandler
-                0x08005cdc                FLASH_IRQHandler
-                0x08005cdc                DMA2_Stream4_IRQHandler
-                0x08005cdc                BusFault_Handler
-                0x08005cdc                USART1_IRQHandler
-                0x08005cdc                OTG_FS_IRQHandler
-                0x08005cdc                SPI3_IRQHandler
-                0x08005cdc                DMA1_Stream4_IRQHandler
-                0x08005cdc                I2C1_ER_IRQHandler
-                0x08005cdc                FMC_IRQHandler
-                0x08005cdc                DMA2_Stream6_IRQHandler
-                0x08005cdc                SAI1_IRQHandler
-                0x08005cdc                DMA1_Stream3_IRQHandler
- *fill*         0x08005ce2        0x2 
+                0x08005a8c        0x6 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x08005a8c                RTC_Alarm_IRQHandler
+                0x08005a8c                EXTI2_IRQHandler
+                0x08005a8c                TIM8_CC_IRQHandler
+                0x08005a8c                DebugMon_Handler
+                0x08005a8c                SPI4_IRQHandler
+                0x08005a8c                TIM1_CC_IRQHandler
+                0x08005a8c                DMA2_Stream5_IRQHandler
+                0x08005a8c                HardFault_Handler
+                0x08005a8c                DMA1_Stream5_IRQHandler
+                0x08005a8c                PVD_IRQHandler
+                0x08005a8c                SDIO_IRQHandler
+                0x08005a8c                TAMP_STAMP_IRQHandler
+                0x08005a8c                PendSV_Handler
+                0x08005a8c                NMI_Handler
+                0x08005a8c                CAN2_RX1_IRQHandler
+                0x08005a8c                EXTI3_IRQHandler
+                0x08005a8c                TIM8_TRG_COM_TIM14_IRQHandler
+                0x08005a8c                TIM1_UP_TIM10_IRQHandler
+                0x08005a8c                TIM8_UP_TIM13_IRQHandler
+                0x08005a8c                I2C3_ER_IRQHandler
+                0x08005a8c                EXTI0_IRQHandler
+                0x08005a8c                I2C2_EV_IRQHandler
+                0x08005a8c                DMA1_Stream2_IRQHandler
+                0x08005a8c                CAN1_RX0_IRQHandler
+                0x08005a8c                FPU_IRQHandler
+                0x08005a8c                UsageFault_Handler
+                0x08005a8c                CAN2_SCE_IRQHandler
+                0x08005a8c                DMA2_Stream2_IRQHandler
+                0x08005a8c                SPI1_IRQHandler
+                0x08005a8c                TIM6_DAC_IRQHandler
+                0x08005a8c                TIM1_BRK_TIM9_IRQHandler
+                0x08005a8c                CAN2_RX0_IRQHandler
+                0x08005a8c                DMA2_Stream3_IRQHandler
+                0x08005a8c                USART6_IRQHandler
+                0x08005a8c                USART3_IRQHandler
+                0x08005a8c                CAN1_RX1_IRQHandler
+                0x08005a8c                UART5_IRQHandler
+                0x08005a8c                DMA2_Stream0_IRQHandler
+                0x08005a8c                TIM4_IRQHandler
+                0x08005a8c                I2C1_EV_IRQHandler
+                0x08005a8c                DMA1_Stream6_IRQHandler
+                0x08005a8c                DMA1_Stream1_IRQHandler
+                0x08005a8c                UART4_IRQHandler
+                0x08005a8c                TIM3_IRQHandler
+                0x08005a8c                RCC_IRQHandler
+                0x08005a8c                TIM8_BRK_TIM12_IRQHandler
+                0x08005a8c                Default_Handler
+                0x08005a8c                EXTI15_10_IRQHandler
+                0x08005a8c                ADC_IRQHandler
+                0x08005a8c                DMA1_Stream7_IRQHandler
+                0x08005a8c                SPI5_IRQHandler
+                0x08005a8c                TIM7_IRQHandler
+                0x08005a8c                CAN2_TX_IRQHandler
+                0x08005a8c                TIM5_IRQHandler
+                0x08005a8c                DMA2_Stream7_IRQHandler
+                0x08005a8c                I2C3_EV_IRQHandler
+                0x08005a8c                EXTI9_5_IRQHandler
+                0x08005a8c                RTC_WKUP_IRQHandler
+                0x08005a8c                SPI2_IRQHandler
+                0x08005a8c                MemManage_Handler
+                0x08005a8c                DMA1_Stream0_IRQHandler
+                0x08005a8c                CAN1_TX_IRQHandler
+                0x08005a8c                SVC_Handler
+                0x08005a8c                EXTI4_IRQHandler
+                0x08005a8c                WWDG_IRQHandler
+                0x08005a8c                SPI6_IRQHandler
+                0x08005a8c                TIM2_IRQHandler
+                0x08005a8c                OTG_FS_WKUP_IRQHandler
+                0x08005a8c                TIM1_TRG_COM_TIM11_IRQHandler
+                0x08005a8c                DMA2D_IRQHandler
+                0x08005a8c                EXTI1_IRQHandler
+                0x08005a8c                I2C2_ER_IRQHandler
+                0x08005a8c                DMA2_Stream1_IRQHandler
+                0x08005a8c                CAN1_SCE_IRQHandler
+                0x08005a8c                FLASH_IRQHandler
+                0x08005a8c                DMA2_Stream4_IRQHandler
+                0x08005a8c                BusFault_Handler
+                0x08005a8c                USART1_IRQHandler
+                0x08005a8c                OTG_FS_IRQHandler
+                0x08005a8c                SPI3_IRQHandler
+                0x08005a8c                DMA1_Stream4_IRQHandler
+                0x08005a8c                I2C1_ER_IRQHandler
+                0x08005a8c                FMC_IRQHandler
+                0x08005a8c                DMA2_Stream6_IRQHandler
+                0x08005a8c                SAI1_IRQHandler
+                0x08005a8c                DMA1_Stream3_IRQHandler
+ *fill*         0x08005a92        0x2 
  .text.systick_handler
-                0x08005ce4       0x1c C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005ce4                systick_handler
- .text.main     0x08005d00       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005d00                main
+                0x08005a94       0x1c C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005a94                systick_handler
+ .text.main     0x08005ab0       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005ab0                main
  .text.APP_init
-                0x08005d48       0x1c C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005d48                APP_init
+                0x08005af8       0x1c C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005af8                APP_init
  .text.GPIO_PIN_CONFIG
-                0x08005d64       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005d64                GPIO_PIN_CONFIG
+                0x08005b14       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005b14                GPIO_PIN_CONFIG
  .text.SystemInit
-                0x08005dac       0x24 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005dac                SystemInit
-                0x08005dd0                . = ALIGN (0x4)
-                0x08005dd0                _etext = .
+                0x08005b5c       0x24 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005b5c                SystemInit
+                0x08005b80                . = ALIGN (0x4)
+                0x08005b80                _etext = .
 
-.glue_7         0x08005dd0        0x0
- .glue_7        0x08005dd0        0x0 linker stubs
+.glue_7         0x08005b80        0x0
+ .glue_7        0x08005b80        0x0 linker stubs
 
-.glue_7t        0x08005dd0        0x0
- .glue_7t       0x08005dd0        0x0 linker stubs
+.glue_7t        0x08005b80        0x0
+ .glue_7t       0x08005b80        0x0 linker stubs
 
-.vfp11_veneer   0x08005dd0        0x0
- .vfp11_veneer  0x08005dd0        0x0 linker stubs
+.vfp11_veneer   0x08005b80        0x0
+ .vfp11_veneer  0x08005b80        0x0 linker stubs
 
-.v4_bx          0x08005dd0        0x0
- .v4_bx         0x08005dd0        0x0 linker stubs
+.v4_bx          0x08005b80        0x0
+ .v4_bx         0x08005b80        0x0 linker stubs
 
-.iplt           0x08005dd0        0x0
- .iplt          0x08005dd0        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x08005b80        0x0
+ .iplt          0x08005b80        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x08005dd0      0x13c
-                0x08005dd0                . = ALIGN (0x4)
+.rodata         0x08005b80       0xe8
+                0x08005b80                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08005dd0       0x52 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08005e22        0x2 
- .rodata        0x08005e24        0x9 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .rodata        0x08005b80        0x9 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  *(.rodata*)
- *fill*         0x08005e2d        0x3 
+ *fill*         0x08005b89        0x3 
  .rodata.asciiToHex
-                0x08005e30       0x69 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08005e99        0x3 
+                0x08005b8c       0x69 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x08005bf5        0x3 
  .rodata.MSP_Value
-                0x08005e9c        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08005e9c                MSP_Value
+                0x08005bf8        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x08005bf8                MSP_Value
  .rodata.asciiToHex
-                0x08005ea0       0x69 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005f0c                . = ALIGN (0x4)
- *fill*         0x08005f09        0x3 
-                0x08005f0c                _sidata = LOADADDR (.data)
+                0x08005bfc       0x69 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005c68                . = ALIGN (0x4)
+ *fill*         0x08005c65        0x3 
+                0x08005c68                _sidata = LOADADDR (.data)
 
-.rel.dyn        0x08005f0c        0x0
- .rel.iplt      0x08005f0c        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x08005c68        0x0
+ .rel.iplt      0x08005c68        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x14 load address 0x08005f0c
+.data           0x20000000       0x14 load address 0x08005c68
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdata = .
  *(.data)
@@ -466,22 +462,22 @@ Linker script and memory map
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  *(.data*)
- .data.filling_buffer
+ .data.flash_address
                 0x20000000        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000000                filling_buffer
- .data.processing_buffer
-                0x20000004        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000004                processing_buffer
+                0x20000000                flash_address
+ .data.flag     0x20000004        0x1 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000004                flag
+ *fill*         0x20000005        0x3 
  .data.Uart_configuration
                 0x20000008        0xc C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
                 0x20000008                Uart_configuration
                 0x20000014                . = ALIGN (0x4)
                 0x20000014                _edata = .
 
-.igot.plt       0x20000014        0x0 load address 0x08005f20
+.igot.plt       0x20000014        0x0 load address 0x08005c7c
  .igot.plt      0x20000014        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000014       0xb0 load address 0x08005f20
+.bss            0x20000014       0x34 load address 0x08005c7c
                 0x20000014                _sbss = .
  *(.bss)
  .bss           0x20000014        0x0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -504,45 +500,35 @@ Linker script and memory map
  .bss.last_uart_rx_tick
                 0x20000020        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
                 0x20000020                last_uart_rx_tick
- .bss.lineBufferA
-                0x20000024       0x40 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000024                lineBufferA
- .bss.lineBufferB
-                0x20000064       0x40 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000064                lineBufferB
- .bss.current_index
-                0x200000a4        0x1 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x200000a4                current_index
- .bss.active_buffer
-                0x200000a5        0x1 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x200000a5                active_buffer
- *fill*         0x200000a6        0x2 
- .bss.buffer_state
-                0x200000a8        0x2 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x200000a8                buffer_state
- *fill*         0x200000aa        0x2 
+ .bss.bin_buffer
+                0x20000024        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000024                bin_buffer
+ .bss.bin_index
+                0x20000028        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000028                bin_index
+ .bss.APP_FLAG  0x2000002c        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x2000002c                APP_FLAG
  .bss.Local_PvFunction
-                0x200000ac        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000030        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .bss.Pt2Func_App
-                0x200000b0        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x200000b0                Pt2Func_App
+                0x20000034        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000034                Pt2Func_App
  .bss.RCC_Configuration
-                0x200000b4        0xc C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x200000b4                RCC_Configuration
- .bss.ms_ticks  0x200000c0        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x200000c0                ms_ticks
-                0x200000c4                . = ALIGN (0x4)
-                0x200000c4                _ebss = .
+                0x20000038        0xc C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000038                RCC_Configuration
+ .bss.ms_ticks  0x20000044        0x4 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000044                ms_ticks
+                0x20000048                . = ALIGN (0x4)
+                0x20000048                _ebss = .
 
 ._user_heap_stack
-                0x200000c4     0x1204 load address 0x08005f20
-                0x200000c8                . = ALIGN (0x8)
- *fill*         0x200000c4        0x4 
-                0x200002c8                . = (. + _Min_Heap_Size)
- *fill*         0x200000c8      0x200 
-                0x200012c8                . = (. + _Min_Stack_Size)
- *fill*         0x200002c8     0x1000 
-                0x200012c8                . = ALIGN (0x8)
+                0x20000048     0x1200 load address 0x08005c7c
+                0x20000048                . = ALIGN (0x8)
+                0x20000248                . = (. + _Min_Heap_Size)
+ *fill*         0x20000048      0x200 
+                0x20001248                . = (. + _Min_Stack_Size)
+ *fill*         0x20000248     0x1000 
+                0x20001248                . = ALIGN (0x8)
 LOAD C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -555,29 +541,29 @@ LOAD C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 OUTPUT(C:/NUCLEO-F446RE/BTLD/Tools/BTLD.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x25fd
+.debug_info     0x00000000     0x2445
  .debug_info    0x00000000      0x3e2 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003e2      0x303 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x000006e5      0x26b C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_info    0x00000950      0x531 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_info    0x00000e81      0x52e C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_info    0x000013af      0x684 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_info    0x00001a33      0x391 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_info    0x00001dc4      0x148 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x00001f0c      0x6f1 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_info    0x00001a33      0x1d9 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_info    0x00001c0c      0x148 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_info    0x00001d54      0x6f1 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_abbrev   0x00000000      0xb3b
+.debug_abbrev   0x00000000      0xae0
  .debug_abbrev  0x00000000      0x134 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x00000134      0x12e C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_abbrev  0x00000262      0x144 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_abbrev  0x000003a6      0x129 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_abbrev  0x000004cf      0x196 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_abbrev  0x00000665      0x1aa C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_abbrev  0x0000080f      0x15b C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_abbrev  0x0000096a       0xe3 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x00000a4d       0xee C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_abbrev  0x0000080f      0x100 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_abbrev  0x0000090f       0xe3 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_abbrev  0x000009f2       0xee C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_aranges  0x00000000      0x338
+.debug_aranges  0x00000000      0x330
  .debug_aranges
                 0x00000000       0x78 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_aranges
@@ -591,24 +577,24 @@ LOAD linker stubs
  .debug_aranges
                 0x000001c0       0xd0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_aranges
-                0x00000290       0x40 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x00000290       0x38 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
  .debug_aranges
-                0x000002d0       0x28 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x000002c8       0x28 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
  .debug_aranges
-                0x000002f8       0x40 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x000002f0       0x40 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_ranges   0x00000000      0x2a8
+.debug_ranges   0x00000000      0x2a0
  .debug_ranges  0x00000000       0x68 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_ranges  0x00000068       0x38 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_ranges  0x000000a0       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_ranges  0x000000e8       0x38 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_ranges  0x00000120       0x50 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_ranges  0x00000170       0xc0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_ranges  0x00000230       0x30 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_ranges  0x00000260       0x18 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_ranges  0x00000278       0x30 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_ranges  0x00000230       0x28 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_ranges  0x00000258       0x18 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_ranges  0x00000270       0x30 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_macro    0x00000000     0x1276
+.debug_macro    0x00000000     0x1282
  .debug_macro   0x00000000       0x32 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000032      0xa66 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000a98       0x10 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -627,26 +613,26 @@ LOAD linker stubs
  .debug_macro   0x00000d81       0x5e C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_macro   0x00000ddf       0x29 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_macro   0x00000e08      0x130 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_macro   0x00000f38       0x50 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_macro   0x00000f88      0x136 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_macro   0x000010be       0x16 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_macro   0x000010d4       0x17 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_macro   0x000010eb       0x8d C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
- .debug_macro   0x00001178       0x9a C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
- .debug_macro   0x00001212       0x64 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_macro   0x00000f38       0x5c C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_macro   0x00000f94      0x136 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_macro   0x000010ca       0x16 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_macro   0x000010e0       0x17 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_macro   0x000010f7       0x8d C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_macro   0x00001184       0x9a C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_macro   0x0000121e       0x64 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x1779
+.debug_line     0x00000000     0x156d
  .debug_line    0x00000000      0x2c0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_line    0x000006a0      0x295 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_line    0x00000935      0x2c1 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_line    0x00000bf6      0x597 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_line    0x0000118d      0x33d C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_line    0x000014ca       0xe1 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x000015ab      0x1ce C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_line    0x0000118d      0x131 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_line    0x000012be       0xe1 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_line    0x0000139f      0x1ce C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x53ea
+.debug_str      0x00000000     0x5372
  .debug_str     0x00000000     0x3497 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x3515 (size before relaxing)
  .debug_str     0x00003497      0x4c4 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
@@ -659,11 +645,11 @@ LOAD linker stubs
                                0x326a (size before relaxing)
  .debug_str     0x000045f5      0x8f0 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
                                0x3636 (size before relaxing)
- .debug_str     0x00004ee5      0x1b7 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                               0x377c (size before relaxing)
- .debug_str     0x0000509c       0xa5 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_str     0x00004ee5      0x13f C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                               0x36e1 (size before relaxing)
+ .debug_str     0x00005024       0xa5 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
                                0x2d2f (size before relaxing)
- .debug_str     0x00005141      0x2a9 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_str     0x000050c9      0x2a9 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
                                0x45a9 (size before relaxing)
 
 .comment        0x00000000       0x49
@@ -699,13 +685,13 @@ LOAD linker stubs
  .ARM.attributes
                 0x000001a0       0x34 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_frame    0x00000000      0xb48
+.debug_frame    0x00000000      0xb20
  .debug_frame   0x00000000      0x1c8 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_frame   0x000001c8      0x100 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_frame   0x000002c8      0x120 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_frame   0x000003e8       0xf4 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_frame   0x000004dc      0x15c C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_frame   0x00000638      0x354 C:/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_frame   0x0000098c       0xcc C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_frame   0x00000a58       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_frame   0x00000aa0       0xa8 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_frame   0x0000098c       0xa4 C:/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_frame   0x00000a30       0x48 C:/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_frame   0x00000a78       0xa8 C:/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
