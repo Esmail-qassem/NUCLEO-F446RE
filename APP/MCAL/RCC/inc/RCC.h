@@ -67,6 +67,8 @@ typedef enum {
     APB1_TIM3,
     APB1_TIM4,
     APB1_TIM5,
+    APB1_TIM6,
+    APB1_TIM7,
     APB1_WWDG = 11,
     APB1_SPI2 = 14,
     APB1_SPI3,

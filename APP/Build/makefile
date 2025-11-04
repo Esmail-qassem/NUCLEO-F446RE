@@ -19,7 +19,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/PwrMD/src \
            $(MCAL_path)/DMA/src \
            $(MCAL_path)/IWDG/src \
-           $(MCAL_path)/TIMERS/src\
+           $(MCAL_path)/Basic_Timer/src\
            $(MCAL_path)/I2C/src\
            $(MCAL_path)/FLASH/src\
            $(HAL_path)/LCD/src\

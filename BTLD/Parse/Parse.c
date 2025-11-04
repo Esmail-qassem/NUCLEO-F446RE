@@ -1,5 +1,5 @@
 #include "Parse.h"
-
+uint8 UART_START;
 #ifdef HEX_MODE
 volatile uint8 lineBufferA[MAX_LINE_LENGTH];
 volatile uint8 lineBufferB[MAX_LINE_LENGTH];
@@ -22,7 +22,7 @@ uint32 flash_address = APP_START_ADDRESS;
 
 #define UART_TIMEOUT_MS  10000  // 10 seconds
 extern  uint32 ms_ticks;
-uint8 APP_FLAG[BIN_BUFFER_SIZE]={0x00,0x00,0x00,0x00};
+uint8 APP_FLAG[BIN_BUFFER_SIZE]={0xFF,0xFF,0xFF,0xFF};
 
 #ifdef HEX_MODE
 
@@ -86,6 +86,7 @@ uint8 parseByte(uint8 high, uint8 low)
 
 void BootLoader_Handler(uint8 byte)
 {
+    UART_START=1;
     #ifdef HEX_MODE
     if (byte == '\n' || byte == '\r') // End of line (accept CR or LF)
     {
@@ -139,6 +140,14 @@ if ((ms_ticks) > UART_TIMEOUT_MS)
     // 10 seconds have passed
      SCB_AIRCR = 0x5FA0004; /* generate soft reset */
 }
+if (((ms_ticks) >200) && UART_START==1)
+{
+    flag=FlashDrv_Verify(flash_address, &APP_FLAG, BIN_BUFFER_SIZE);
+    if(flag==0)
+    {
+        SCB_AIRCR = 0x5FA0004; /* generate soft reset */
+    }
+}
     #ifdef HEX_MODE
   // Check both buffers
     for (uint8 i = 0; i < 2; i++)
@@ -158,11 +167,6 @@ if (bin_index >= BIN_BUFFER_SIZE)
     FlashDrv_ProgramBufferAligned(flash_address,&bin_buffer, BIN_BUFFER_SIZE);
     flash_address += BIN_BUFFER_SIZE;
     bin_index = 0;
-}
-flag=FlashDrv_Verify(0x08009D98, &APP_FLAG, BIN_BUFFER_SIZE);
-if(flag==0)
-{
-    SCB_AIRCR = 0x5FA0004; /* generate soft reset */
 }
     #endif
 }

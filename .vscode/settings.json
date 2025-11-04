@@ -13,6 +13,7 @@
         "bit": "c",
         "cstddef": "c",
         "type_traits": "c",
-        "nvic_interface.h": "c"
+        "nvic_interface.h": "c",
+        "basic_timer.h": "c"
     }
 }
