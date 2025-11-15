@@ -60,7 +60,7 @@ uint8 processRecord(uint8 *recordBuffer)
     }
     else if(record_type == 0x01) // End of File record
     {
-        UART_SendString(UART2, "\nEOF record received - firmware upload complete\n");
+        UART_SendSyncBuffer(UART2, "\nEOF record received - firmware upload complete\n");
         // ADD EOL ACTIONS HERE:
         SCB_AIRCR = 0x5FA0004; /* generate soft reset */
         return 0xFF; // End of load
@@ -119,7 +119,7 @@ void BootLoader_Handler(uint8 byte)
         else
         {
             // Overflow protection
-            UART_SendString(UART2, "Line too long!\n");
+            UART_SendSyncBuffer(UART2, "Line too long!\n");
             current_index = 0;
         }
     }

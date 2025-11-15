@@ -7,22 +7,28 @@ uint32 Get_BASE_ADD(uint8 base)
     uint32 x=0;
     switch(base)
     {
-        case UART1 :   
-                x= USART1_BASE;
-            break;
-        case UART2 :   
-            x= USART2_BASE;
-            break;
-        case UART3 :  
-            x   = USART3_BASE;
-            break;
-        default : 
-            break; 
+        case UART1 :   x= USART1_BASE; break;
+        case UART2 :   x= USART2_BASE; break;
+        case UART3 :   x= USART3_BASE; break;
+        default :      break; 
     }
     return x;
-
 }
-
+void Write_UART_Number(UART_HardWare_t HardWare_Unit, sint32 Copy_sint32Number)
+{
+    uint8 NUM[10];
+    uint8 Local_uint8Counter=0;
+    while(Copy_sint32Number>0)
+    {
+    	NUM[Local_uint8Counter++]=(Copy_sint32Number%10)+'0';
+    	Copy_sint32Number/=10;
+    }
+    /*reverse*/
+    for(uint8 i=Local_uint8Counter;i>0;i--)
+    {
+        UART_SendSyncBuffer(HardWare_Unit,(uint8*)(NUM + i - 1),1u);
+    }
+}
 /* ---------------- Initialization ---------------- */
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
 {
@@ -68,62 +74,31 @@ void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
 }
 
 /* ---------------- Transmit Single Byte ---------------- */
-void UART_SendByte(UART_HardWare_t base, uint8 data)
-{
-        uint32 Add =Get_BASE_ADD(base);
-    while (!GET_BIT(USART_SR(Add), 7)); // TXE
-    USART_DR(Add) = data;
-}
+void UART_SendSyncBuffer(UART_HardWare_t base, const uint8 *buf, uint8 size)
 
-/* ---------------- Transmit String ---------------- */
-void UART_SendString(UART_HardWare_t base, const char *str)
 {
-    while (*str) {
-        UART_SendByte(base, *str++);
+    uint32 Add = Get_BASE_ADD(base);
+
+    for (uint8 i = 0; i < size; i++)
+    {
+        while (!GET_BIT(USART_SR(Add), 7)); // Wait until TXE = 1
+        USART_DR(Add) = *(buf + i);
     }
-}
 
-/* ---------------- Receive Byte (Blocking) ---------------- */
-uint8 UART_ReceiveByte(UART_HardWare_t base)
-{
-    uint32 Add =Get_BASE_ADD(base);
-    while (!GET_BIT(USART_SR(Add), 5)); // RXNE
-    return (uint8)USART_DR(Add);
-}
-
-/* ---------------- Receive Byte with Timeout ---------------- */
-uint8 UART_ReceiveByte_Timeout(UART_HardWare_t base, uint32 timeout)
-{
-        uint32 Add =Get_BASE_ADD(base);
-
-    while ((!GET_BIT(USART_SR(Add), 5)) && timeout--) ;
-    if (timeout == 0) return 0xFF; // Timeout
-    return (uint8)USART_DR(Add);
-}
-void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,uint32 Copy_sint32Number)
+    }
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number)
 {
 	if(Copy_sint32Number<0)
 	{
-		UART_SendByte(HardWare_Unit,'-');
+		UART_SendSyncBuffer(HardWare_Unit,(uint8*)"-",1u);
 		Copy_sint32Number= -Copy_sint32Number;
 	}
 	if(Copy_sint32Number==0)
 	{
- UART_SendByte(HardWare_Unit,'0');
+        UART_SendSyncBuffer(HardWare_Unit,(uint8*)"0",1u);
 		return;
 	}
-uint8 NUM[10];
-uint8 Local_uint8Counter=0;
-while(Copy_sint32Number>0)
-{
-	NUM[Local_uint8Counter++]=(Copy_sint32Number%10)+'0';
-	Copy_sint32Number/=10;
-}
-/*reverse*/
-for(uint8 i=Local_uint8Counter;i>0;i--)
-{
-    UART_SendByte(HardWare_Unit,(NUM[i-1]));
-}
+    Write_UART_Number(HardWare_Unit,Copy_sint32Number);
 }
 
 void UART2_CALLBACK(void(*p2function)(uint8))

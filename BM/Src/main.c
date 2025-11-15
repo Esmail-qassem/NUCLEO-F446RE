@@ -44,7 +44,7 @@ GPIO_PIN_CONFIG();
  SET_BIT(RCC_CSR,RMVF);
 while(1) 
 {
-UART_SendString(UART2, "\n BM \n");
+UART_SendSyncBuffer(UART2, (uint8 *)"\n BM \n",7);
 if(PowerReset || SwReset)
 {
   VTOR=0x08008000;

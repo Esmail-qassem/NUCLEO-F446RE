@@ -42,7 +42,7 @@ void main (void)
   SysTick_voidInit();
   NVIC_EnableInterrupt(38);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
-  UART_SendString(UART2, "\n BTLD \n");
+  UART_SendSyncBuffer(UART2, "\n BTLD \n",8);
   FlashDrv_EraseSector(2);
   UART2_CALLBACK(BootLoader_Handler);
 while(1) 

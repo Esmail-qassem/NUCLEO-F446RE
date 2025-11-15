@@ -4,6 +4,7 @@
 #include "RTOS.h"
 #include "GPIO_interface.h"
 #include "UART.h"
+#include "Basic_Timer.h"
 RCC_Config_t RCC_Configuration =
 {
   RCC_CLK_HSI,
@@ -31,21 +32,20 @@ void APP_init(void);
 
 void LED (void)
 {
-   GPIO_TogglePin(GPIO_PORTA, PIN5);
+  GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
 void UART (void)
 {
-  static uint32 counter=0;
-  UART_voidSendNumber(UART2,counter);
-   UART_SendByte(UART2,'\n');
-   counter++;  
+  static sint32 counter = -100 ;
+     UART_voidSendNumber(UART2,counter);
+     UART_SendSyncBuffer(UART2,(uint8*)"\n", 1);
+  counter++;  
 }
 
 void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
-FlashDrv_ProgramWord(0x800A100,0x5A5A5A5A);
 RTOS_voidCreateTask(0,500,LED);
 RTOS_voidCreateTask(1,100,UART);
 
