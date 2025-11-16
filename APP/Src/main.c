@@ -6,6 +6,8 @@
 #include "GPIO_interface.h"
 #include "UART.h"
 #include "Basic_Timer.h"
+#include "ESP.h"
+extern uint8 ESP_APPLICATION_FLAG;
 RCC_Config_t RCC_Configuration =
 {
   RCC_CLK_HSI,
@@ -28,44 +30,21 @@ UART_Config_t Uart_configuration={
 /*           function prototype              */
 void GPIO_PIN_CONFIG(void);
 void APP_init(void);
+void ENABLE_NVIC_INTERRUPTS(void);
+void CallBackFunctions(void);
 /**************************************************************/
 /**************************************************************/
-static uint8 counter=0;
 void LED (void)
 {
   GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
-void UART (void)
+void OS_500_Task (void)
 {
-  switch(counter)
+  if (ESP_APPLICATION_FLAG == 0)
   {
-    case 0 : 
-          {
-            UART_SendSyncBuffer(UART1,(uint8*)"AT\r\n", 5);
-            counter=1;
-            break;
-          }
-    case 1 : 
-          {
-            UART_SendSyncBuffer(UART1,(uint8*)"AT+CWMODE?\r\n", 14);
-            counter=2;
-            break;
-          }   
-     case 2 :
-          {
-            UART_SendSyncBuffer(UART1,(uint8*)"AT+CWJAP=\"ZzZz\",\"J8702143  \"\r\n", 31);
-            counter=3;
-            break;
-          } 
-           case 3 :
-          {
-            UART_SendSyncBuffer(UART1,(uint8*)"AT+CIFSR\r\n", 11);
-            counter=3;
-            break;
-          }
-             default : break;     
-  }       
-
+     ESP_MainFunction();
+  }
+ 
 }
 void UART1_ISR (uint8 num)
 {
@@ -81,15 +60,12 @@ void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
-NVIC_EnableInterrupt(UART1_IQ_NUM);
-NVIC_EnableInterrupt(UART2_IQ_NUM);
-UART2_CALLBACK(UART2_ISR);
-UART1_CALLBACK(UART1_ISR);
-RTOS_voidCreateTask(0,500,LED);
-RTOS_voidCreateTask(1,5000,UART);
+ENABLE_NVIC_INTERRUPTS();
+CallBackFunctions();
+RTOS_voidCreateTask(0,200,LED);
+RTOS_voidCreateTask(1,500,OS_500_Task);
 while(1) {}
 }
-
 
 
 void APP_init(void)
@@ -123,6 +99,27 @@ GPIO_SetAF(GPIO_PORTA, PIN3, 7);
 GPIO_SetAF(GPIO_PORTB, PIN10, 7);  
 GPIO_SetAF(GPIO_PORTB, PIN11, 7);  
 }
+
+void ENABLE_NVIC_INTERRUPTS(void)
+{
+  NVIC_EnableInterrupt(UART1_IQ_NUM);
+  NVIC_EnableInterrupt(UART2_IQ_NUM);
+}
+
+void CallBackFunctions(void)
+{
+  UART2_CALLBACK(UART2_ISR);
+  UART1_CALLBACK(UART1_ISR);
+}
+
+
+
+
+
+
+
+
+
 
 
 void SystemInit(void)

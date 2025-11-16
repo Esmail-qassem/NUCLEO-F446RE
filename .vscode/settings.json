@@ -14,6 +14,7 @@
         "cstddef": "c",
         "type_traits": "c",
         "nvic_interface.h": "c",
-        "basic_timer.h": "c"
+        "basic_timer.h": "c",
+        "esp.h": "c"
     }
 }

@@ -69,6 +69,14 @@ Discarded input sections
  .debug_macro   0x00000000       0x2e C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_macro   0x00000000       0x22 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_macro   0x00000000       0x70 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
@@ -107,7 +115,7 @@ Linker script and memory map
                 0x08008000                Vector_Table
                 0x08008178                . = ALIGN (0x4)
 
-.text           0x08008178     0x25e8
+.text           0x08008178     0x2620
                 0x08008178                . = ALIGN (0x4)
  *(.text)
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -120,6 +128,7 @@ Linker script and memory map
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.text*)
  .text.RCC_EnableHSI
@@ -486,63 +495,77 @@ Linker script and memory map
                 0x0800a4d4                DMA2_Stream6_IRQHandler
                 0x0800a4d4                SAI1_IRQHandler
                 0x0800a4d4                DMA1_Stream3_IRQHandler
- .text.LED      0x0800a4da       0x10 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a4da                LED
- *fill*         0x0800a4ea        0x2 
- .text.UART     0x0800a4ec       0x88 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a4ec                UART
+ .text.my_strlen
+                0x0800a4da       0x2e C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x0800a4da                my_strlen
+ .text.ESP_MainFunction
+                0x0800a508       0x68 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x0800a508                ESP_MainFunction
+ .text.LED      0x0800a570       0x10 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a570                LED
+ .text.OS_500_Task
+                0x0800a580       0x18 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a580                OS_500_Task
  .text.UART1_ISR
-                0x0800a574       0x24 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a574                UART1_ISR
+                0x0800a598       0x24 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a598                UART1_ISR
  .text.UART2_ISR
-                0x0800a598       0x20 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a598                UART2_ISR
- .text.main     0x0800a5b8       0x50 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a5b8                main
+                0x0800a5bc       0x20 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a5bc                UART2_ISR
+ .text.main     0x0800a5dc       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a5dc                main
  .text.APP_init
-                0x0800a608       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a608                APP_init
+                0x0800a610       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a610                APP_init
  .text.GPIO_PIN_CONFIG
-                0x0800a63c       0xe8 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a63c                GPIO_PIN_CONFIG
+                0x0800a644       0xe8 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a644                GPIO_PIN_CONFIG
+ .text.ENABLE_NVIC_INTERRUPTS
+                0x0800a72c       0x14 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a72c                ENABLE_NVIC_INTERRUPTS
+ .text.CallBackFunctions
+                0x0800a740       0x1c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a740                CallBackFunctions
  .text.SystemInit
-                0x0800a724       0x3c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800a724                SystemInit
-                0x0800a760                . = ALIGN (0x4)
-                0x0800a760                _etext = .
+                0x0800a75c       0x3c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800a75c                SystemInit
+                0x0800a798                . = ALIGN (0x4)
+                0x0800a798                _etext = .
 
-.glue_7         0x0800a760        0x0
- .glue_7        0x0800a760        0x0 linker stubs
+.glue_7         0x0800a798        0x0
+ .glue_7        0x0800a798        0x0 linker stubs
 
-.glue_7t        0x0800a760        0x0
- .glue_7t       0x0800a760        0x0 linker stubs
+.glue_7t        0x0800a798        0x0
+ .glue_7t       0x0800a798        0x0 linker stubs
 
-.vfp11_veneer   0x0800a760        0x0
- .vfp11_veneer  0x0800a760        0x0 linker stubs
+.vfp11_veneer   0x0800a798        0x0
+ .vfp11_veneer  0x0800a798        0x0 linker stubs
 
-.v4_bx          0x0800a760        0x0
- .v4_bx         0x0800a760        0x0 linker stubs
+.v4_bx          0x0800a798        0x0
+ .v4_bx         0x0800a798        0x0 linker stubs
 
-.iplt           0x0800a760        0x0
- .iplt          0x0800a760        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x0800a798        0x0
+ .iplt          0x0800a798        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x0800a760       0x5c
-                0x0800a760                . = ALIGN (0x4)
+.rodata         0x0800a798       0x6c
+                0x0800a798                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0800a760        0x6 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x0800a766        0x2 
- .rodata        0x0800a768       0x50 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .rodata        0x0800a798        0x6 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x0800a79e        0x2 
+ .rodata        0x0800a7a0       0x53 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ *fill*         0x0800a7f3        0x1 
+ .rodata        0x0800a7f4        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.rodata*)
  .rodata.MSP_Value
-                0x0800a7b8        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800a7b8                MSP_Value
-                0x0800a7bc                . = ALIGN (0x4)
-                0x0800a7bc                _sidata = LOADADDR (.data)
+                0x0800a800        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800a800                MSP_Value
+                0x0800a804                . = ALIGN (0x4)
+                0x0800a804                _sidata = LOADADDR (.data)
 
-.rel.dyn        0x0800a7bc        0x0
- .rel.iplt      0x0800a7bc        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x0800a804        0x0
+ .rel.iplt      0x0800a804        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x10 load address 0x0800a7bc
+.data           0x20000000       0x28 load address 0x0800a804
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdata = .
  *(.data)
@@ -556,78 +579,86 @@ Linker script and memory map
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.data*)
  .data.nvic_stat
                 0x20000000        0x1 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
                 0x20000000                nvic_stat
  *fill*         0x20000001        0x3 
+ .data.ESP_Commands
+                0x20000004       0x18 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x20000004                ESP_Commands
  .data.Uart_configuration
-                0x20000004        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000004                Uart_configuration
-                0x20000010                . = ALIGN (0x4)
-                0x20000010                _edata = .
+                0x2000001c        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x2000001c                Uart_configuration
+                0x20000028                . = ALIGN (0x4)
+                0x20000028                _edata = .
 
-.igot.plt       0x20000010        0x0 load address 0x0800a7cc
- .igot.plt      0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.igot.plt       0x20000028        0x0 load address 0x0800a82c
+ .igot.plt      0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000010       0x64 load address 0x0800a7cc
-                0x20000010                _sbss = .
+.bss            0x20000028       0x68 load address 0x0800a82c
+                0x20000028                _sbss = .
  *(.bss)
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .bss           0x20000010        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .bss           0x20000028        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.bss*)
  .bss.Local_PvFunction
-                0x20000010        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .bss.rx_test   0x20000014        0x1 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
-                0x20000014                rx_test
- *fill*         0x20000015        0x3 
+                0x20000028        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .bss.rx_test   0x2000002c        0x1 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+                0x2000002c                rx_test
+ *fill*         0x2000002d        0x3 
  .bss.uart1_funcPtr
-                0x20000018        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
-                0x20000018                uart1_funcPtr
+                0x20000030        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+                0x20000030                uart1_funcPtr
  .bss.uart2_funcPtr
-                0x2000001c        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
-                0x2000001c                uart2_funcPtr
+                0x20000034        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+                0x20000034                uart2_funcPtr
  .bss.uart3_funcPtr
-                0x20000020        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
-                0x20000020                uart3_funcPtr
+                0x20000038        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+                0x20000038                uart3_funcPtr
  .bss.tim6_callback
-                0x20000024        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
+                0x2000003c        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .bss.tim7_callback
-                0x20000028        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
+                0x20000040        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .bss.total_ticks
-                0x2000002c        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
-                0x2000002c                total_ticks
+                0x20000044        0x4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
+                0x20000044                total_ticks
  .bss.Local_PvFunction
-                0x20000030        0x4 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .bss.SysTask   0x20000034       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x20000034                SysTask
+                0x20000048        0x4 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .bss.SysTask   0x2000004c       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x2000004c                SysTask
+ .bss.ESP_APPLICATION_FLAG
+                0x2000007c        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x2000007c                ESP_APPLICATION_FLAG
+ *fill*         0x2000007d        0x3 
+ .bss.ESP_Commands_Counter.0
+                0x20000080        0x4 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
  .bss.RCC_Configuration
-                0x20000064        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000064                RCC_Configuration
- .bss.counter   0x20000070        0x1 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000074                . = ALIGN (0x4)
- *fill*         0x20000071        0x3 
-                0x20000074                _ebss = .
+                0x20000084        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x20000084                RCC_Configuration
+                0x20000090                . = ALIGN (0x4)
+                0x20000090                _ebss = .
 
 ._user_heap_stack
-                0x20000074     0x1204 load address 0x0800a7cc
-                0x20000078                . = ALIGN (0x8)
- *fill*         0x20000074        0x4 
-                0x20000278                . = (. + _Min_Heap_Size)
- *fill*         0x20000078      0x200 
-                0x20001278                . = (. + _Min_Stack_Size)
- *fill*         0x20000278     0x1000 
-                0x20001278                . = ALIGN (0x8)
+                0x20000090     0x1200 load address 0x0800a82c
+                0x20000090                . = ALIGN (0x8)
+                0x20000290                . = (. + _Min_Heap_Size)
+ *fill*         0x20000090      0x200 
+                0x20001290                . = (. + _Min_Stack_Size)
+ *fill*         0x20000290     0x1000 
+                0x20001290                . = ALIGN (0x8)
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -638,11 +669,12 @@ LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+LOAD C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 OUTPUT(C:/NUCLEO-F446RE/APP/Tools/application.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x2fc5
+.debug_info     0x00000000     0x3148
  .debug_info    0x00000000      0x3e2 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003e2      0x303 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x000006e5      0x26b C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -653,9 +685,10 @@ LOAD linker stubs
  .debug_info    0x00001e30      0x684 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_info    0x000024b4      0x2a6 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_info    0x0000275a      0x148 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x000028a2      0x723 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_info    0x000028a2      0x165 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_info    0x00002a07      0x741 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_abbrev   0x00000000      0xd6d
+.debug_abbrev   0x00000000      0xe60
  .debug_abbrev  0x00000000      0x134 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x00000134      0x12e C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_abbrev  0x00000262      0x144 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -666,9 +699,10 @@ LOAD linker stubs
  .debug_abbrev  0x00000897      0x1aa C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_abbrev  0x00000a41      0x134 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_abbrev  0x00000b75       0xe3 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x00000c58      0x115 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_abbrev  0x00000c58       0xf1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_abbrev  0x00000d49      0x117 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_aranges  0x00000000      0x460
+.debug_aranges  0x00000000      0x498
  .debug_aranges
                 0x00000000       0x78 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_aranges
@@ -690,9 +724,11 @@ LOAD linker stubs
  .debug_aranges
                 0x000003e0       0x28 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_aranges
-                0x00000408       0x58 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x00000408       0x28 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_aranges
+                0x00000430       0x68 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_ranges   0x00000000      0x3b0
+.debug_ranges   0x00000000      0x3d8
  .debug_ranges  0x00000000       0x68 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_ranges  0x00000068       0x38 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_ranges  0x000000a0       0x48 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -703,9 +739,10 @@ LOAD linker stubs
  .debug_ranges  0x00000250       0xc0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_ranges  0x00000310       0x40 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_ranges  0x00000350       0x18 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_ranges  0x00000368       0x48 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_ranges  0x00000368       0x18 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_ranges  0x00000380       0x58 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_macro    0x00000000     0x14b8
+.debug_macro    0x00000000     0x14fe
  .debug_macro   0x00000000       0x32 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000032      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000a98       0x10 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -732,12 +769,13 @@ LOAD linker stubs
  .debug_macro   0x000011ad       0x44 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_macro   0x000011f1       0x10 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_macro   0x00001201       0x17 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_macro   0x00001218       0x78 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x00001290      0x136 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x000013c6       0x76 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x0000143c       0x7c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x00001218       0x3c C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_macro   0x00001254       0x82 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x000012d6      0x136 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x0000140c       0x76 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x00001482       0x7c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x1d2f
+.debug_line     0x00000000     0x1e23
  .debug_line    0x00000000      0x2c0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -748,9 +786,10 @@ LOAD linker stubs
  .debug_line    0x000012a9      0x597 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_line    0x00001840      0x1dc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_line    0x00001a1c       0xe1 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00001afd      0x232 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_line    0x00001afd       0xd1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_line    0x00001bce      0x255 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x5c04
+.debug_str      0x00000000     0x5ca5
  .debug_str     0x00000000     0x3506 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x3584 (size before relaxing)
  .debug_str     0x00003506      0x4c4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
@@ -771,8 +810,10 @@ LOAD linker stubs
                                0x311e (size before relaxing)
  .debug_str     0x00005ae2       0xa5 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
                                0x2d2e (size before relaxing)
- .debug_str     0x00005b87       0x7d C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                               0x46aa (size before relaxing)
+ .debug_str     0x00005b87       0x79 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                               0x3060 (size before relaxing)
+ .debug_str     0x00005c00       0xa5 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                               0x46ef (size before relaxing)
 
 .comment        0x00000000       0x49
  .comment       0x00000000       0x49 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -786,6 +827,7 @@ LOAD linker stubs
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .ARM.attributes
@@ -811,9 +853,11 @@ LOAD linker stubs
  .ARM.attributes
                 0x000001d4       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .ARM.attributes
-                0x00000208       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x00000208       0x34 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .ARM.attributes
+                0x0000023c       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_frame    0x00000000      0xfa8
+.debug_frame    0x00000000     0x1040
  .debug_frame   0x00000000      0x1c8 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_frame   0x000001c8      0x100 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_frame   0x000002c8      0x120 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -824,4 +868,5 @@ LOAD linker stubs
  .debug_frame   0x000009ec      0x354 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_frame   0x00000d40      0x118 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_frame   0x00000e58       0x48 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_frame   0x00000ea0      0x108 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_frame   0x00000ea0       0x60 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .debug_frame   0x00000f00      0x140 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
