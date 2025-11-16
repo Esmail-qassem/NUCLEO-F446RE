@@ -74,12 +74,16 @@ typedef struct {
     UART_WordLength_t WordLength;
     UART_Synch_t Sync_Mode
 } UART_Config_t;
-
+#define UART1_IQ_NUM  37
+#define UART2_IQ_NUM  38
+#define UART3_IQ_NUM  39
 
 /* ---------------- API ---------------- */
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk);
 void UART_SendSyncBuffer(UART_HardWare_t base, const uint8 *buf, uint8 size);
 void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number);
 void UART2_CALLBACK(void(*p2function)(uint8));
+void UART3_CALLBACK(void(*p2function)(uint8));
+void UART1_CALLBACK(void(*p2function)(uint8));
 
 #endif

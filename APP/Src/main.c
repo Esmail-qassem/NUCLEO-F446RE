@@ -1,6 +1,7 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
 #include "FLASH.h"
+#include "NVIC_interface.h"
 #include "RTOS.h"
 #include "GPIO_interface.h"
 #include "UART.h"
@@ -15,12 +16,12 @@ RCC_Config_t RCC_Configuration =
 };
 
 UART_Config_t Uart_configuration={
-  921600,
-  UART_MODE_TX,
+  115200, //921600
+  UART_MODE_TX_RX,
   UART_PARITY_NONE,
   UART_STOPBITS_1,
   UART_WORDLEN_8B,
-  Polling
+  Interrupt
 };
 
 /**************************************************************/
@@ -29,28 +30,63 @@ void GPIO_PIN_CONFIG(void);
 void APP_init(void);
 /**************************************************************/
 /**************************************************************/
-
+static uint8 counter=0;
 void LED (void)
 {
   GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
 void UART (void)
 {
-  static sint32 counter = -100 ;
-     UART_voidSendNumber(UART2,counter);
-     UART_SendSyncBuffer(UART2,(uint8*)"\n", 1);
-  counter++;  
+  switch(counter)
+  {
+    case 0 : 
+          {
+            UART_SendSyncBuffer(UART1,(uint8*)"AT\r\n", 5);
+            counter=1;
+            break;
+          }
+    case 1 : 
+          {
+            UART_SendSyncBuffer(UART1,(uint8*)"AT+CWMODE?\r\n", 14);
+            counter=2;
+            break;
+          }   
+     case 2 :
+          {
+            UART_SendSyncBuffer(UART1,(uint8*)"AT+CWJAP=\"ZzZz\",\"J8702143  \"\r\n", 31);
+            counter=3;
+            break;
+          } 
+           case 3 :
+          {
+            UART_SendSyncBuffer(UART1,(uint8*)"AT+CIFSR\r\n", 11);
+            counter=3;
+            break;
+          }
+             default : break;     
+  }       
+
+}
+void UART1_ISR (uint8 num)
+{
+  uint8 Str[]={num};
+  UART_SendSyncBuffer(UART2,(uint8*) Str, 1);
+}
+void UART2_ISR (uint8 num)
+{
+  UART_SendSyncBuffer(UART2,(uint8*)"UART2 ISR\r\n", 12);
 }
 
 void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
+NVIC_EnableInterrupt(UART1_IQ_NUM);
+NVIC_EnableInterrupt(UART2_IQ_NUM);
+UART2_CALLBACK(UART2_ISR);
+UART1_CALLBACK(UART1_ISR);
 RTOS_voidCreateTask(0,500,LED);
-RTOS_voidCreateTask(1,100,UART);
-
-/*Synchronous function*/
-// Blink loop
+RTOS_voidCreateTask(1,5000,UART);
 while(1) {}
 }
 
@@ -72,13 +108,20 @@ GPIO_InitPin(GPIO_PORTA, PIN5,GPIO_MODE_OUTPUT,GPIO_OTYPE_PP,GPIO_SPEED_FAST,GPI
 GPIO_InitPin(GPIO_PORTA, PIN8,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 /*UART1*/
 GPIO_InitPin(GPIO_PORTA, PIN9,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+GPIO_InitPin(GPIO_PORTA, PIN10,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+
 /*UART2*/
 GPIO_InitPin(GPIO_PORTA, PIN2,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+GPIO_InitPin(GPIO_PORTA, PIN3,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 /*UART3*/
 GPIO_InitPin(GPIO_PORTB, PIN10,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+GPIO_InitPin(GPIO_PORTB, PIN11,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 GPIO_SetAF(GPIO_PORTA, PIN9, 7);
+GPIO_SetAF(GPIO_PORTA, PIN10, 7);
 GPIO_SetAF(GPIO_PORTA, PIN2, 7);
+GPIO_SetAF(GPIO_PORTA, PIN3, 7);
 GPIO_SetAF(GPIO_PORTB, PIN10, 7);  
+GPIO_SetAF(GPIO_PORTB, PIN11, 7);  
 }
 
 
