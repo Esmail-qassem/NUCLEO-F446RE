@@ -28,6 +28,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
 		   ../RTOS\
            ../Startup\
            ../P1/ESP\
+           ../P1/OLED\
 		   ../Src\
 		   
 
@@ -35,6 +36,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
 INC_DIRS = ../Inc/ \
 		   ../RTOS\
 		   ../P1/ESP\
+		   ../P1/OLED\
            $(wildcard $(MCAL_path)/*/inc/) \
            $(wildcard $(HAL_path)/*/inc/)
 

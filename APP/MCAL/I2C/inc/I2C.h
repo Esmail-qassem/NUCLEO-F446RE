@@ -23,7 +23,7 @@
 #define I2C_TIMEOUT_MAX  100000
 #define I2C_READ  1
 #define I2C_WRITE 0
-#define PCLK1 36000000
+#define PCLK1 16000000
 /*-----------------------------*/
 /*         ENUMS/TYPES         */
 /*-----------------------------*/
