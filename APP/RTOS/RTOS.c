@@ -5,7 +5,7 @@
 #include "SysTick_interface.h"
 #include "RTOS.h"
 task_type SysTask[TASK_NUMBER]={{0}};
-
+cpu_load_type CPU_Load = {0};
 
 void RTOS_voidStart(void)
 {
@@ -34,6 +34,7 @@ void RTOS_voidSchedular(void)
 {
     uint8 Local_u8TaskCounter;
     uint8 task_executed = 0;
+    CPU_Load.total_ticks++;
 
     for (Local_u8TaskCounter = 0; Local_u8TaskCounter < TASK_NUMBER; Local_u8TaskCounter++)
     {
@@ -53,8 +54,25 @@ void RTOS_voidSchedular(void)
             }
         }
     }
-}
+    if (task_executed == 0)
+    {
+        CPU_Load.idle_ticks++;
+        OS_IDLE_TASK();
+    }
+    // Calculate CPU load periodically (every 1000 ticks = 1 second if 1ms tick)
+    if (CPU_Load.total_ticks == 1000)
+    {
+        CPU_Load.cpu_load_percent = 100 - ((CPU_Load.idle_ticks * 100) / CPU_Load.total_ticks);
+        // Reset counters for next measurement period
+        CPU_Load.idle_ticks = 0;
+        CPU_Load.total_ticks = 0;
+    }
 
+}
+uint8 RTOS_u8GetCPULoad(void)
+{
+    return CPU_Load.cpu_load_percent;
+}
 
 Task_status RTOS_voidDeleteTask(uint8 Copy_priority)
 {

@@ -61,7 +61,7 @@ void ESP_MainFunction(void)
     }
 
     // When we finish AT+CIPSTART (index 5)
-    if (ESP_Commands_Counter == sizeof(ESP_Commands)+1)
+    if (ESP_Commands_Counter == sizeof(ESP_Commands)/sizeof(ESP_Commands[0]))
     {
         ESP_APPLICATION_FLAG = 1;
 

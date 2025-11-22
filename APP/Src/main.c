@@ -59,14 +59,20 @@ void ESP_TASK (void)
   {
      ESP_MainFunction();
   }
-  // UART_voidSendNumber(UART2,counter);
-  // UART_SendSyncBuffer(UART2,(uint8*)"\n", 1);
-   counter++;
+  else
+  {
+    RTOS_voidSuspendTask(3);
+    
+  }
 }
 
 void OS_10ms_Task (void)
 {
-
+  uint32 static counter=0;
+  UART_SendSyncBuffer(UART2, "10ms_task\n",10);
+  UART_SendSyncBuffer(UART2, "cpu load is ",12);
+  UART_voidSendNumber(UART2, RTOS_u8GetCPULoad());
+  UART_SendSyncBuffer(UART2, "\n",1);
 
 }
 void OS_5ms_Task (void)
@@ -74,16 +80,20 @@ void OS_5ms_Task (void)
 
   
 }
+void OS_IDLE_TASK (void)
+{
+}
+
 void main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
 ENABLE_NVIC_INTERRUPTS();
 CallBackFunctions();
-RTOS_voidCreateTask(3,1000,LED);
-RTOS_voidCreateTask(2,2000,ESP_TASK);
-RTOS_voidCreateTask(0,5,OS_5ms_Task);
+RTOS_voidCreateTask(0,50,LED);
 RTOS_voidCreateTask(1,10,OS_10ms_Task);
+RTOS_voidCreateTask(2,5,OS_5ms_Task);
+RTOS_voidCreateTask(3,500,ESP_TASK);
 while(1) {}
 }
 
