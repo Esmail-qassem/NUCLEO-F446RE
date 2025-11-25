@@ -701,7 +701,7 @@ Linker script and memory map
 .igot.plt       0x20000048        0x0 load address 0x0800b460
  .igot.plt      0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000048      0x900 load address 0x0800b460
+.bss            0x20000048      0x8f4 load address 0x0800b460
                 0x20000048                _sbss = .
  *(.bss)
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -756,40 +756,41 @@ Linker script and memory map
  *fill*         0x200000f5        0x3 
  .bss.Local_PvFunction
                 0x200000f8        0x4 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .bss.SysTask   0x200000fc       0x24 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .bss.SysTask   0x200000fc       0x18 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
                 0x200000fc                SysTask
- .bss.CPU_Load  0x20000120        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x20000120                CPU_Load
+ .bss.CPU_Load  0x20000114        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x20000114                CPU_Load
  .bss.ESP_APPLICATION_FLAG
-                0x2000012c        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                0x2000012c                ESP_APPLICATION_FLAG
+                0x20000120        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x20000120                ESP_APPLICATION_FLAG
  .bss.ESP_Commands_Counter.0
-                0x2000012d        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- *fill*         0x2000012e        0x2 
- .bss.BufferA   0x20000130      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x20000130                BufferA
- .bss.BufferB   0x20000530      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x20000530                BufferB
+                0x20000121        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ *fill*         0x20000122        0x2 
+ .bss.BufferA   0x20000124      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x20000124                BufferA
+ .bss.BufferB   0x20000524      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x20000524                BufferB
  .bss.RCC_Configuration
-                0x20000930        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000930                RCC_Configuration
+                0x20000924        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x20000924                RCC_Configuration
  .bss.counter.2
-                0x2000093c        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x20000930        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .bss.counter.1
-                0x20000940        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .bss.y.0       0x20000944        0x1 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000948                . = ALIGN (0x4)
- *fill*         0x20000945        0x3 
-                0x20000948                _ebss = .
+                0x20000934        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .bss.y.0       0x20000938        0x1 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x2000093c                . = ALIGN (0x4)
+ *fill*         0x20000939        0x3 
+                0x2000093c                _ebss = .
 
 ._user_heap_stack
-                0x20000948     0x1200 load address 0x0800b460
-                0x20000948                . = ALIGN (0x8)
-                0x20000b48                . = (. + _Min_Heap_Size)
- *fill*         0x20000948      0x200 
-                0x20001b48                . = (. + _Min_Stack_Size)
- *fill*         0x20000b48     0x1000 
-                0x20001b48                . = ALIGN (0x8)
+                0x2000093c     0x1204 load address 0x0800b460
+                0x20000940                . = ALIGN (0x8)
+ *fill*         0x2000093c        0x4 
+                0x20000b40                . = (. + _Min_Heap_Size)
+ *fill*         0x20000940      0x200 
+                0x20001b40                . = (. + _Min_Stack_Size)
+ *fill*         0x20000b40     0x1000 
+                0x20001b40                . = ALIGN (0x8)
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o

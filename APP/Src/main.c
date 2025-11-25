@@ -99,9 +99,9 @@ GPIO_PIN_CONFIG();
 ENABLE_NVIC_INTERRUPTS();
 CallBackFunctions();
 APP_init();
-RTOS_voidCreateTask(2,200,LED);
+RTOS_voidCreateTask(0,2000,LED);
 //RTOS_voidCreateTask(2,90,OS_10ms_Task);
-RTOS_voidCreateTask(0,50,OS_5ms_Task);
+RTOS_voidCreateTask(1,10,OS_5ms_Task);
 while(1) {}
 }
 
