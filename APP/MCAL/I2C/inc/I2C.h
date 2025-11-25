@@ -20,7 +20,7 @@
 #define I2C_TRISE(base)       *((volatile uint32*)(base + 0x20))
 
 /*-----------------------------*/
-#define I2C_TIMEOUT_MAX  100000
+#define I2C_TIMEOUT_MAX  10000
 #define I2C_READ  1
 #define I2C_WRITE 0
 #define PCLK1 16000000
@@ -33,6 +33,11 @@ typedef enum {
     I2C_BUSY,
     I2C_TIMEOUT
 } I2C_Status_t;
+typedef enum {
+    I2C_IDLE,
+    I2C_BUSY_TX,
+    I2C_BUSY_RX
+} I2C_State_t;
 
 typedef enum {
     I2C1_PORT,
@@ -40,12 +45,23 @@ typedef enum {
     I2C3_PORT,
 } I2C_Port_t;
 
+
+
+typedef enum
+{
+    I2C_POLLING,
+    I2C_INTERRUPT
+}
+I2C_Intruppt_t;
+
 /* Configuration structure */
 typedef struct {
     uint32 ClockSpeed;       // e.g. 100000 for 100kHz
     uint8 OwnAddress;        // Device address (if slave)
     uint8 Acknowledgement;   // ENABLE / DISABLE
     uint8 DutyCycle;         // for Fast mode (if used)
+  //  I2C_Intruppt_t I2C_INT;
+
 } I2C_Config_t;
 
 /* Initialization and configuration */
@@ -64,7 +80,7 @@ I2C_Status_t I2C_MasterTransmit(I2C_Port_t port, uint8 slave_addr, uint8 *data, 
 I2C_Status_t I2C_MasterReceive(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size, uint8 repeated_start);
 
 /* interrupt/event/error handling */
-
+void I2C_MasterTransmit_IT(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size);
 
 
 uint8 I2C_ReadStatus(uint32 base);

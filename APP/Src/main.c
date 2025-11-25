@@ -77,33 +77,46 @@ void OS_10ms_Task (void)
 }
 void OS_5ms_Task (void)
 {
-
-  
-}
+  static uint8 y=0;
+  y++;
+  for(uint8 x=0;x<128;x++)
+  {
+  OLED_DrawPixel(x,y, OLED_COLOR_WHITE);
+  }
+  if(y==64)
+      y=0;
+  swapBuffer();
+  OLED_UpdateScreen(I2C1_PORT);
+  OLED_Clear();
+ }
 void OS_IDLE_TASK (void)
 {
 }
 
 void main (void)
 {
-APP_init();
 GPIO_PIN_CONFIG();
 ENABLE_NVIC_INTERRUPTS();
 CallBackFunctions();
-RTOS_voidCreateTask(0,50,LED);
-RTOS_voidCreateTask(1,10,OS_10ms_Task);
-RTOS_voidCreateTask(2,5,OS_5ms_Task);
-RTOS_voidCreateTask(3,500,ESP_TASK);
+APP_init();
+RTOS_voidCreateTask(2,200,LED);
+//RTOS_voidCreateTask(2,90,OS_10ms_Task);
+RTOS_voidCreateTask(0,50,OS_5ms_Task);
 while(1) {}
 }
 
 
 void APP_init(void)
 {
- RTOS_voidStart(); 
  UART_Init(UART1, &Uart1_configuration, 16000000);
  UART_Init(UART2, &Uart2_configuration, 16000000);
  UART_Init(UART3, &Uart2_configuration, 16000000);
+ I2C_Init(I2C1_PORT,&config);
+ OLED_Init(I2C1_PORT);
+
+
+
+RTOS_voidStart();  
 }
 
 void GPIO_PIN_CONFIG(void)
@@ -124,9 +137,9 @@ GPIO_InitPin(GPIO_PORTB, PIN10,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_N
 GPIO_InitPin(GPIO_PORTB, PIN11,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 
 /*I2C1  SDA*/
-//GPIO_InitPin(GPIO_PORTB, PIN9,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+GPIO_InitPin(GPIO_PORTB, PIN9,GPIO_MODE_AF,GPIO_OTYPE_OD,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 /*I2C1  SCL*/
-//GPIO_InitPin(GPIO_PORTB, PIN8,GPIO_MODE_AF,GPIO_OTYPE_PP,GPIO_SPEED_HIGH,GPIO_NO_PULL);
+GPIO_InitPin(GPIO_PORTB, PIN8,GPIO_MODE_AF,GPIO_OTYPE_OD,GPIO_SPEED_HIGH,GPIO_NO_PULL);
 
 /* UART */
 GPIO_SetAF(GPIO_PORTA, PIN9, 7);
@@ -137,14 +150,17 @@ GPIO_SetAF(GPIO_PORTB, PIN10, 7);
 GPIO_SetAF(GPIO_PORTB, PIN11, 7); 
 
 /* I2C */
-//GPIO_SetAF(GPIO_PORTB, PIN8, 4); 
-//GPIO_SetAF(GPIO_PORTB, PIN9, 4); 
+GPIO_SetAF(GPIO_PORTB, PIN8, 4); 
+GPIO_SetAF(GPIO_PORTB, PIN9, 4); 
 }
 
 void ENABLE_NVIC_INTERRUPTS(void)
 {
   NVIC_EnableInterrupt(UART1_IQ_NUM);
   NVIC_EnableInterrupt(UART2_IQ_NUM);
+
+  // NVIC_EnableInterrupt(31);
+  // NVIC_EnableInterrupt(32);
 }
 
 void CallBackFunctions(void)

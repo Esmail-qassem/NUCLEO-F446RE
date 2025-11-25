@@ -235,32 +235,100 @@ I2C_Status_t I2C_MasterReceive(I2C_Port_t port, uint8 slave_addr, uint8 *data, u
     return I2C_OK;
 }
 
-void I2C3_EV_IRQHandler(void)
-{     
+void static I2C_DisableInterrupts(uint32 base)
+{
 
-
-}     
-void I2C3_ER_IRQHandler(void)
-{     
-
-
+    CLEAR_BIT(I2C_CR2(base), 9);  // ITBUFEN
+    CLEAR_BIT(I2C_CR2(base), 10); // ITEVTEN
+    CLEAR_BIT(I2C_CR2(base), 8);  // ITERREN
 }
+
+static volatile I2C_State_t I2C1_State = I2C_IDLE;
+
+static uint8 *I2C1_TxBuffer;
+static uint16 I2C1_TxSize;
+static uint16 I2C1_TxIndex;
+static uint8 I2C1_Address;
+void I2C_MasterTransmit_IT(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size)
+{
+    uint32 base = I2C_GetBase(port);
+
+    I2C1_State     = I2C_BUSY_TX;
+    I2C1_TxBuffer  = data;
+    I2C1_TxSize    = size;
+    I2C1_TxIndex   = 0;
+    I2C1_Address   = slave_addr << 1;  // write mode
+
+    // Enable interrupts
+    SET_BIT(I2C_CR2(base), 9);  // ITBUFEN (TXE, RXNE)
+    SET_BIT(I2C_CR2(base), 10); // ITEVTEN (EV)
+    SET_BIT(I2C_CR2(base), 8);  // ITERREN (ERR)
+
+    // Start condition
+    SET_BIT(I2C_CR1(base), 8);
+}
+
 void I2C1_EV_IRQHandler(void)
-{     
+{
+    uint32 base = I2C1_BASE;
+    uint32 sr1 = I2C_SR1(base);
 
+    // 1) START condition sent (SB)
+    if (sr1 & (1<<0)) {
+        I2C_DR(base) = I2C1_Address;   // Send address
+        return;
+    }
 
-}
+    // 2) Address sent (ADDR)
+    if (sr1 & (1<<1)) {
+        (void)I2C_SR1(base);
+        (void)I2C_SR2(base);
+        return;
+    }
+
+    // 3) TXE: time to send next byte
+    if ((sr1 & (1<<7)) && (I2C1_State == I2C_BUSY_TX)) {
+        if (I2C1_TxIndex < I2C1_TxSize) {
+            I2C_DR(base) = I2C1_TxBuffer[I2C1_TxIndex++];
+        }
+        return;
+    }
+
+    // 4) BTF: last byte transferred → STOP
+    if ((sr1 & (1<<2)) && (I2C1_TxIndex >= I2C1_TxSize)) {
+        SET_BIT(I2C_CR1(base), 9);  // STOP
+        I2C1_State = I2C_IDLE;
+        return;
+    }
+    I2C_DisableInterrupts(base);
+}   
 void I2C1_ER_IRQHandler(void)
-{     
+{
+    uint32 base = I2C1_BASE;
 
+    // Clear all errors
+    I2C_SR1(base) = 0;
 
+    I2C1_State = I2C_IDLE;
+I2C_DisableInterrupts(base);
 }
+
 void I2C2_EV_IRQHandler(void)
 {     
 
 
 }
 void I2C2_ER_IRQHandler(void)
+{     
+
+
+}
+void I2C3_EV_IRQHandler(void)
+{     
+
+
+}
+void I2C3_ER_IRQHandler(void)
 {     
 
 

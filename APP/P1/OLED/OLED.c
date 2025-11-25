@@ -71,6 +71,7 @@ void OLED_Init(I2C_Port_t PORT)
     OLED_SendCommand(PORT, 0xA6); // Normal display
 
     OLED_Clear();
+    swapBuffer();
     OLED_UpdateScreen(PORT);
 
     OLED_SendCommand(PORT, 0xAF); // Display ON
@@ -118,7 +119,7 @@ void OLED_UpdateScreen(I2C_Port_t PORT)
         }
 
         // Send entire page at once
-        I2C_MasterTransmit(PORT, OLED_I2C_ADDR, data, sizeof(data), 0);
+       I2C_MasterTransmit(PORT, OLED_I2C_ADDR, data, sizeof(data), 0);
     }
 }
 
