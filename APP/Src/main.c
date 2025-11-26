@@ -99,8 +99,7 @@ GPIO_PIN_CONFIG();
 ENABLE_NVIC_INTERRUPTS();
 CallBackFunctions();
 APP_init();
-RTOS_voidCreateTask(0,2000,LED);
-//RTOS_voidCreateTask(2,90,OS_10ms_Task);
+RTOS_voidCreateTask(0,500,LED);
 RTOS_voidCreateTask(1,10,OS_5ms_Task);
 while(1) {}
 }
@@ -113,9 +112,6 @@ void APP_init(void)
  UART_Init(UART3, &Uart2_configuration, 16000000);
  I2C_Init(I2C1_PORT,&config);
  OLED_Init(I2C1_PORT);
-
-
-
 RTOS_voidStart();  
 }
 

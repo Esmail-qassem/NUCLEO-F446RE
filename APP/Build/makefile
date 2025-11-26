@@ -22,23 +22,18 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/Basic_Timer/src\
            $(MCAL_path)/I2C/src\
            $(MCAL_path)/FLASH/src\
-           $(HAL_path)/LCD/src\
-           $(HAL_path)/EEPROM/src\
-           $(HAL_path)/OLED_SH1106/src\
+           $(HAL_path)/ESP\
+           $(HAL_path)/OLED\
 		   ../RTOS\
            ../Startup\
-           ../P1/ESP\
-           ../P1/OLED\
 		   ../Src\
 		   
 
 # Include directories
 INC_DIRS = ../Inc/ \
 		   ../RTOS\
-		   ../P1/ESP\
-		   ../P1/OLED\
            $(wildcard $(MCAL_path)/*/inc/) \
-           $(wildcard $(HAL_path)/*/inc/)
+           $(wildcard $(HAL_path)/*/)
 
 INC_FLAGS = $(addprefix -I,$(INC_DIRS))
 

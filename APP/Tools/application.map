@@ -62,6 +62,23 @@ Discarded input sections
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_macro   0x00000000       0x22 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_macro   0x00000000       0x70 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00000000       0x22 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00000000       0x64 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
@@ -75,23 +92,6 @@ Discarded input sections
  .debug_macro   0x00000000       0x2e C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_macro   0x00000000       0x22 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_macro   0x00000000       0x70 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_macro   0x00000000      0xa66 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_macro   0x00000000       0x10 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_macro   0x00000000       0x22 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_macro   0x00000000       0x64 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .group         0x00000000        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
@@ -144,10 +144,10 @@ Linker script and memory map
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
  .text          0x08008178        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.text*)
  .text.RCC_EnableHSI
@@ -444,145 +444,145 @@ Linker script and memory map
  .text.FlashDrv_ProgramWordSafe
                 0x0800a7e8       0x28 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
                 0x0800a7e8                FlashDrv_ProgramWordSafe
- .text.RTOS_voidStart
-                0x0800a810       0x1c C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800a810                RTOS_voidStart
- .text.RTOS_voidCreateTask
-                0x0800a82c       0x84 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800a82c                RTOS_voidCreateTask
- .text.RTOS_voidSchedular
-                0x0800a8b0      0x124 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800a8b0                RTOS_voidSchedular
- .text.RTOS_u8GetCPULoad
-                0x0800a9d4       0x18 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800a9d4                RTOS_u8GetCPULoad
- .text.RTOS_voidDeleteTask
-                0x0800a9ec       0x90 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800a9ec                RTOS_voidDeleteTask
- .text.RTOS_voidSuspendTask
-                0x0800aa7c       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800aa7c                RTOS_voidSuspendTask
- .text.RTOS_voidResumeTask
-                0x0800aaac       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800aaac                RTOS_voidResumeTask
- .text.RTOS_voidWaitEvent
-                0x0800aadc       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x0800aadc                RTOS_voidWaitEvent
- .text.Reset_Handler
-                0x0800ab0c       0x94 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800ab0c                Reset_Handler
- .text.Default_Handler
-                0x0800aba0        0x6 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800aba0                RTC_Alarm_IRQHandler
-                0x0800aba0                EXTI2_IRQHandler
-                0x0800aba0                TIM8_CC_IRQHandler
-                0x0800aba0                DebugMon_Handler
-                0x0800aba0                SPI4_IRQHandler
-                0x0800aba0                TIM1_CC_IRQHandler
-                0x0800aba0                DMA2_Stream5_IRQHandler
-                0x0800aba0                HardFault_Handler
-                0x0800aba0                DMA1_Stream5_IRQHandler
-                0x0800aba0                PVD_IRQHandler
-                0x0800aba0                SDIO_IRQHandler
-                0x0800aba0                TAMP_STAMP_IRQHandler
-                0x0800aba0                PendSV_Handler
-                0x0800aba0                NMI_Handler
-                0x0800aba0                CAN2_RX1_IRQHandler
-                0x0800aba0                EXTI3_IRQHandler
-                0x0800aba0                TIM8_TRG_COM_TIM14_IRQHandler
-                0x0800aba0                TIM1_UP_TIM10_IRQHandler
-                0x0800aba0                TIM8_UP_TIM13_IRQHandler
-                0x0800aba0                EXTI0_IRQHandler
-                0x0800aba0                DMA1_Stream2_IRQHandler
-                0x0800aba0                CAN1_RX0_IRQHandler
-                0x0800aba0                FPU_IRQHandler
-                0x0800aba0                UsageFault_Handler
-                0x0800aba0                CAN2_SCE_IRQHandler
-                0x0800aba0                DMA2_Stream2_IRQHandler
-                0x0800aba0                SPI1_IRQHandler
-                0x0800aba0                TIM1_BRK_TIM9_IRQHandler
-                0x0800aba0                CAN2_RX0_IRQHandler
-                0x0800aba0                DMA2_Stream3_IRQHandler
-                0x0800aba0                USART6_IRQHandler
-                0x0800aba0                CAN1_RX1_IRQHandler
-                0x0800aba0                UART5_IRQHandler
-                0x0800aba0                DMA2_Stream0_IRQHandler
-                0x0800aba0                TIM4_IRQHandler
-                0x0800aba0                DMA1_Stream6_IRQHandler
-                0x0800aba0                DMA1_Stream1_IRQHandler
-                0x0800aba0                UART4_IRQHandler
-                0x0800aba0                TIM3_IRQHandler
-                0x0800aba0                RCC_IRQHandler
-                0x0800aba0                TIM8_BRK_TIM12_IRQHandler
-                0x0800aba0                Default_Handler
-                0x0800aba0                EXTI15_10_IRQHandler
-                0x0800aba0                ADC_IRQHandler
-                0x0800aba0                DMA1_Stream7_IRQHandler
-                0x0800aba0                SPI5_IRQHandler
-                0x0800aba0                CAN2_TX_IRQHandler
-                0x0800aba0                TIM5_IRQHandler
-                0x0800aba0                DMA2_Stream7_IRQHandler
-                0x0800aba0                EXTI9_5_IRQHandler
-                0x0800aba0                RTC_WKUP_IRQHandler
-                0x0800aba0                SPI2_IRQHandler
-                0x0800aba0                MemManage_Handler
-                0x0800aba0                DMA1_Stream0_IRQHandler
-                0x0800aba0                CAN1_TX_IRQHandler
-                0x0800aba0                SVC_Handler
-                0x0800aba0                EXTI4_IRQHandler
-                0x0800aba0                WWDG_IRQHandler
-                0x0800aba0                SPI6_IRQHandler
-                0x0800aba0                TIM2_IRQHandler
-                0x0800aba0                OTG_FS_WKUP_IRQHandler
-                0x0800aba0                TIM1_TRG_COM_TIM11_IRQHandler
-                0x0800aba0                DMA2D_IRQHandler
-                0x0800aba0                EXTI1_IRQHandler
-                0x0800aba0                DMA2_Stream1_IRQHandler
-                0x0800aba0                CAN1_SCE_IRQHandler
-                0x0800aba0                FLASH_IRQHandler
-                0x0800aba0                DMA2_Stream4_IRQHandler
-                0x0800aba0                BusFault_Handler
-                0x0800aba0                OTG_FS_IRQHandler
-                0x0800aba0                SPI3_IRQHandler
-                0x0800aba0                DMA1_Stream4_IRQHandler
-                0x0800aba0                FMC_IRQHandler
-                0x0800aba0                DMA2_Stream6_IRQHandler
-                0x0800aba0                SAI1_IRQHandler
-                0x0800aba0                DMA1_Stream3_IRQHandler
- *fill*         0x0800aba6        0x2 
  .text.int_to_str
-                0x0800aba8       0x90 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                0x0800aba8                int_to_str
+                0x0800a810       0x90 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+                0x0800a810                int_to_str
  .text.my_strlen
-                0x0800ac38       0x2e C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                0x0800ac38                my_strlen
- *fill*         0x0800ac66        0x2 
+                0x0800a8a0       0x2e C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+                0x0800a8a0                my_strlen
+ *fill*         0x0800a8ce        0x2 
  .text.ESP_MainFunction
-                0x0800ac68       0x70 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                0x0800ac68                ESP_MainFunction
+                0x0800a8d0       0x70 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+                0x0800a8d0                ESP_MainFunction
  .text.swapBuffer
-                0x0800acd8       0x30 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800acd8                swapBuffer
+                0x0800a940       0x30 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800a940                swapBuffer
  .text.OLED_SendCommand
-                0x0800ad08       0x32 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800ad08                OLED_SendCommand
+                0x0800a970       0x32 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800a970                OLED_SendCommand
  .text.OLED_SendData
-                0x0800ad3a       0x32 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800ad3a                OLED_SendData
+                0x0800a9a2       0x32 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800a9a2                OLED_SendData
  .text.OLED_Init
-                0x0800ad6c      0x120 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800ad6c                OLED_Init
+                0x0800a9d4      0x120 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800a9d4                OLED_Init
  .text.OLED_Clear
-                0x0800ae8c       0x38 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800ae8c                OLED_Clear
+                0x0800aaf4       0x38 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800aaf4                OLED_Clear
  .text.OLED_DrawPixel
-                0x0800aec4       0xa8 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800aec4                OLED_DrawPixel
+                0x0800ab2c       0xa8 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800ab2c                OLED_DrawPixel
  .text.OLED_UpdateScreen
-                0x0800af6c       0xac C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x0800af6c                OLED_UpdateScreen
- .text.LED      0x0800b018       0x10 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800b018                LED
+                0x0800abd4       0xac C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x0800abd4                OLED_UpdateScreen
+ .text.RTOS_voidStart
+                0x0800ac80       0x1c C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800ac80                RTOS_voidStart
+ .text.RTOS_voidCreateTask
+                0x0800ac9c       0x84 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800ac9c                RTOS_voidCreateTask
+ .text.RTOS_voidSchedular
+                0x0800ad20      0x124 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800ad20                RTOS_voidSchedular
+ .text.RTOS_u8GetCPULoad
+                0x0800ae44       0x18 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800ae44                RTOS_u8GetCPULoad
+ .text.RTOS_voidDeleteTask
+                0x0800ae5c       0x90 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800ae5c                RTOS_voidDeleteTask
+ .text.RTOS_voidSuspendTask
+                0x0800aeec       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800aeec                RTOS_voidSuspendTask
+ .text.RTOS_voidResumeTask
+                0x0800af1c       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800af1c                RTOS_voidResumeTask
+ .text.RTOS_voidWaitEvent
+                0x0800af4c       0x30 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x0800af4c                RTOS_voidWaitEvent
+ .text.Reset_Handler
+                0x0800af7c       0x94 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800af7c                Reset_Handler
+ .text.Default_Handler
+                0x0800b010        0x6 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800b010                RTC_Alarm_IRQHandler
+                0x0800b010                EXTI2_IRQHandler
+                0x0800b010                TIM8_CC_IRQHandler
+                0x0800b010                DebugMon_Handler
+                0x0800b010                SPI4_IRQHandler
+                0x0800b010                TIM1_CC_IRQHandler
+                0x0800b010                DMA2_Stream5_IRQHandler
+                0x0800b010                HardFault_Handler
+                0x0800b010                DMA1_Stream5_IRQHandler
+                0x0800b010                PVD_IRQHandler
+                0x0800b010                SDIO_IRQHandler
+                0x0800b010                TAMP_STAMP_IRQHandler
+                0x0800b010                PendSV_Handler
+                0x0800b010                NMI_Handler
+                0x0800b010                CAN2_RX1_IRQHandler
+                0x0800b010                EXTI3_IRQHandler
+                0x0800b010                TIM8_TRG_COM_TIM14_IRQHandler
+                0x0800b010                TIM1_UP_TIM10_IRQHandler
+                0x0800b010                TIM8_UP_TIM13_IRQHandler
+                0x0800b010                EXTI0_IRQHandler
+                0x0800b010                DMA1_Stream2_IRQHandler
+                0x0800b010                CAN1_RX0_IRQHandler
+                0x0800b010                FPU_IRQHandler
+                0x0800b010                UsageFault_Handler
+                0x0800b010                CAN2_SCE_IRQHandler
+                0x0800b010                DMA2_Stream2_IRQHandler
+                0x0800b010                SPI1_IRQHandler
+                0x0800b010                TIM1_BRK_TIM9_IRQHandler
+                0x0800b010                CAN2_RX0_IRQHandler
+                0x0800b010                DMA2_Stream3_IRQHandler
+                0x0800b010                USART6_IRQHandler
+                0x0800b010                CAN1_RX1_IRQHandler
+                0x0800b010                UART5_IRQHandler
+                0x0800b010                DMA2_Stream0_IRQHandler
+                0x0800b010                TIM4_IRQHandler
+                0x0800b010                DMA1_Stream6_IRQHandler
+                0x0800b010                DMA1_Stream1_IRQHandler
+                0x0800b010                UART4_IRQHandler
+                0x0800b010                TIM3_IRQHandler
+                0x0800b010                RCC_IRQHandler
+                0x0800b010                TIM8_BRK_TIM12_IRQHandler
+                0x0800b010                Default_Handler
+                0x0800b010                EXTI15_10_IRQHandler
+                0x0800b010                ADC_IRQHandler
+                0x0800b010                DMA1_Stream7_IRQHandler
+                0x0800b010                SPI5_IRQHandler
+                0x0800b010                CAN2_TX_IRQHandler
+                0x0800b010                TIM5_IRQHandler
+                0x0800b010                DMA2_Stream7_IRQHandler
+                0x0800b010                EXTI9_5_IRQHandler
+                0x0800b010                RTC_WKUP_IRQHandler
+                0x0800b010                SPI2_IRQHandler
+                0x0800b010                MemManage_Handler
+                0x0800b010                DMA1_Stream0_IRQHandler
+                0x0800b010                CAN1_TX_IRQHandler
+                0x0800b010                SVC_Handler
+                0x0800b010                EXTI4_IRQHandler
+                0x0800b010                WWDG_IRQHandler
+                0x0800b010                SPI6_IRQHandler
+                0x0800b010                TIM2_IRQHandler
+                0x0800b010                OTG_FS_WKUP_IRQHandler
+                0x0800b010                TIM1_TRG_COM_TIM11_IRQHandler
+                0x0800b010                DMA2D_IRQHandler
+                0x0800b010                EXTI1_IRQHandler
+                0x0800b010                DMA2_Stream1_IRQHandler
+                0x0800b010                CAN1_SCE_IRQHandler
+                0x0800b010                FLASH_IRQHandler
+                0x0800b010                DMA2_Stream4_IRQHandler
+                0x0800b010                BusFault_Handler
+                0x0800b010                OTG_FS_IRQHandler
+                0x0800b010                SPI3_IRQHandler
+                0x0800b010                DMA1_Stream4_IRQHandler
+                0x0800b010                FMC_IRQHandler
+                0x0800b010                DMA2_Stream6_IRQHandler
+                0x0800b010                SAI1_IRQHandler
+                0x0800b010                DMA1_Stream3_IRQHandler
+ .text.LED      0x0800b016       0x10 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800b016                LED
+ *fill*         0x0800b026        0x2 
  .text.ESP_TASK
                 0x0800b028       0x20 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
                 0x0800b028                ESP_TASK
@@ -642,7 +642,7 @@ Linker script and memory map
  *(.rodata)
  .rodata        0x0800b34c        0x6 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
  *fill*         0x0800b352        0x2 
- .rodata        0x0800b354       0x92 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+ .rodata        0x0800b354       0x92 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
  *fill*         0x0800b3e6        0x2 
  .rodata        0x0800b3e8       0x2c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.rodata*)
@@ -668,10 +668,10 @@ Linker script and memory map
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
  .data          0x20000000        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.data*)
  .data.nvic_stat
@@ -679,13 +679,13 @@ Linker script and memory map
                 0x20000000                nvic_stat
  *fill*         0x20000001        0x3 
  .data.ESP_Commands
-                0x20000004       0x1c C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x20000004       0x1c C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
                 0x20000004                ESP_Commands
  .data.OLED_Buffer
-                0x20000020        0x4 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x20000020        0x4 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
                 0x20000020                OLED_Buffer
  .data.OLED_DisplayBuffer
-                0x20000024        0x4 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x20000024        0x4 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
                 0x20000024                OLED_DisplayBuffer
  .data.Uart1_configuration
                 0x20000028        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
@@ -701,7 +701,7 @@ Linker script and memory map
 .igot.plt       0x20000048        0x0 load address 0x0800b460
  .igot.plt      0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000048      0x8f4 load address 0x0800b460
+.bss            0x20000048      0x8f0 load address 0x0800b460
                 0x20000048                _sbss = .
  *(.bss)
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -713,10 +713,10 @@ Linker script and memory map
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
  .bss           0x20000048        0x0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.bss*)
  .bss.Local_PvFunction
@@ -753,44 +753,42 @@ Linker script and memory map
                 0x200000f2        0x2 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .bss.I2C1_Address
                 0x200000f4        0x1 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
- *fill*         0x200000f5        0x3 
- .bss.Local_PvFunction
-                0x200000f8        0x4 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .bss.SysTask   0x200000fc       0x18 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x200000fc                SysTask
- .bss.CPU_Load  0x20000114        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
-                0x20000114                CPU_Load
  .bss.ESP_APPLICATION_FLAG
-                0x20000120        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                0x20000120                ESP_APPLICATION_FLAG
+                0x200000f5        0x1 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+                0x200000f5                ESP_APPLICATION_FLAG
  .bss.ESP_Commands_Counter.0
-                0x20000121        0x1 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- *fill*         0x20000122        0x2 
- .bss.BufferA   0x20000124      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x20000124                BufferA
- .bss.BufferB   0x20000524      0x400 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                0x20000524                BufferB
+                0x200000f6        0x1 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ *fill*         0x200000f7        0x1 
+ .bss.BufferA   0x200000f8      0x400 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x200000f8                BufferA
+ .bss.BufferB   0x200004f8      0x400 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                0x200004f8                BufferB
+ .bss.Local_PvFunction
+                0x200008f8        0x4 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .bss.SysTask   0x200008fc       0x18 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x200008fc                SysTask
+ .bss.CPU_Load  0x20000914        0xc C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x20000914                CPU_Load
  .bss.RCC_Configuration
-                0x20000924        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x20000924                RCC_Configuration
+                0x20000920        0xc C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x20000920                RCC_Configuration
  .bss.counter.2
-                0x20000930        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x2000092c        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .bss.counter.1
-                0x20000934        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .bss.y.0       0x20000938        0x1 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x2000093c                . = ALIGN (0x4)
- *fill*         0x20000939        0x3 
-                0x2000093c                _ebss = .
+                0x20000930        0x4 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .bss.y.0       0x20000934        0x1 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x20000938                . = ALIGN (0x4)
+ *fill*         0x20000935        0x3 
+                0x20000938                _ebss = .
 
 ._user_heap_stack
-                0x2000093c     0x1204 load address 0x0800b460
-                0x20000940                . = ALIGN (0x8)
- *fill*         0x2000093c        0x4 
-                0x20000b40                . = (. + _Min_Heap_Size)
- *fill*         0x20000940      0x200 
-                0x20001b40                . = (. + _Min_Stack_Size)
- *fill*         0x20000b40     0x1000 
-                0x20001b40                . = ALIGN (0x8)
+                0x20000938     0x1200 load address 0x0800b460
+                0x20000938                . = ALIGN (0x8)
+                0x20000b38                . = (. + _Min_Heap_Size)
+ *fill*         0x20000938      0x200 
+                0x20001b38                . = (. + _Min_Stack_Size)
+ *fill*         0x20000b38     0x1000 
+                0x20001b38                . = ALIGN (0x8)
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -800,10 +798,10 @@ LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/DMA/src/DMA.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+LOAD C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+LOAD C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-LOAD C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-LOAD C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
 LOAD C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 OUTPUT(C:/NUCLEO-F446RE/APP/Tools/application.elf elf32-littlearm)
 LOAD linker stubs
@@ -818,10 +816,10 @@ LOAD linker stubs
  .debug_info    0x00001b8b      0x3be C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .debug_info    0x00001f49      0x709 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_info    0x00002652      0x684 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_info    0x00002cd6      0x336 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_info    0x0000300c      0x148 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x00003154      0x1b8 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_info    0x0000330c      0x351 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+ .debug_info    0x00002cd6      0x1b8 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_info    0x00002e8e      0x351 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_info    0x000031df      0x336 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_info    0x00003515      0x148 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_info    0x0000365d      0x871 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .debug_abbrev   0x00000000     0x125f
@@ -834,10 +832,10 @@ LOAD linker stubs
  .debug_abbrev  0x00000819       0xfa C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .debug_abbrev  0x00000913      0x1ae C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_abbrev  0x00000ac1      0x1aa C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_abbrev  0x00000c6b      0x17c C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_abbrev  0x00000de7       0xe3 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x00000eca      0x120 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_abbrev  0x00000fea      0x12a C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+ .debug_abbrev  0x00000c6b      0x120 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_abbrev  0x00000d8b      0x12a C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_abbrev  0x00000eb5      0x17c C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_abbrev  0x00001031       0xe3 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_abbrev  0x00001114      0x14b C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .debug_aranges  0x00000000      0x588
@@ -860,13 +858,13 @@ LOAD linker stubs
  .debug_aranges
                 0x00000338       0xd0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_aranges
-                0x00000408       0x58 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x00000408       0x30 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
  .debug_aranges
-                0x00000460       0x28 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x00000438       0x50 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .debug_aranges
-                0x00000488       0x30 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x00000488       0x58 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_aranges
-                0x000004b8       0x50 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x000004e0       0x28 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_aranges
                 0x00000508       0x80 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
@@ -880,10 +878,10 @@ LOAD linker stubs
  .debug_ranges  0x000001d8       0x40 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .debug_ranges  0x00000218       0xa0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_ranges  0x000002b8       0xc0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_ranges  0x00000378       0x48 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_ranges  0x000003c0       0x18 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_ranges  0x000003d8       0x20 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_ranges  0x000003f8       0x40 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+ .debug_ranges  0x00000378       0x20 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_ranges  0x00000398       0x40 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_ranges  0x000003d8       0x48 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_ranges  0x00000420       0x18 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_ranges  0x00000438       0x70 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .debug_macro    0x00000000     0x1707
@@ -913,12 +911,12 @@ LOAD linker stubs
  .debug_macro   0x000010f8       0x64 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_macro   0x0000115c       0x29 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_macro   0x00001185      0x130 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_macro   0x000012b5       0x44 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_macro   0x000012f9       0x10 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_macro   0x00001309       0x17 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_macro   0x00001320       0x3c C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_macro   0x0000135c       0x47 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_macro   0x000013a3       0x1c C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+ .debug_macro   0x000012b5       0x3c C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_macro   0x000012f1       0x47 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00001338       0x1c C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_macro   0x00001354       0x44 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_macro   0x00001398       0x10 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_macro   0x000013a8       0x17 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_macro   0x000013bf       0x94 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .debug_macro   0x00001453       0x76 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .debug_macro   0x000014c9       0x7c C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
@@ -926,7 +924,7 @@ LOAD linker stubs
  .debug_macro   0x0000167b       0x6a C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  .debug_macro   0x000016e5       0x22 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x25e1
+.debug_line     0x00000000     0x25e5
  .debug_line    0x00000000      0x2c0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -936,13 +934,13 @@ LOAD linker stubs
  .debug_line    0x00001017      0x216 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .debug_line    0x0000122d      0x4cb C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_line    0x000016f8      0x597 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_line    0x00001c8f      0x225 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_line    0x00001eb4       0xe1 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00001f95      0x124 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_line    0x000020b9      0x21a C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
- .debug_line    0x000022d3      0x30e C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_line    0x00001c8f      0x125 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_line    0x00001db4      0x21b C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_line    0x00001fcf      0x225 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_line    0x000021f4       0xe1 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .debug_line    0x000022d5      0x310 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x66b3
+.debug_str      0x00000000     0x66b5
  .debug_str     0x00000000     0x3506 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x3584 (size before relaxing)
  .debug_str     0x00003506      0x4c4 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
@@ -961,15 +959,15 @@ LOAD linker stubs
                                0x32bb (size before relaxing)
  .debug_str     0x0000589c      0x8e0 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
                                0x3635 (size before relaxing)
- .debug_str     0x0000617c      0x1ef C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_str     0x0000617c       0x76 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+                               0x3069 (size before relaxing)
+ .debug_str     0x000061f2      0x157 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+                               0x3199 (size before relaxing)
+ .debug_str     0x00006349      0x1ef C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
                                0x3183 (size before relaxing)
- .debug_str     0x0000636b       0xa5 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .debug_str     0x00006538       0xa5 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
                                0x2d2e (size before relaxing)
- .debug_str     0x00006410       0x75 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
-                               0x3068 (size before relaxing)
- .debug_str     0x00006485      0x156 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
-                               0x3198 (size before relaxing)
- .debug_str     0x000065db       0xd8 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_str     0x000065dd       0xd8 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
                                0x4a45 (size before relaxing)
 
 .comment        0x00000000       0x49
@@ -983,10 +981,10 @@ LOAD linker stubs
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
  .comment       0x00000049       0x4a C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .ARM.attributes
@@ -1010,13 +1008,13 @@ LOAD linker stubs
  .ARM.attributes
                 0x000001a0       0x34 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
  .ARM.attributes
-                0x000001d4       0x34 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+                0x000001d4       0x34 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
  .ARM.attributes
-                0x00000208       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x00000208       0x34 C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
  .ARM.attributes
-                0x0000023c       0x34 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
+                0x0000023c       0x34 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .ARM.attributes
-                0x00000270       0x34 C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+                0x00000270       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .ARM.attributes
                 0x000002a4       0x34 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
@@ -1030,8 +1028,8 @@ LOAD linker stubs
  .debug_frame   0x00000810      0x100 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/Basic_Timer/src/Basic_Timer.o
  .debug_frame   0x00000910      0x2b8 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .debug_frame   0x00000bc8      0x354 C:/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_frame   0x00000f1c      0x138 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_frame   0x00001054       0x48 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_frame   0x0000109c       0x80 C:/NUCLEO-F446RE/APP/Build/Object/P1/ESP/ESP.o
- .debug_frame   0x0000111c      0x11c C:/NUCLEO-F446RE/APP/Build/Object/P1/OLED/OLED.o
+ .debug_frame   0x00000f1c       0x80 C:/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_frame   0x00000f9c      0x11c C:/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_frame   0x000010b8      0x138 C:/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_frame   0x000011f0       0x48 C:/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
  .debug_frame   0x00001238      0x1a0 C:/NUCLEO-F446RE/APP/Build/Object/Src/main.o
