@@ -24,6 +24,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/FLASH/src\
            $(HAL_path)/ESP\
            $(HAL_path)/OLED\
+           $(P1_path)/FLAPPY_Bird\
 		   ../RTOS\
            ../Startup\
 		   ../Src\
@@ -33,7 +34,8 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
 INC_DIRS = ../Inc/ \
 		   ../RTOS\
            $(wildcard $(MCAL_path)/*/inc/) \
-           $(wildcard $(HAL_path)/*/)
+           $(wildcard $(HAL_path)/*/)\
+           $(wildcard $(P1_path)/*/)
 
 INC_FLAGS = $(addprefix -I,$(INC_DIRS))
 

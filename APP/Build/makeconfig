@@ -13,4 +13,5 @@ BIN=arm-none-eabi-objcopy
 STL="C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
 MCAL_path := ../MCAL
 HAL_path := ../HAL
+P1_path := ../P1
 SIZE=arm-none-eabi-size

@@ -18,6 +18,7 @@
         "esp.h": "c",
         "rtos.h": "c",
         "oled.h": "c",
-        "i2c.h": "c"
+        "i2c.h": "c",
+        "spi.h": "c"
     }
 }
