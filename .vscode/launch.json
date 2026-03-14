@@ -2,9 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug APP",
+            "name": "Debug Full System",
             "type": "cortex-debug",
             "request": "launch",
+            "servertype": "openocd",
             "gdbPath": "gdb-multiarch",
             "servertype": "openocd",
             "executable": "${workspaceFolder}/APP/Tools/application.elf",

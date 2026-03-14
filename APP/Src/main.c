@@ -75,10 +75,10 @@ void ESP_TASK(void)
 void OS_10ms_Task(void)
 {
   uint32 static counter = 0;
-  UART_SendSyncBuffer(UART2, "10ms_task\n", 10);
-  UART_SendSyncBuffer(UART2, "cpu load is ", 12);
-  UART_voidSendNumber(UART2, RTOS_u8GetCPULoad());
-  UART_SendSyncBuffer(UART2, "\n", 1);
+UART_SendSyncBuffer(UART2, "10ms_task\r\n", 11);
+UART_SendSyncBuffer(UART2, "cpu load is ", 12);
+UART_voidSendNumber(UART2, RTOS_u8GetCPULoad());
+UART_SendSyncBuffer(UART2, "\r\n", 2);
 }
 void OS_5ms_Task(void)
 {
@@ -96,13 +96,13 @@ void OS_IDLE_TASK(void)
 }
 
 void main(void)
-{
+{ 
   GPIO_PIN_CONFIG();
   ENABLE_NVIC_INTERRUPTS();
   CallBackFunctions();
   APP_init();
-  RTOS_voidCreateTask(1, 300, LED);
-  //RTOS_voidCreateTask(0, 10, OS_5ms_Task);
+  RTOS_voidCreateTask(0, 300, OS_10ms_Task);
+  RTOS_voidCreateTask(1, 1000, LED);
   while (1)
   {
   }
@@ -115,8 +115,8 @@ void APP_init(void)
   UART_Init(UART3, &Uart2_configuration, 16000000);
   //_Init(&spi_config);
 
-  I2C_Init(I2C1_PORT, &config);
-  OLED_Init(I2C1_PORT);
+  //I2C_Init(I2C1_PORT, &config);
+  //OLED_Init(I2C1_PORT);
   RTOS_voidStart();
 }
 
