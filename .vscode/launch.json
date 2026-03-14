@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug APP",
+            "type": "cortex-debug",
+            "request": "launch",
+            "gdbPath": "gdb-multiarch",
+            "servertype": "openocd",
+            "executable": "${workspaceFolder}/APP/Tools/application.elf",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "loadAddress": "0x08008000",
+            "preLaunchTask": "build"
+        }
+    ]
+}

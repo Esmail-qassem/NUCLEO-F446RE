@@ -45,7 +45,7 @@ SECTIONS{
   } >FLASH
 
 /*used by the startup code*/
-_sidata= LOADADDR(.data);
+_sidata = LOADADDR(.data);
   /* .data section, Initialized data sections into "RAM" Ram type memory */
   .data :
   {

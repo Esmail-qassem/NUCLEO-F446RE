@@ -4,7 +4,7 @@
 #include "RTOS.h"
 #include "GPIO_interface.h"
 #include "UART.h"
-#include "SPI.h"
+//#include "SPI.h"
 #include "Basic_Timer.h"
 #include "FLASH.h"
 #include "ESP.h"
@@ -33,16 +33,16 @@ UART_Config_t Uart2_configuration = {
     UART_WORDLEN_8B,
     Interrupt};
 
-const SPI_Config_t spi_config =
-    {
-        SPI1,
-        2, /* 2,4,8,16,32,64,128,256 (driver maps to BR bits) */
-        SPI_MODE_0,
-        1, /* 1=master, 0=slave */
-        8, /* 8 or 16 bits */
-        0, /* 0=MSB first, 1=LSB first */
-        1, /* 1 -> SSM/SSI set (master) */
-};
+//const SPI_Config_t spi_config =
+//    {
+//        SPI1,
+//        2, /* 2,4,8,16,32,64,128,256 (driver maps to BR bits) */
+//        SPI_MODE_0,
+//        1, /* 1=master, 0=slave */
+//        8, /* 8 or 16 bits */
+//        0, /* 0=MSB first, 1=LSB first */
+//        1, /* 1 -> SSM/SSI set (master) */
+//};
 I2C_Config_t config = {400000, 0, 1, 0};
 
 /**************************************************************/
@@ -101,8 +101,8 @@ void main(void)
   ENABLE_NVIC_INTERRUPTS();
   CallBackFunctions();
   APP_init();
-  RTOS_voidCreateTask(1, 1000, LED);
-  RTOS_voidCreateTask(0, 10, OS_5ms_Task);
+  RTOS_voidCreateTask(1, 300, LED);
+  //RTOS_voidCreateTask(0, 10, OS_5ms_Task);
   while (1)
   {
   }
@@ -113,7 +113,7 @@ void APP_init(void)
   UART_Init(UART1, &Uart1_configuration, 16000000);
   UART_Init(UART2, &Uart2_configuration, 16000000);
   UART_Init(UART3, &Uart2_configuration, 16000000);
-  SPI_Init(&spi_config);
+  //_Init(&spi_config);
 
   I2C_Init(I2C1_PORT, &config);
   OLED_Init(I2C1_PORT);

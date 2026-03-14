@@ -1,4 +1,4 @@
-#include "spi.h"
+#include "SPI.h"
 
 /* ---------- Helper: map prescaler value (2..256) to CR1 BR bits ---------- */
 static uint32 prescaler_to_br_bits(uint32 prescaler)

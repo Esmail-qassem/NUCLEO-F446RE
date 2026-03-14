@@ -10,7 +10,7 @@ CFLAGS += -O0 -g3 -Wall -std=gnu11 -ffunction-sections -fdata-sections
 CFLAGS += -specs=nano.specs -lc -lm -lnosys
 LD=arm-none-eabi-ld
 BIN=arm-none-eabi-objcopy
-STL="C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe"
+STL=st-flash
 MCAL_path := ../MCAL
 HAL_path := ../HAL
 SIZE=arm-none-eabi-size

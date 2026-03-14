@@ -13,13 +13,12 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/GPIO/src \
            $(MCAL_path)/EXTI/src \
            $(MCAL_path)/AFIO/src \
-           $(MCAL_path)/SPI/src \
            $(MCAL_path)/UART/src \
            $(MCAL_path)/FPEC/src \
            $(MCAL_path)/PwrMD/src \
            $(MCAL_path)/DMA/src \
            $(MCAL_path)/IWDG/src \
-           $(MCAL_path)/Basic_Timer/src\
+           $(MCAL_path)/BASIC_TIMER/src\
            $(MCAL_path)/I2C/src\
            $(MCAL_path)/FLASH/src\
            $(HAL_path)/ESP\
@@ -56,17 +55,17 @@ all: $(Images)/application.bin size
 
 size: $(Images)/application.elf
 	@$(SIZE) $<
-	@echo -e "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)"
 
 $(Images)/application.bin: $(Images)/application.elf
 	@$(BIN) -O binary $< $@
 	@$(BIN) -O ihex $< $(@:.bin=.hex)
 	@cp $(@:.bin=.hex) $(@:.bin=.txt)
-	@echo -e "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)"
 
 $(Images)/application.elf: $(OBJ_FILES)
 	@if [ -z "$(OBJ_FILES)" ]; then \
-		echo -e "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
+		echo  "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
 		exit 1; \
 	fi
 # 	@$(info MCAL_path = $(MCAL_path))
@@ -74,24 +73,25 @@ $(Images)/application.elf: $(OBJ_FILES)
 # 	@$(info SRC_DIRS = $(SRC_DIRS))
 # 	@$(info SRC_FILES = $(SRC_FILES))
 # 	@$(info OBJ_FILES = $(OBJ_FILES))
-	@echo -e "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)"
 	@$(LD) -Map $(Images)/application.map -T $(LinkerDir)/LinkerScript.ld $(OBJ_FILES) -o $@
-	@echo -e "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)"
 
 
 $(OBJDIR)/%.o: ../%.c
 	@mkdir -p $(dir $@)
-	@echo -e "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)"
 	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -c $< -o $@
 
 clean:
 	@rm -rf $(OBJDIR)/* $(Images)/*.elf $(Images)/*.map $(Images)/*.bin $(Images)/*.hex $(Images)/*.txt
-	@echo -e "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)"
 
 flash: $(Images)/application.bin
-	@$(STL) -c port=swd -d $< 0x08000000 -v -rst
+	@$(STL) --reset write $< 0x08000000
+
 
 erase:
-	@$(STL) -c port=swd -e all
+	@$(STL) erase
 
 -include $(DEP_FILES)
