@@ -256,7 +256,7 @@ Compiler flags:
 ---
 ## 👤 Author
 
-**Esmail Qassem Qassem Gomma  
+Esmail Qassem Gomma  
 Embedded Software Engineer  
 GitHub: [@Esmail-qassem](https://github.com/Esmail-qassem/NUCLEO-F446RE)
 
