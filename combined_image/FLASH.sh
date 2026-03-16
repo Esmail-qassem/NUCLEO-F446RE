@@ -6,7 +6,6 @@ echo "Flashing combined image..."
 st-flash --format ihex write $COMBINED_DIR/full_image.hex
 
 echo "Resetting via SWD..."
-sleep 1
 openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \
     -c "init" \
     -c "arm semihosting enable" \
