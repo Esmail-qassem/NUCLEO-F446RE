@@ -18,7 +18,7 @@ RCC_Config_t RCC_Configuration=
 };
 
 UART_Config_t Uart_configuration={
-  921600,
+  115200,
   UART_MODE_TX_RX,
   UART_PARITY_NONE,
   UART_STOPBITS_1,

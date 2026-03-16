@@ -1,7 +1,7 @@
 #ifndef RTOS_INTERFACE_H_
 #define RTOS_INTERFACE_H_
 
-#define TASK_NUMBER  2
+#define TASK_NUMBER  4
 
 
 typedef enum

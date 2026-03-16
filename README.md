@@ -12,6 +12,7 @@ This project demonstrates a full embedded firmware architecture from scratch —
 - ✅ Direct register-level peripheral drivers
 - ✅ Three-stage boot architecture: BM → BTLD → APP
 - ✅ Custom bootloader supporting `.bin` and `.hex` over UART
+- ✅ OTA firmware update over UART at 115200 baud (~1.17 seconds)
 - ✅ Custom bare-metal RTOS scheduler
 - ✅ Modular MCAL + HAL driver architecture
 - ✅ Makefile-based build system with custom linker scripts
@@ -28,31 +29,61 @@ This project demonstrates a full embedded firmware architecture from scratch —
 │  BM (16 KB)  │ BTLD (16 KB) │     APP (480 KB)      │
 │ 0x08000000   │ 0x08004000   │     0x08008000        │
 └──────────────┴──────────────┴───────────────────────┘
-```
-
-### Boot Flow
-
-```
-Reset
-  │
-  ▼
-BM (Boot Manager) @ 0x08000000
-  │  • Checks power reset flag
-  │  • Decides: firmware update or run application
-  │
-  ├──[Update requested]──► BTLD (Bootloader) @ 0x08004000
-  │                           │  • Receives .bin or .hex over UART
-  │                           │  • Erases target flash region
-  │                           │  • Writes and verifies new image
-  │                           │  • Jumps to APP after update
-  │
-  └──[No update]────────► APP (Application) @ 0x08008000
-                              │  • Sets VTOR to 0x08008000
-                              │  • Starts custom RTOS scheduler
-                              │  • Runs application tasks
+│                   RAM (128 KB)                      │
+│              0x20000000 - 0x20020000                │
+└─────────────────────────────────────────────────────┘
 ```
 
 ---
+
+## 🔄 Boot Flow
+
+```
+Power ON / SW Reset
+        │
+        ▼
+┌───────────────────────────────────────┐
+│         BM (Boot Manager)             │
+│         @ 0x08000000                  │
+│                                       │
+│  Reads RCC reset flags:               │
+│  • PowerReset → jump to APP           │
+│  • SwReset    → jump to APP           │
+│  • PinReset   → jump to BTLD          │
+└───────────────────────────────────────┘
+        │                    │
+        │ PinReset            │ PowerReset / SwReset
+        ▼                    ▼
+┌──────────────┐    ┌───────────────────────────────────┐
+│     BTLD     │    │            APP                    │
+│ @ 0x08004000 │    │        @ 0x08008000               │
+│              │    │                                   │
+│ • Receives   │    │ • Sets VTOR = 0x08008000          │
+│   .bin/.hex  │    │ • Starts RTOS scheduler           │
+│   over UART  │    │ • Runs application tasks          │
+│ • Erases     │    │ • UART logging @ 921600 or 115200 │
+│   APP flash  │    │ • ESP WiFi communication          │
+│ • Writes new │    │ • OLED display                    │
+│   firmware   │    └───────────────────────────────────┘
+│ • Verifies   │
+│ • SW Reset   │──► BM sees SwReset ──► jumps to APP
+└──────────────┘
+```
+
+### Reset Flag Logic
+
+| Reset Type | Cause | BM Action |
+|------------|-------|-----------|
+| `PowerReset` | Power on / unplug-replug | Jump to APP |
+| `SwReset` | Software reset (SYSRESETREQ) | Jump to APP |
+| `PinReset` | NRST pin / reset button | Jump to BTLD |
+
+> **Note:** `st-flash --reset` triggers a **pin reset** → goes to BTLD.
+> OpenOCD `reset run` triggers a **SW reset** → goes to APP.
+> This is why pressing F5 in VS Code works correctly.
+
+---
+
 ## 🗂️ Repository Structure
 
 ```
@@ -108,9 +139,8 @@ NUCLEO-F446RE/
 │   ├── FULL_IMAGE.sh           # Build BM + BTLD + APP
 │   ├── FLASH.sh                # Flash combined image to board
 │   ├── clean_all.sh            # Clean all build outputs
-│   └── full_image.hex          # Generated combined hex
-│
-├── flash.sh                    # Master flash script (all modes)
+│   ├── full_image.hex          # Generated combined hex
+│   └── send_bin.py             # OTA firmware update script
 │
 ├── .vscode/
 │   ├── launch.json             # Cortex-Debug configuration
@@ -129,21 +159,9 @@ NUCLEO-F446RE/
 sudo apt update
 sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi gdb-multiarch
 sudo apt install make stlink-tools openocd srecord picocom
+pip install pyserial --break-system-packages
 ```
 
-### USB Permissions (run once)
-
-```bash
-sudo usermod -aG dialout $USER
-sudo usermod -aG plugdev $USER
-sudo nano /etc/udev/rules.d/49-stlink.rules
-```
-### VS Code Extensions
-
-- **Cortex-Debug** by marus25
-- **Serial Monitor** by Microsoft
-
----
 
 ## 🚀 Getting Started
 
@@ -206,6 +224,64 @@ cd BTLD/Build && ./m.sh
 
 ---
 
+## 📡 OTA Firmware Update
+
+The bootloader supports receiving a new `.bin` firmware image over UART and flashing it to the APP region — **no ST-Link required**.
+
+### How it works
+
+```
+PC                              STM32
+│                                  │
+│  1. Press reset button           │
+│  ───────────────────────────►    │ BM: PinReset → jump to BTLD
+│                                  │
+│  2. python3 send_bin.py app.bin  │
+│  ───────────────────────────►    │ BTLD: receive bytes @ 115200
+│                                  │ BTLD: write 4 bytes at a time to flash
+│                                  │ BTLD: verify stack ptr + reset handler
+│                                  │ BTLD: SW reset
+│                                  │ BM: SwReset → jump to APP ✅
+```
+
+### Verification
+
+After receiving the full image, BTLD verifies the first 8 bytes of the APP region:
+
+| Address | Expected value | Meaning |
+|---------|---------------|---------|
+| `0x08008000` | `0x20000000` – `0x20020000` | Valid stack pointer in RAM |
+| `0x08008004` | `0x08008000` – `0x08080000` | Valid reset handler in APP flash |
+
+If both pass → soft reset → APP runs ✅
+If either fails → BTLD stays waiting for retry ❌
+
+### Send firmware
+
+```bash
+# Install pyserial (once)
+pip install pyserial --break-system-packages
+
+# Press reset button on board to enter BTLD, then:
+python3 send_bin.py APP/Tools/application.bin
+```
+
+**Expected output:**
+```
+Sending 13532 bytes...
+Done!
+```
+
+**Serial monitor (115200 baud):**
+```
+BTLD
+Verification OK!
+```
+
+Transfer time: **~1.17 seconds** at 115200 baud.
+
+---
+
 ## 🐛 Debug
 
 1. Flash the full system:
@@ -225,14 +301,24 @@ cd BTLD/Build && ./m.sh
 
 To watch a variable: open **Run & Debug** sidebar → **WATCH** panel → click `+` → type variable name.
 
+> **Note:** F5 uses OpenOCD which triggers SW reset → BM jumps to APP correctly.
+> `st-flash --reset` triggers pin reset → BM jumps to BTLD instead.
+
 ---
 
-## 📡 Serial Monitor
+## 📺 Serial Monitor
 
-UART2 @ 921600 baud** on `/dev/ttyACM0`
+| Interface | Baud Rate | Purpose |
+|-----------|-----------|---------|
+| UART2 | 921600 | APP logging / debug output |
+| UART2 | 115200 | BTLD firmware receive |
 
 ```bash
+# Monitor APP output
 picocom -b 921600 /dev/ttyACM0
+
+# Monitor BTLD output
+picocom -b 115200 /dev/ttyACM0
 ```
 
 Exit: `Ctrl+A` then `Ctrl+X`
@@ -254,10 +340,11 @@ Compiler flags:
 ```
 
 ---
+
 ## 👤 Author
 
-Esmail Qassem Gomma  
-Embedded Software Engineer  
+**Esmail Qassem Gomma**
+Embedded Software Engineer
 GitHub: [@Esmail-qassem](https://github.com/Esmail-qassem/NUCLEO-F446RE)
 
 ---

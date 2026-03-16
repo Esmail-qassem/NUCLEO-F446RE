@@ -3,13 +3,13 @@
 uint8* ESP_Commands[] =
 {
     (uint8*)"AT\r\n",
-    (uint8*)"AT+CWMODE?\r\n",
     (uint8*)"AT+CWMODE=1\r\n",
-    //(uint8*)"AT+CWJAP=\"ESMAIL\",\"123456789\"\r\n",
+    (uint8*)"AT+CWJAP=\"ZzZz\",\"Esmail_122001\"\r\n",
     (uint8*)"AT+CIFSR\r\n",
-    (uint8*)"AT+CIPSTART=\"TCP\",\"192.168.137.1\",8080\r\n",
-    (uint8*)"AT+CIPSEND=33\r\n",
-    (uint8*)"GET /application.bin HTTP/1.1\r\n\r\n"
+    (uint8*)"AT+PING=\"8.8.8.8\"\r\n",
+    (uint8*)"AT+CIPSTART=\"TCP\",\"example.com\",80\r\n",
+    (uint8*)"AT+CIPSEND=18\r\n",
+    (uint8*)"GET / HTTP/1.1\r\n\r\n"
 
 };
 

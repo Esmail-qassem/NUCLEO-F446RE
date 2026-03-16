@@ -46,17 +46,17 @@ all: $(Images)/BTLD.bin size
 
 size: $(Images)/BTLD.elf
 	@$(SIZE) $<
-	@echo -e "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)"
 
 $(Images)/BTLD.bin: $(Images)/BTLD.elf
 	@$(BIN) -O binary $< $@
 	@$(BIN) -O ihex $< $(@:.bin=.hex)
 	@cp $(@:.bin=.hex) $(@:.bin=.txt)
-	@echo -e "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)"
 
 $(Images)/BTLD.elf: $(OBJ_FILES)
 	@if [ -z "$(OBJ_FILES)" ]; then \
-		echo -e "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
+		echo  "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
 		exit 1; \
 	fi
 # 	@$(info MCAL_path = $(MCAL_path))
@@ -64,24 +64,24 @@ $(Images)/BTLD.elf: $(OBJ_FILES)
 # 	@$(info SRC_DIRS = $(SRC_DIRS))
 # 	@$(info SRC_FILES = $(SRC_FILES))
 # 	@$(info OBJ_FILES = $(OBJ_FILES))
-	@echo -e "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)"
 	@$(LD) -Map $(Images)/BTLD.map -T $(LinkerDir)/LinkerScript.ld $(OBJ_FILES) -o $@
-	@echo -e "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)"
+	@echo  "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)"
 
 
 $(OBJDIR)/%.o: ../%.c
 	@mkdir -p $(dir $@)
-	@echo -e "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)"
 	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -c $< -o $@
 
 clean:
 	@rm -rf $(OBJDIR)/* $(Images)/*.elf $(Images)/*.map $(Images)/*.bin $(Images)/*.hex $(Images)/*.txt
-	@echo -e "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)"
+	@echo  "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)"
 
 flash: $(Images)/BTLD.bin
 	@$(STL) -c port=swd -d $< 0x08000000 -v -rst
 
 erase:
-	@$(STL) -c port=swd -e all
+	@$(STL) -c port=swd  all
 
 -include $(DEP_FILES)

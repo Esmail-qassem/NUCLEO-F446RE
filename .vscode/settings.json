@@ -20,5 +20,6 @@
         "oled.h": "c",
         "i2c.h": "c",
         "spi.h": "c"
-    }
+    },
+    "cortex-debug.variableUseNaturalFormat": false
 }

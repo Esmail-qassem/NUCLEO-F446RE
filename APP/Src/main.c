@@ -26,7 +26,7 @@ UART_Config_t Uart1_configuration = {
     UART_WORDLEN_8B,
     Interrupt};
 UART_Config_t Uart2_configuration = {
-    921600, // 921600
+    115200, // 921600
     UART_MODE_TX_RX,
     UART_PARITY_NONE,
     UART_STOPBITS_1,
@@ -68,14 +68,12 @@ void ESP_TASK(void)
   }
   else
   {
-    RTOS_voidSuspendTask(3);
+    RTOS_voidSuspendTask(1);
   }
 }
 
 void OS_10ms_Task(void)
 {
-  uint32 static counter = 0;
-UART_SendSyncBuffer(UART2, "10ms_task\r\n", 11);
 UART_SendSyncBuffer(UART2, "cpu load is ", 12);
 UART_voidSendNumber(UART2, RTOS_u8GetCPULoad());
 UART_SendSyncBuffer(UART2, "\r\n", 2);
@@ -91,18 +89,27 @@ void OS_5ms_Task(void)
   OLED_UpdateScreen(I2C1_PORT);
   OLED_Clear();
 }
-void OS_IDLE_TASK(void)
+OS_IDLE_TASK()
 {
+ // GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
-
+void LifeCounter(void)
+{
+  static uint32 counter = 0;
+  UART_SendSyncBuffer(UART2, "Life counter: ", 14);
+  UART_voidSendNumber(UART2, counter);
+  UART_SendSyncBuffer(UART2, "\r\n", 2);
+  counter++;
+}
 void main(void)
 { 
   GPIO_PIN_CONFIG();
   ENABLE_NVIC_INTERRUPTS();
   CallBackFunctions();
   APP_init();
-  RTOS_voidCreateTask(0, 300, OS_10ms_Task);
-  RTOS_voidCreateTask(1, 1000, LED);
+  RTOS_voidCreateTask(0, 500, LED);
+  //RTOS_voidCreateTask(1, 5000, ESP_TASK);
+  RTOS_voidCreateTask(2, 1000, LifeCounter);
   while (1)
   {
   }
@@ -178,6 +185,7 @@ void UART1_ISR(uint8 num)
 void UART2_ISR(uint8 num)
 {
   UART_SendSyncBuffer(UART2, (uint8 *)"UART2 ISR\r\n", 12);
+  OS_10ms_Task();
 }
 
 void SystemInit(void)
