@@ -652,25 +652,25 @@ Linker script and memory map
 .iplt           0x0800b3ac        0x0
  .iplt          0x0800b3ac        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x0800b3ac       0xe4
+.rodata         0x0800b3ac       0xe0
                 0x0800b3ac                        . = ALIGN (0x4)
  *(.rodata)
  .rodata        0x0800b3ac        0x6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
  *fill*         0x0800b3b2        0x2 
  .rodata        0x0800b3b4       0xa7 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
  *fill*         0x0800b45b        0x1 
- .rodata        0x0800b45c       0x30 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .rodata        0x0800b45c       0x2c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.rodata*)
  .rodata.MSP_Value
-                0x0800b48c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800b48c                MSP_Value
-                0x0800b490                        . = ALIGN (0x4)
-                0x0800b490                        _sidata = LOADADDR (.data)
+                0x0800b488        0x4 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800b488                MSP_Value
+                0x0800b48c                        . = ALIGN (0x4)
+                0x0800b48c                        _sidata = LOADADDR (.data)
 
-.rel.dyn        0x0800b490        0x0
- .rel.iplt      0x0800b490        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x0800b48c        0x0
+ .rel.iplt      0x0800b48c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x4c load address 0x0800b490
+.data           0x20000000       0x4c load address 0x0800b48c
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -714,10 +714,10 @@ Linker script and memory map
                 0x2000004c                        . = ALIGN (0x4)
                 0x2000004c                        _edata = .
 
-.igot.plt       0x2000004c        0x0 load address 0x0800b4dc
+.igot.plt       0x2000004c        0x0 load address 0x0800b4d8
  .igot.plt      0x2000004c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x2000004c      0x908 load address 0x0800b4dc
+.bss            0x2000004c      0x908 load address 0x0800b4d8
                 0x2000004c                        _sbss = .
  *(.bss)
  .bss           0x2000004c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -800,7 +800,7 @@ Linker script and memory map
                 0x20000954                        _ebss = .
 
 ._user_heap_stack
-                0x20000954     0x1204 load address 0x0800b4dc
+                0x20000954     0x1204 load address 0x0800b4d8
                 0x20000958                        . = ALIGN (0x8)
  *fill*         0x20000954        0x4 
                 0x20000b58                        . = (. + _Min_Heap_Size)

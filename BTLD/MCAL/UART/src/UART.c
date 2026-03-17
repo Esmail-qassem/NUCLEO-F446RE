@@ -213,6 +213,7 @@ void USART1_IRQHandler(void)
     if (status & (1 << 5))  // RXNE
     {
         rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
+        ms_ticks=0;
         uart1_funcPtr(rx_test);
     }
     

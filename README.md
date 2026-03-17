@@ -12,7 +12,8 @@ This project demonstrates a full embedded firmware architecture from scratch —
 - ✅ Direct register-level peripheral drivers
 - ✅ Three-stage boot architecture: BM → BTLD → APP
 - ✅ Custom bootloader supporting `.bin` and `.hex` over UART
-- ✅ OTA firmware update over UART at 115200 baud (~1.17 seconds)
+- ✅ Wired OTA firmware update over UART at 115200 baud (~1.17 seconds)
+- ✅ **Wireless OTA** via ESP8266 + RPi4 server — no PC required!
 - ✅ Custom bare-metal RTOS scheduler
 - ✅ Modular MCAL + HAL driver architecture
 - ✅ Makefile-based build system with custom linker scripts
@@ -54,19 +55,19 @@ Power ON / SW Reset
         │                    │
         │ PinReset            │ PowerReset / SwReset
         ▼                    ▼
-┌──────────────┐    ┌───────────────────────────────────┐
-│     BTLD     │    │            APP                    │
-│ @ 0x08004000 │    │        @ 0x08008000               │
-│              │    │                                   │
-│ • Receives   │    │ • Sets VTOR = 0x08008000          │
-│   .bin/.hex  │    │ • Starts RTOS scheduler           │
-│   over UART  │    │ • Runs application tasks          │
-│ • Erases     │    │ • UART logging @ 921600 or 115200 │
-│   APP flash  │    │ • ESP WiFi communication          │
-│ • Writes new │    │ • OLED display                    │
-│   firmware   │    └───────────────────────────────────┘
+┌──────────────┐    ┌─────────────────────────────────┐
+│     BTLD     │    │            APP                  │
+│ @ 0x08004000 │    │        @ 0x08008000             │
+│              │    │                                 │
+│ • Receives   │    │ • Sets VTOR = 0x08008000        │
+│   .bin/.hex  │    │ • Starts RTOS scheduler         │
+│   over UART  │    │ • Runs application tasks        │
+│ • Erases     │    │ • UART logging @ 921600         │
+│   APP flash  │    │ • ESP WiFi communication        │
+│ • Writes new │    │ • OLED display                  │
+│   firmware   │    └─────────────────────────────────┘
 │ • Verifies   │
-│ • SW Reset   │──► BM sees SwReset ──► jumps to APP
+│ • SW Reset   │──► BM sees SwReset ──► jumps to APP ✅
 └──────────────┘
 ```
 
@@ -140,7 +141,16 @@ NUCLEO-F446RE/
 │   ├── FLASH.sh                # Flash combined image to board
 │   ├── clean_all.sh            # Clean all build outputs
 │   ├── full_image.hex          # Generated combined hex
-│   └── send_bin.py             # OTA firmware update script
+│   └── send_bin.py             # Wired OTA script (direct UART)
+│
+├── ESP_OTA/
+│   └── ESP_OTA.ino             # ESP8266 wireless OTA client code
+│
+├── RPi4_server/
+│   └── server.py               # Flask OTA server for RPi4
+│
+├── flash.sh                    # Master flash script (all modes)
+├── upload_firmware.sh          # Upload new firmware to RPi4 server
 │
 ├── .vscode/
 │   ├── launch.json             # Cortex-Debug configuration
@@ -162,6 +172,32 @@ sudo apt install make stlink-tools openocd srecord picocom
 pip install pyserial --break-system-packages
 ```
 
+### USB Permissions (run once)
+
+```bash
+sudo usermod -aG dialout $USER
+sudo usermod -aG plugdev $USER
+sudo nano /etc/udev/rules.d/49-stlink.rules
+```
+
+Add:
+```
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="374b", MODE="0666", GROUP="plugdev"
+```
+
+```bash
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+Log out and back in.
+
+### VS Code Extensions
+
+- **Cortex-Debug** by marus25
+- **C/C++** by Microsoft
+- **Serial Monitor** by Microsoft
+
+---
 
 ## 🚀 Getting Started
 
@@ -172,6 +208,7 @@ cd NUCLEO-F446RE
 
 # Make scripts executable
 chmod +x flash.sh
+chmod +x upload_firmware.sh
 chmod +x combined_image/FULL_IMAGE.sh
 chmod +x combined_image/FLASH.sh
 chmod +x combined_image/clean_all.sh
@@ -224,9 +261,9 @@ cd BTLD/Build && ./m.sh
 
 ---
 
-## 📡 OTA Firmware Update
+## 📡 Wired OTA Firmware Update
 
-The bootloader supports receiving a new `.bin` firmware image over UART and flashing it to the APP region — **no ST-Link required**.
+The bootloader supports receiving a new `.bin` firmware image over UART directly from a PC — no ST-Link required.
 
 ### How it works
 
@@ -238,47 +275,174 @@ PC                              STM32
 │                                  │
 │  2. python3 send_bin.py app.bin  │
 │  ───────────────────────────►    │ BTLD: receive bytes @ 115200
-│                                  │ BTLD: write 4 bytes at a time to flash
+│                                  │ BTLD: write 4 bytes at a time
 │                                  │ BTLD: verify stack ptr + reset handler
 │                                  │ BTLD: SW reset
 │                                  │ BM: SwReset → jump to APP ✅
 ```
 
-### Verification
-
-After receiving the full image, BTLD verifies the first 8 bytes of the APP region:
-
-| Address | Expected value | Meaning |
-|---------|---------------|---------|
-| `0x08008000` | `0x20000000` – `0x20020000` | Valid stack pointer in RAM |
-| `0x08008004` | `0x08008000` – `0x08080000` | Valid reset handler in APP flash |
-
-If both pass → soft reset → APP runs ✅
-If either fails → BTLD stays waiting for retry ❌
-
 ### Send firmware
 
 ```bash
-# Install pyserial (once)
-pip install pyserial --break-system-packages
-
 # Press reset button on board to enter BTLD, then:
-python3 send_bin.py APP/Tools/application.bin
-```
-
-**Expected output:**
-```
-Sending 13532 bytes...
-Done!
-```
-
-**Serial monitor (115200 baud):**
-```
-BTLD
-Verification OK!
+python3 combined_image/send_bin.py APP/Tools/application.bin
 ```
 
 Transfer time: **~1.17 seconds** at 115200 baud.
+
+---
+
+## 📡 Wireless OTA Firmware Update
+
+A complete wireless OTA system built with **ESP8266 NodeMCU** as a WiFi gateway and **Raspberry Pi 4** as the firmware server. Upload new firmware from any PC on the same network — the STM32 updates automatically within 30 seconds, no cables needed.
+
+### System Architecture
+
+```
+┌──────────┐   HTTP POST    ┌──────────────┐   HTTP GET    ┌──────────────┐
+│  Your PC │ ─────────────► │  RPi4 Server │ ◄──────────── │  ESP8266     │
+│          │  upload_       │  Flask API   │               │  NodeMCU     │
+│          │  firmware.sh   │  port 5000   │               │              │
+└──────────┘                └──────────────┘               └──────┬───────┘
+                                                                  │ UART 115200
+                                                                  │ NRST pin
+                                                                  ▼
+                                                           ┌──────────────┐
+                                                           │  STM32F446   │
+                                                           │  BTLD → APP  │
+                                                           └──────────────┘
+```
+
+### Wireless OTA Flow
+
+```
+1. You run upload_firmware.sh on your PC
+         │ HTTP POST /upload
+         ▼
+2. RPi4 server stores new .bin + version
+         │
+         │ (ESP polls every 30 seconds)
+         ▼
+3. ESP detects new version: GET /version
+         │ GET /firmware
+         ▼
+4. ESP downloads .bin into RAM (~49KB free)
+         │
+         ▼
+5. ESP pulls STM32 NRST pin LOW → pin reset → BM → BTLD
+         │
+         ▼
+6. ESP sends .bin over UART @ 115200
+         │
+         ▼
+7. BTLD receives, flashes, verifies → SW reset → APP ✅
+         │
+         ▼
+8. ESP notifies RPi4: POST /status "ok"
+```
+
+---
+
+### ESP8266 Hardware Connections
+
+| ESP8266 Pin | Connects to | Purpose |
+|-------------|-------------|---------|
+| `TX` | STM32 UART2 RX (PA3) | Send firmware bytes |
+| `RX` | STM32 UART2 TX (PA2) | Receive debug output |
+| `D1` (GPIO5) | STM32 NRST | Trigger pin reset → BTLD |
+| `GND` | STM32 GND | Common ground |
+
+> ⚠️ All pins are 3.3V — connect directly, no level shifter needed.
+> ⚠️ Disconnect RX/TX wires when flashing new ESP firmware via USB.
+
+---
+
+### RPi4 Server Setup
+
+**Install dependencies:**
+```bash
+sudo apt update
+sudo apt install python3 python3-pip -y
+pip3 install flask --break-system-packages
+```
+
+**Create server directory:**
+```bash
+mkdir ~/ota_server
+cd ~/ota_server
+```
+
+**Copy server script:**
+```bash
+cp /path/to/RPi4_server/server.py ~/ota_server/
+```
+
+**Run the server:**
+```bash
+python3 server.py
+```
+
+Server runs on port `5000`. Find your RPi4 IP with:
+```bash
+hostname -I
+```
+
+**Run server on boot (optional):**
+```bash
+# Add to crontab
+crontab -e
+# Add this line:
+@reboot python3 /home/pi/ota_server/server.py &
+```
+
+### RPi4 Server API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/version` | GET | Returns current firmware version |
+| `/upload` | POST | Upload new `.bin` + version |
+| `/firmware` | GET | Download latest `.bin` |
+| `/status` | POST | ESP reports update result |
+
+---
+
+### Upload New Firmware
+
+From your PC, run the interactive upload script:
+
+```bash
+./upload_firmware.sh
+```
+
+```
+Enter server IP: 192.168.1.8
+Enter version: 1.2
+Uploading v1.2 to http://192.168.1.8:5000...
+Firmware v1.2 uploaded successfully!
+
+Done! ESP will pick it up within 30 seconds.
+```
+
+The ESP polls every **30 seconds** and automatically updates the STM32 when a new version is detected.
+
+---
+
+### ESP8266 Firmware
+
+The ESP8266 runs a custom Arduino sketch (`ESP_OTA/ESP_OTA.ino`) that:
+- Connects to WiFi on boot
+- Polls RPi4 every 30 seconds for new firmware version
+- Downloads firmware into RAM if new version detected
+- Triggers STM32 pin reset → enters BTLD
+- Sends firmware over UART at 115200 baud
+- Notifies RPi4 of update result
+
+**Configure WiFi and server IP in the sketch:**
+```cpp
+#define WIFI_SSID   "your_wifi_name"
+#define WIFI_PASS   "your_wifi_password"
+#define SERVER_IP   "192.168.1.8"   // ← your RPi4 IP
+```
 
 ---
 
