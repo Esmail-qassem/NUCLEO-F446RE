@@ -143,13 +143,7 @@ NUCLEO-F446RE/
 │   ├── full_image.hex          # Generated combined hex
 │   └── send_bin.py             # Wired OTA script (direct UART)
 │
-├── ESP_OTA/
-│   └── ESP_OTA.ino             # ESP8266 wireless OTA client code
 │
-├── RPi4_server/
-│   └── server.py               # Flask OTA server for RPi4
-│
-├── flash.sh                    # Master flash script (all modes)
 ├── upload_firmware.sh          # Upload new firmware to RPi4 server
 │
 ├── .vscode/
@@ -415,9 +409,9 @@ From your PC, run the interactive upload script:
 ```
 
 ```
-Enter server IP: 192.168.1.8
+Enter server IP: 192.168.1.xx
 Enter version: 1.2
-Uploading v1.2 to http://192.168.1.8:5000...
+Uploading v1.2 to http://192.168.1.xx:5000...
 Firmware v1.2 uploaded successfully!
 
 Done! ESP will pick it up within 30 seconds.
@@ -429,7 +423,7 @@ The ESP polls every **30 seconds** and automatically updates the STM32 when a ne
 
 ### ESP8266 Firmware
 
-The ESP8266 runs a custom Arduino sketch (`ESP_OTA/ESP_OTA.ino`) that:
+The ESP8266 runs code that:
 - Connects to WiFi on boot
 - Polls RPi4 every 30 seconds for new firmware version
 - Downloads firmware into RAM if new version detected
