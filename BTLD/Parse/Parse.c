@@ -216,10 +216,6 @@ void BootLoader_MainFunction(void)
         {
             UART_SendSyncBuffer(UART2, "\nVerification OK!\n", 18);
             flash_address = APP_START_ADDRESS;
-            UART_SendSyncBuffer(UART2, "\nFlash addr: ", 13);
-UART_voidSendNumber(UART2, flash_address);
-UART_SendSyncBuffer(UART2, "\nExpected: ", 11);
-UART_voidSendNumber(UART2, (uint32)(APP_START_ADDRESS + 13448));
             SCB_AIRCR = 0x5FA0004;
         }
         else

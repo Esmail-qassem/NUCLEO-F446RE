@@ -63,9 +63,9 @@ void I2C2_EV_IRQHandler                (void) __attribute__ ((alias ("Default_Ha
 void I2C2_ER_IRQHandler                (void) __attribute__ ((alias ("Default_Handler")));
 void SPI1_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
 void SPI2_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
-void USART1_IRQHandler                 (void) __attribute__ ((alias ("Default_Handler")));
+void USART1_IRQHandler                 (void) ;
 void USART2_IRQHandler                 (void);
-void USART3_IRQHandler                 (void) __attribute__ ((alias ("Default_Handler")));
+void USART3_IRQHandler                 (void) ;
 void EXTI15_10_IRQHandler              (void) __attribute__ ((alias ("Default_Handler")));
 void RTC_Alarm_IRQHandler              (void) __attribute__ ((alias ("Default_Handler")));
 void OTG_FS_WKUP_IRQHandler            (void) __attribute__ ((alias ("Default_Handler")));
