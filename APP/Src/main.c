@@ -59,19 +59,6 @@ void LED(void)
 {
   GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
-void ESP_TASK(void)
-{
-  uint32 static counter = 0;
-  if (ESP_APPLICATION_FLAG == 0)
-  {
-    ESP_MainFunction();
-  }
-  else
-  {
-    RTOS_voidSuspendTask(1);
-  }
-}
-
 void OS_10ms_Task(void)
 {
 UART_SendSyncBuffer(UART2, "cpu load is ", 12);
@@ -96,7 +83,7 @@ OS_IDLE_TASK()
 void LifeCounter(void)
 {
   static uint32 counter = 0;
-  UART_SendSyncBuffer(UART2, "counter: ", 14);
+  UART_SendSyncBuffer(UART2, "Life counter: ", 14);
   UART_voidSendNumber(UART2, counter);
   UART_SendSyncBuffer(UART2, "\r\n", 2);
   counter++;
@@ -107,9 +94,8 @@ void main(void)
   ENABLE_NVIC_INTERRUPTS();
   CallBackFunctions();
   APP_init();
-  RTOS_voidCreateTask(0, 1000, LED);
-  //RTOS_voidCreateTask(1, 5000, ESP_TASK);
-  RTOS_voidCreateTask(2, 1000, LifeCounter);
+  RTOS_voidCreateTask(0, 100, LED);
+  RTOS_voidCreateTask(1, 500, LifeCounter);
   while (1)
   {
   }
