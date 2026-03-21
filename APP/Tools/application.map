@@ -143,7 +143,7 @@ Linker script and memory map
                 0x08008000                Vector_Table
                 0x08008178                        . = ALIGN (0x4)
 
-.text           0x08008178     0x3214
+.text           0x08008178     0x3228
                 0x08008178                        . = ALIGN (0x4)
  *(.text)
  .text          0x08008178        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -623,51 +623,55 @@ Linker script and memory map
                 0x0800b2dc       0x1c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
                 0x0800b2dc                CallBackFunctions
  .text.UART1_ISR
-                0x0800b2f8       0x24 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800b2f8       0x38 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
                 0x0800b2f8                UART1_ISR
  .text.UART2_ISR
-                0x0800b31c       0x24 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800b31c                UART2_ISR
+                0x0800b330       0x24 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800b330                UART2_ISR
  .text.SystemInit
-                0x0800b340       0x4c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800b340                SystemInit
-                0x0800b38c                        . = ALIGN (0x4)
-                0x0800b38c                        _etext = .
+                0x0800b354       0x4c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800b354                SystemInit
+                0x0800b3a0                        . = ALIGN (0x4)
+                0x0800b3a0                        _etext = .
 
-.glue_7         0x0800b38c        0x0
- .glue_7        0x0800b38c        0x0 linker stubs
+.glue_7         0x0800b3a0        0x0
+ .glue_7        0x0800b3a0        0x0 linker stubs
 
-.glue_7t        0x0800b38c        0x0
- .glue_7t       0x0800b38c        0x0 linker stubs
+.glue_7t        0x0800b3a0        0x0
+ .glue_7t       0x0800b3a0        0x0 linker stubs
 
-.vfp11_veneer   0x0800b38c        0x0
- .vfp11_veneer  0x0800b38c        0x0 linker stubs
+.vfp11_veneer   0x0800b3a0        0x0
+ .vfp11_veneer  0x0800b3a0        0x0 linker stubs
 
-.v4_bx          0x0800b38c        0x0
- .v4_bx         0x0800b38c        0x0 linker stubs
+.v4_bx          0x0800b3a0        0x0
+ .v4_bx         0x0800b3a0        0x0 linker stubs
 
-.iplt           0x0800b38c        0x0
- .iplt          0x0800b38c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x0800b3a0        0x0
+ .iplt          0x0800b3a0        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x0800b38c       0xe4
-                0x0800b38c                        . = ALIGN (0x4)
+.rodata         0x0800b3a0       0xec
+                0x0800b3a0                        . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0800b38c        0x6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x0800b392        0x2 
- .rodata        0x0800b394       0xa7 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
- *fill*         0x0800b43b        0x1 
- .rodata        0x0800b43c       0x30 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .rodata        0x0800b3a0        0x6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x0800b3a6        0x2 
+ .rodata        0x0800b3a8       0xa7 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ *fill*         0x0800b44f        0x1 
+ .rodata        0x0800b450       0x30 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
  *(.rodata*)
  .rodata.MSP_Value
-                0x0800b46c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800b46c                MSP_Value
-                0x0800b470                        . = ALIGN (0x4)
-                0x0800b470                        _sidata = LOADADDR (.data)
+                0x0800b480        0x4 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800b480                MSP_Value
+ .rodata.FIRMWARE_VERSION
+                0x0800b484        0x6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800b484                FIRMWARE_VERSION
+                0x0800b48c                        . = ALIGN (0x4)
+ *fill*         0x0800b48a        0x2 
+                0x0800b48c                        _sidata = LOADADDR (.data)
 
-.rel.dyn        0x0800b470        0x0
- .rel.iplt      0x0800b470        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x0800b48c        0x0
+ .rel.iplt      0x0800b48c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x4c load address 0x0800b470
+.data           0x20000000       0x4c load address 0x0800b48c
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -711,10 +715,10 @@ Linker script and memory map
                 0x2000004c                        . = ALIGN (0x4)
                 0x2000004c                        _edata = .
 
-.igot.plt       0x2000004c        0x0 load address 0x0800b4bc
+.igot.plt       0x2000004c        0x0 load address 0x0800b4d8
  .igot.plt      0x2000004c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x2000004c      0x904 load address 0x0800b4bc
+.bss            0x2000004c      0x904 load address 0x0800b4d8
                 0x2000004c                        _sbss = .
  *(.bss)
  .bss           0x2000004c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -795,7 +799,7 @@ Linker script and memory map
                 0x20000950                        _ebss = .
 
 ._user_heap_stack
-                0x20000950     0x1200 load address 0x0800b4bc
+                0x20000950     0x1200 load address 0x0800b4d8
                 0x20000950                        . = ALIGN (0x8)
                 0x20000b50                        . = (. + _Min_Heap_Size)
  *fill*         0x20000950      0x200 
@@ -820,7 +824,7 @@ LOAD /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 OUTPUT(/home/esmail/Desktop/NUCLEO-F446RE/APP/Tools/application.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x40e3
+.debug_info     0x00000000     0x4115
  .debug_info    0x00000000      0x3a5 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003a5      0x2d5 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x0000067a      0x24b /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -835,7 +839,7 @@ LOAD linker stubs
  .debug_info    0x00003006      0x13a /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/P1/FLAPPY_Bird/FLAPPY_Bird.o
  .debug_info    0x00003140      0x379 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_info    0x000034b9      0x196 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x0000364f      0xa94 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_info    0x0000364f      0xac6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .debug_abbrev   0x00000000     0x149d
  .debug_abbrev  0x00000000      0x13e /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -919,7 +923,7 @@ LOAD linker stubs
  .debug_rnglists
                 0x000003bb       0x5c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_macro    0x00000000     0x17a0
+.debug_macro    0x00000000     0x17a6
  .debug_macro   0x00000000       0x32 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000032      0xac6 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000af8       0x10 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -953,13 +957,13 @@ LOAD linker stubs
  .debug_macro   0x000013ff       0x44 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_macro   0x00001443       0x10 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_macro   0x00001453       0x17 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_macro   0x0000146a       0xa4 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x0000150e       0x76 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x00001584       0x7c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x00001600      0x136 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_macro   0x00001736       0x6a /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x0000146a       0xaa /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x00001514       0x76 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x0000158a       0x7c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x00001606      0x136 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_macro   0x0000173c       0x6a /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x278f
+.debug_line     0x00000000     0x2793
  .debug_line    0x00000000      0x2e5 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002e5      0x206 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004eb      0x1da /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -974,25 +978,25 @@ LOAD linker stubs
  .debug_line    0x000020a1       0xfd /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/P1/FLAPPY_Bird/FLAPPY_Bird.o
  .debug_line    0x0000219e      0x225 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_line    0x000023c3       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00002486      0x309 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_line    0x00002486      0x30d /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x68a8
- .debug_str     0x00000000     0x68a8 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.debug_str      0x00000000     0x68ce
+ .debug_str     0x00000000     0x68ce /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x371c (size before relaxing)
- .debug_str     0x000068a8     0x341e /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .debug_str     0x000068a8     0x3296 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .debug_str     0x000068a8     0x343c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .debug_str     0x000068a8     0x3452 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
- .debug_str     0x000068a8     0x3697 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/DMA/src/DMA.o
- .debug_str     0x000068a8     0x3a3f /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/BASIC_TIMER/src/Basic_Timer.o
- .debug_str     0x000068a8     0x3453 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
- .debug_str     0x000068a8     0x37cd /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_str     0x000068a8     0x3225 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
- .debug_str     0x000068a8     0x3377 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
- .debug_str     0x000068a8     0x3274 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/P1/FLAPPY_Bird/FLAPPY_Bird.o
- .debug_str     0x000068a8     0x337d /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- .debug_str     0x000068a8     0x2fb2 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_str     0x000068a8     0x4dc2 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_str     0x000068ce     0x341e /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
+ .debug_str     0x000068ce     0x3296 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .debug_str     0x000068ce     0x343c /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .debug_str     0x000068ce     0x3452 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+ .debug_str     0x000068ce     0x3697 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/DMA/src/DMA.o
+ .debug_str     0x000068ce     0x3a3f /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/BASIC_TIMER/src/Basic_Timer.o
+ .debug_str     0x000068ce     0x3453 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
+ .debug_str     0x000068ce     0x37cd /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/FLASH/src/FLASH.o
+ .debug_str     0x000068ce     0x3225 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ .debug_str     0x000068ce     0x3377 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/OLED/OLED.o
+ .debug_str     0x000068ce     0x3274 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/P1/FLAPPY_Bird/FLAPPY_Bird.o
+ .debug_str     0x000068ce     0x337d /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ .debug_str     0x000068ce     0x2fb2 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+ .debug_str     0x000068ce     0x4ded /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
 
 .comment        0x00000000       0x26
  .comment       0x00000000       0x26 /home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o

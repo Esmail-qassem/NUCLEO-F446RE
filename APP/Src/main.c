@@ -88,6 +88,8 @@ void LifeCounter(void)
   UART_SendSyncBuffer(UART2, "\r\n", 2);
   counter++;
 }
+const char FIRMWARE_VERSION[] = "2.0.0";
+#define CMD_GET_VERSION 0xA1
 void main(void)
 { 
   GPIO_PIN_CONFIG();
@@ -167,6 +169,10 @@ void UART1_ISR(uint8 num)
 {
   uint8 Str[] = {num};
   UART_SendSyncBuffer(UART2, (uint8 *)Str, 1);
+  if(num == CMD_GET_VERSION )
+  {
+    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION));
+  }
 }
 void UART2_ISR(uint8 num)
 {
