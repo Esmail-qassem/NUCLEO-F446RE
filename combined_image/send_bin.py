@@ -7,7 +7,7 @@ PORT = '/dev/ttyACM0'
 BAUD = 115200
 # ─── Config ───────────────────────────────────────────────
 INPUT  = '../APP/Tools/application.bin'   # <-- change this
-OUTPUT = '../APP/Tools/application_with_header.bin'    # <-- saved in current folder
+OUTPUT = '../APP/Tools/APP_BTLD.bin'    # <-- saved in current folder
 
 with open(INPUT, 'rb') as f:
     app_data = f.read()
