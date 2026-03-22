@@ -31,7 +31,6 @@ UART_Config_t Uart_configuration={
 void GPIO_PIN_CONFIG(void);
 void APP_init(void);
 void CallBackFunctions(void);
-void UART1_ISR(uint8 num);
  uint32 ms_ticks = 0;
 void systick_handler(void)
 {
@@ -43,9 +42,10 @@ void main (void)
   APP_init();
   SysTick_voidInit();
   NVIC_EnableInterrupt(UART1_IQ_NUM);
-  //NVIC_EnableInterrupt(UART2_IQ_NUM);
+  NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
   UART_SendSyncBuffer(UART2, "\n BTLD \n",8);
+  CRC32_Init();
   FlashDrv_EraseSector(2);
   CallBackFunctions();
 while(1) 
@@ -58,7 +58,7 @@ while(1)
 
 void APP_init(void)
 {
- UART_Init(UART2, &Uart_configuration, 16000000);
+ //UART_Init(UART2, &Uart_configuration, 16000000);
  UART_Init(UART1, &Uart_configuration, 16000000);
 }
 
@@ -83,15 +83,8 @@ void SystemInit(void)
 RCC_Init(&RCC_Configuration);
 RCC_EnableClock(RCC_AHB1, AHB1_GPIOA);
 RCC_EnableClock(RCC_APB2, APB2_USART1);
-RCC_EnableClock(RCC_APB1,APB1_USART2);
+//RCC_EnableClock(RCC_APB1,APB1_USART2);
 
-}
-
-
-void UART1_ISR(uint8 num)
-{
-  uint8 Str[] = {num};
-  UART_SendSyncBuffer(UART2, (uint8 *)Str, 1);
 }
 
 void CallBackFunctions(void)

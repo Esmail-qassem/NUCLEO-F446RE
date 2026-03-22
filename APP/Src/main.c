@@ -176,8 +176,7 @@ void UART1_ISR(uint8 num)
 }
 void UART2_ISR(uint8 num)
 {
-  UART_SendSyncBuffer(UART2, (uint8 *)"UART2 ISR\r\n", 12);
-  OS_10ms_Task();
+  
 }
 
 void SystemInit(void)
