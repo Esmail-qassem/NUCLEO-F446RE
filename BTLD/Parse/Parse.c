@@ -131,12 +131,33 @@ uint32 CRC32_Calculate(const uint8 *data, uint32 length)
 /*===========================================================================
                         BOOTLOADER ISR HANDLER
 ===========================================================================*/
+static uint8 sync_received = 0;
+
 void BootLoader_Handler(uint8 byte)
 {
+    //if (byte == 0xA1) return;
+
+    /* Wait for sync byte 0x55 before accepting any data */
+    if (sync_received == 0)
+    {
+        if (byte == 0x55)
+        {
+            sync_received = 1;  // ← sync received, ready for firmware
+            ms_ticks      = 0;
+        }
+        return;  // ← ignore everything until 0x55 arrives
+    }
+
+    /* Normal firmware receive */
     UART_START  = 1;
+    ms_ticks    = 0;
     flush_done  = 0;
     verify_done = 0;
-    ms_ticks=0;
+
+    if(bin_index < BIN_BUFFER_SIZE)
+    {
+        bin_buffer[bin_index++] = byte;
+    }
 
     #ifdef HEX_MODE
     if (byte == '\n' || byte == '\r')
@@ -166,12 +187,7 @@ void BootLoader_Handler(uint8 byte)
     }
     #endif
 
-    #ifdef BIN_MODE
-    if (bin_index < BIN_BUFFER_SIZE)
-    {
-        bin_buffer[bin_index++] = byte;
-    }
-    #endif
+
 }
 
 /*===========================================================================
@@ -184,8 +200,6 @@ void BootLoader_MainFunction(void)
     {
         SCB_AIRCR = 0x5FA0004;
     }
-
-    #ifdef BIN_MODE
     /*--- Write full buffer to flash ---*/
     if (bin_index >= BIN_BUFFER_SIZE)
     {
@@ -263,10 +277,6 @@ if(counter == (Header/BIN_BUFFER_SIZE)+3)
     }
 }
 
-
-
-    #endif
-
     /*--- Verify after 2s silence ---*/
     if ((ms_ticks > 2000 || Binary_receivingfinished == 1) && UART_START == 1 && verify_done == 0)
     {
@@ -280,6 +290,7 @@ if(counter == (Header/BIN_BUFFER_SIZE)+3)
             flash_address = APP_START_ADDRESS;
             Binary_receivingfinished=0;
             counter=0;
+            sync_received = 0;
             received_crc = 0;
             SCB_AIRCR = 0x5FA0004;
         }
@@ -288,6 +299,7 @@ if(counter == (Header/BIN_BUFFER_SIZE)+3)
             UART_SendSyncBuffer(UART2, "\nVerification FAILED!\n", 21);
             counter=0;
             received_crc = 0;
+            sync_received = 0;
             Binary_receivingfinished=0;
             flash_address = APP_START_ADDRESS;  /* reset for retry */
         }

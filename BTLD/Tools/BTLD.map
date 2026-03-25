@@ -94,7 +94,7 @@ Linker script and memory map
                 0x08004000                Vector_Table
                 0x08004178                        . = ALIGN (0x4)
 
-.text           0x08004178     0x1e28
+.text           0x08004178     0x1e6c
                 0x08004178                        . = ALIGN (0x4)
  *(.text)
  .text          0x08004178        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -306,161 +306,161 @@ Linker script and memory map
                 0x08005a88       0x58 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
                 0x08005a88                CRC32_Calculate
  .text.BootLoader_Handler
-                0x08005ae0       0x60 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x08005ae0       0x80 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
                 0x08005ae0                BootLoader_Handler
  .text.BootLoader_MainFunction
-                0x08005b40      0x284 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x08005b40                BootLoader_MainFunction
+                0x08005b60      0x294 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x08005b60                BootLoader_MainFunction
  .text.Reset_Handler
-                0x08005dc4       0x94 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08005dc4                Reset_Handler
+                0x08005df4       0x94 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x08005df4                Reset_Handler
  .text.Default_Handler
-                0x08005e58        0x8 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08005e58                RTC_Alarm_IRQHandler
-                0x08005e58                EXTI2_IRQHandler
-                0x08005e58                TIM8_CC_IRQHandler
-                0x08005e58                DebugMon_Handler
-                0x08005e58                SPI4_IRQHandler
-                0x08005e58                TIM1_CC_IRQHandler
-                0x08005e58                DMA2_Stream5_IRQHandler
-                0x08005e58                HardFault_Handler
-                0x08005e58                DMA1_Stream5_IRQHandler
-                0x08005e58                PVD_IRQHandler
-                0x08005e58                SDIO_IRQHandler
-                0x08005e58                TAMP_STAMP_IRQHandler
-                0x08005e58                PendSV_Handler
-                0x08005e58                NMI_Handler
-                0x08005e58                CAN2_RX1_IRQHandler
-                0x08005e58                EXTI3_IRQHandler
-                0x08005e58                TIM8_TRG_COM_TIM14_IRQHandler
-                0x08005e58                TIM1_UP_TIM10_IRQHandler
-                0x08005e58                TIM8_UP_TIM13_IRQHandler
-                0x08005e58                I2C3_ER_IRQHandler
-                0x08005e58                EXTI0_IRQHandler
-                0x08005e58                I2C2_EV_IRQHandler
-                0x08005e58                DMA1_Stream2_IRQHandler
-                0x08005e58                CAN1_RX0_IRQHandler
-                0x08005e58                FPU_IRQHandler
-                0x08005e58                UsageFault_Handler
-                0x08005e58                CAN2_SCE_IRQHandler
-                0x08005e58                DMA2_Stream2_IRQHandler
-                0x08005e58                SPI1_IRQHandler
-                0x08005e58                TIM6_DAC_IRQHandler
-                0x08005e58                TIM1_BRK_TIM9_IRQHandler
-                0x08005e58                CAN2_RX0_IRQHandler
-                0x08005e58                DMA2_Stream3_IRQHandler
-                0x08005e58                USART6_IRQHandler
-                0x08005e58                CAN1_RX1_IRQHandler
-                0x08005e58                UART5_IRQHandler
-                0x08005e58                DMA2_Stream0_IRQHandler
-                0x08005e58                TIM4_IRQHandler
-                0x08005e58                I2C1_EV_IRQHandler
-                0x08005e58                DMA1_Stream6_IRQHandler
-                0x08005e58                DMA1_Stream1_IRQHandler
-                0x08005e58                UART4_IRQHandler
-                0x08005e58                TIM3_IRQHandler
-                0x08005e58                RCC_IRQHandler
-                0x08005e58                TIM8_BRK_TIM12_IRQHandler
-                0x08005e58                Default_Handler
-                0x08005e58                EXTI15_10_IRQHandler
-                0x08005e58                ADC_IRQHandler
-                0x08005e58                DMA1_Stream7_IRQHandler
-                0x08005e58                SPI5_IRQHandler
-                0x08005e58                TIM7_IRQHandler
-                0x08005e58                CAN2_TX_IRQHandler
-                0x08005e58                TIM5_IRQHandler
-                0x08005e58                DMA2_Stream7_IRQHandler
-                0x08005e58                I2C3_EV_IRQHandler
-                0x08005e58                EXTI9_5_IRQHandler
-                0x08005e58                RTC_WKUP_IRQHandler
-                0x08005e58                SPI2_IRQHandler
-                0x08005e58                MemManage_Handler
-                0x08005e58                DMA1_Stream0_IRQHandler
-                0x08005e58                CAN1_TX_IRQHandler
-                0x08005e58                SVC_Handler
-                0x08005e58                EXTI4_IRQHandler
-                0x08005e58                WWDG_IRQHandler
-                0x08005e58                SPI6_IRQHandler
-                0x08005e58                TIM2_IRQHandler
-                0x08005e58                OTG_FS_WKUP_IRQHandler
-                0x08005e58                TIM1_TRG_COM_TIM11_IRQHandler
-                0x08005e58                DMA2D_IRQHandler
-                0x08005e58                EXTI1_IRQHandler
-                0x08005e58                I2C2_ER_IRQHandler
-                0x08005e58                DMA2_Stream1_IRQHandler
-                0x08005e58                CAN1_SCE_IRQHandler
-                0x08005e58                FLASH_IRQHandler
-                0x08005e58                DMA2_Stream4_IRQHandler
-                0x08005e58                BusFault_Handler
-                0x08005e58                OTG_FS_IRQHandler
-                0x08005e58                SPI3_IRQHandler
-                0x08005e58                DMA1_Stream4_IRQHandler
-                0x08005e58                I2C1_ER_IRQHandler
-                0x08005e58                FMC_IRQHandler
-                0x08005e58                DMA2_Stream6_IRQHandler
-                0x08005e58                SAI1_IRQHandler
-                0x08005e58                DMA1_Stream3_IRQHandler
+                0x08005e88        0x8 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x08005e88                RTC_Alarm_IRQHandler
+                0x08005e88                EXTI2_IRQHandler
+                0x08005e88                TIM8_CC_IRQHandler
+                0x08005e88                DebugMon_Handler
+                0x08005e88                SPI4_IRQHandler
+                0x08005e88                TIM1_CC_IRQHandler
+                0x08005e88                DMA2_Stream5_IRQHandler
+                0x08005e88                HardFault_Handler
+                0x08005e88                DMA1_Stream5_IRQHandler
+                0x08005e88                PVD_IRQHandler
+                0x08005e88                SDIO_IRQHandler
+                0x08005e88                TAMP_STAMP_IRQHandler
+                0x08005e88                PendSV_Handler
+                0x08005e88                NMI_Handler
+                0x08005e88                CAN2_RX1_IRQHandler
+                0x08005e88                EXTI3_IRQHandler
+                0x08005e88                TIM8_TRG_COM_TIM14_IRQHandler
+                0x08005e88                TIM1_UP_TIM10_IRQHandler
+                0x08005e88                TIM8_UP_TIM13_IRQHandler
+                0x08005e88                I2C3_ER_IRQHandler
+                0x08005e88                EXTI0_IRQHandler
+                0x08005e88                I2C2_EV_IRQHandler
+                0x08005e88                DMA1_Stream2_IRQHandler
+                0x08005e88                CAN1_RX0_IRQHandler
+                0x08005e88                FPU_IRQHandler
+                0x08005e88                UsageFault_Handler
+                0x08005e88                CAN2_SCE_IRQHandler
+                0x08005e88                DMA2_Stream2_IRQHandler
+                0x08005e88                SPI1_IRQHandler
+                0x08005e88                TIM6_DAC_IRQHandler
+                0x08005e88                TIM1_BRK_TIM9_IRQHandler
+                0x08005e88                CAN2_RX0_IRQHandler
+                0x08005e88                DMA2_Stream3_IRQHandler
+                0x08005e88                USART6_IRQHandler
+                0x08005e88                CAN1_RX1_IRQHandler
+                0x08005e88                UART5_IRQHandler
+                0x08005e88                DMA2_Stream0_IRQHandler
+                0x08005e88                TIM4_IRQHandler
+                0x08005e88                I2C1_EV_IRQHandler
+                0x08005e88                DMA1_Stream6_IRQHandler
+                0x08005e88                DMA1_Stream1_IRQHandler
+                0x08005e88                UART4_IRQHandler
+                0x08005e88                TIM3_IRQHandler
+                0x08005e88                RCC_IRQHandler
+                0x08005e88                TIM8_BRK_TIM12_IRQHandler
+                0x08005e88                Default_Handler
+                0x08005e88                EXTI15_10_IRQHandler
+                0x08005e88                ADC_IRQHandler
+                0x08005e88                DMA1_Stream7_IRQHandler
+                0x08005e88                SPI5_IRQHandler
+                0x08005e88                TIM7_IRQHandler
+                0x08005e88                CAN2_TX_IRQHandler
+                0x08005e88                TIM5_IRQHandler
+                0x08005e88                DMA2_Stream7_IRQHandler
+                0x08005e88                I2C3_EV_IRQHandler
+                0x08005e88                EXTI9_5_IRQHandler
+                0x08005e88                RTC_WKUP_IRQHandler
+                0x08005e88                SPI2_IRQHandler
+                0x08005e88                MemManage_Handler
+                0x08005e88                DMA1_Stream0_IRQHandler
+                0x08005e88                CAN1_TX_IRQHandler
+                0x08005e88                SVC_Handler
+                0x08005e88                EXTI4_IRQHandler
+                0x08005e88                WWDG_IRQHandler
+                0x08005e88                SPI6_IRQHandler
+                0x08005e88                TIM2_IRQHandler
+                0x08005e88                OTG_FS_WKUP_IRQHandler
+                0x08005e88                TIM1_TRG_COM_TIM11_IRQHandler
+                0x08005e88                DMA2D_IRQHandler
+                0x08005e88                EXTI1_IRQHandler
+                0x08005e88                I2C2_ER_IRQHandler
+                0x08005e88                DMA2_Stream1_IRQHandler
+                0x08005e88                CAN1_SCE_IRQHandler
+                0x08005e88                FLASH_IRQHandler
+                0x08005e88                DMA2_Stream4_IRQHandler
+                0x08005e88                BusFault_Handler
+                0x08005e88                OTG_FS_IRQHandler
+                0x08005e88                SPI3_IRQHandler
+                0x08005e88                DMA1_Stream4_IRQHandler
+                0x08005e88                I2C1_ER_IRQHandler
+                0x08005e88                FMC_IRQHandler
+                0x08005e88                DMA2_Stream6_IRQHandler
+                0x08005e88                SAI1_IRQHandler
+                0x08005e88                DMA1_Stream3_IRQHandler
  .text.systick_handler
-                0x08005e60       0x1c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005e60                systick_handler
- .text.main     0x08005e7c       0x4c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005e7c                main
+                0x08005e90       0x1c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005e90                systick_handler
+ .text.main     0x08005eac       0x4c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005eac                main
  .text.APP_init
-                0x08005ec8       0x1c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005ec8                APP_init
+                0x08005ef8       0x28 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005ef8                APP_init
  .text.GPIO_PIN_CONFIG
-                0x08005ee4       0x84 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005ee4                GPIO_PIN_CONFIG
+                0x08005f20       0x84 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005f20                GPIO_PIN_CONFIG
  .text.SystemInit
-                0x08005f68       0x24 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005f68                SystemInit
+                0x08005fa4       0x2c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005fa4                SystemInit
  .text.CallBackFunctions
-                0x08005f8c       0x14 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005f8c                CallBackFunctions
-                0x08005fa0                        . = ALIGN (0x4)
-                0x08005fa0                        _etext = .
+                0x08005fd0       0x14 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005fd0                CallBackFunctions
+                0x08005fe4                        . = ALIGN (0x4)
+                0x08005fe4                        _etext = .
 
-.glue_7         0x08005fa0        0x0
- .glue_7        0x08005fa0        0x0 linker stubs
+.glue_7         0x08005fe4        0x0
+ .glue_7        0x08005fe4        0x0 linker stubs
 
-.glue_7t        0x08005fa0        0x0
- .glue_7t       0x08005fa0        0x0 linker stubs
+.glue_7t        0x08005fe4        0x0
+ .glue_7t       0x08005fe4        0x0 linker stubs
 
-.vfp11_veneer   0x08005fa0        0x0
- .vfp11_veneer  0x08005fa0        0x0 linker stubs
+.vfp11_veneer   0x08005fe4        0x0
+ .vfp11_veneer  0x08005fe4        0x0 linker stubs
 
-.v4_bx          0x08005fa0        0x0
- .v4_bx         0x08005fa0        0x0 linker stubs
+.v4_bx          0x08005fe4        0x0
+ .v4_bx         0x08005fe4        0x0 linker stubs
 
-.iplt           0x08005fa0        0x0
- .iplt          0x08005fa0        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x08005fe4        0x0
+ .iplt          0x08005fe4        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x08005fa0      0x138
-                0x08005fa0                        . = ALIGN (0x4)
+.rodata         0x08005fe4      0x138
+                0x08005fe4                        . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08005fa0        0x6 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x08005fa6        0x2 
- .rodata        0x08005fa8       0x47 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08005fef        0x1 
- .rodata        0x08005ff0        0x9 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .rodata        0x08005fe4        0x6 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x08005fea        0x2 
+ .rodata        0x08005fec       0x47 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x08006033        0x1 
+ .rodata        0x08006034        0x9 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  *(.rodata*)
- *fill*         0x08005ff9        0x3 
+ *fill*         0x0800603d        0x3 
  .rodata.asciiToHex
-                0x08005ffc       0x69 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08006065        0x3 
+                0x08006040       0x69 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x080060a9        0x3 
  .rodata.MSP_Value
-                0x08006068        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x08006068                MSP_Value
+                0x080060ac        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x080060ac                MSP_Value
  .rodata.asciiToHex
-                0x0800606c       0x69 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x080060d8                        . = ALIGN (0x4)
- *fill*         0x080060d5        0x3 
-                0x080060d8                        _sidata = LOADADDR (.data)
+                0x080060b0       0x69 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x0800611c                        . = ALIGN (0x4)
+ *fill*         0x08006119        0x3 
+                0x0800611c                        _sidata = LOADADDR (.data)
 
-.rel.dyn        0x080060d8        0x0
- .rel.iplt      0x080060d8        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x0800611c        0x0
+ .rel.iplt      0x0800611c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x10 load address 0x080060d8
+.data           0x20000000       0x1c load address 0x0800611c
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -477,95 +477,101 @@ Linker script and memory map
  .data.flash_address
                 0x20000000        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
                 0x20000000                flash_address
- .data.Uart_configuration
+ .data.Uart1_configuration
                 0x20000004        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x20000004                Uart_configuration
-                0x20000010                        . = ALIGN (0x4)
-                0x20000010                        _edata = .
+                0x20000004                Uart1_configuration
+ .data.Uart2_configuration
+                0x20000010        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000010                Uart2_configuration
+                0x2000001c                        . = ALIGN (0x4)
+                0x2000001c                        _edata = .
 
-.igot.plt       0x20000010        0x0 load address 0x080060e8
- .igot.plt      0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.igot.plt       0x2000001c        0x0 load address 0x08006138
+ .igot.plt      0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000010      0x44c load address 0x080060e8
-                0x20000010                        _sbss = .
+.bss            0x2000001c      0x450 load address 0x08006138
+                0x2000001c                        _sbss = .
  *(.bss)
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .bss           0x20000010        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  *(.bss*)
  .bss.Local_PvFunction
-                0x20000010        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .bss.rx_test   0x20000014        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
-                0x20000014                rx_test
- *fill*         0x20000015        0x3 
+                0x2000001c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .bss.rx_test   0x20000020        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+                0x20000020                rx_test
+ *fill*         0x20000021        0x3 
  .bss.uart1_funcPtr
-                0x20000018        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
-                0x20000018                uart1_funcPtr
+                0x20000024        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+                0x20000024                uart1_funcPtr
  .bss.uart2_funcPtr
-                0x2000001c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
-                0x2000001c                uart2_funcPtr
+                0x20000028        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+                0x20000028                uart2_funcPtr
  .bss.uart3_funcPtr
-                0x20000020        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
-                0x20000020                uart3_funcPtr
+                0x2000002c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+                0x2000002c                uart3_funcPtr
  .bss.UART_START
-                0x20000024        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000024                UART_START
- .bss.flush_done
-                0x20000025        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .bss.verify_done
-                0x20000026        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x20000027        0x1 
- .bss.counter   0x20000028        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .bss.Header    0x2000002c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x2000002c                Header
- .bss.Binary_receivingfinished
                 0x20000030        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000030                Binary_receivingfinished
- *fill*         0x20000031        0x3 
+                0x20000030                UART_START
+ .bss.flush_done
+                0x20000031        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .bss.verify_done
+                0x20000032        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x20000033        0x1 
+ .bss.counter   0x20000034        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .bss.Header    0x20000038        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000038                Header
+ .bss.Binary_receivingfinished
+                0x2000003c        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x2000003c                Binary_receivingfinished
+ *fill*         0x2000003d        0x3 
  .bss.received_crc
-                0x20000034        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000034                received_crc
+                0x20000040        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000040                received_crc
  .bss.crc32_table
-                0x20000038      0x400 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000038                crc32_table
+                0x20000044      0x400 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000044                crc32_table
  .bss.crc32_table_ready
-                0x20000438        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000438                crc32_table_ready
- *fill*         0x20000439        0x3 
+                0x20000444        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000444                crc32_table_ready
+ *fill*         0x20000445        0x3 
  .bss.bin_buffer
-                0x2000043c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x2000043c                bin_buffer
+                0x20000448        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x20000448                bin_buffer
  .bss.bin_index
-                0x20000440        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
-                0x20000440                bin_index
+                0x2000044c        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x2000044c                bin_index
+ .bss.sync_received
+                0x20000450        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x20000451        0x3 
  .bss.Local_PvFunction
-                0x20000444        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000454        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .bss.Pt2Func_App
-                0x20000448        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x20000448                Pt2Func_App
+                0x20000458        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000458                Pt2Func_App
  .bss.RCC_Configuration
-                0x2000044c        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x2000044c                RCC_Configuration
- .bss.ms_ticks  0x20000458        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x20000458                ms_ticks
-                0x2000045c                        . = ALIGN (0x4)
-                0x2000045c                        _ebss = .
+                0x2000045c        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x2000045c                RCC_Configuration
+ .bss.ms_ticks  0x20000468        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000468                ms_ticks
+                0x2000046c                        . = ALIGN (0x4)
+                0x2000046c                        _ebss = .
 
 ._user_heap_stack
-                0x2000045c     0x1204 load address 0x080060e8
-                0x20000460                        . = ALIGN (0x8)
- *fill*         0x2000045c        0x4 
-                0x20000660                        . = (. + _Min_Heap_Size)
- *fill*         0x20000460      0x200 
-                0x20001660                        . = (. + _Min_Stack_Size)
- *fill*         0x20000660     0x1000 
-                0x20001660                        . = ALIGN (0x8)
+                0x2000046c     0x1204 load address 0x08006138
+                0x20000470                        . = ALIGN (0x8)
+ *fill*         0x2000046c        0x4 
+                0x20000670                        . = (. + _Min_Heap_Size)
+ *fill*         0x20000470      0x200 
+                0x20001670                        . = (. + _Min_Stack_Size)
+ *fill*         0x20000670     0x1000 
+                0x20001670                        . = ALIGN (0x8)
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -578,27 +584,27 @@ LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 OUTPUT(/home/esmail/Desktop/NUCLEO-F446RE/BTLD/Tools/BTLD.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x28a1
+.debug_info     0x00000000     0x28c6
  .debug_info    0x00000000      0x3a5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003a5      0x2d5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x0000067a      0x24b /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_info    0x000008c5      0x4dc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_info    0x00000da1      0x5dd /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_info    0x0000137e      0x628 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_info    0x000019a6      0x442 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_info    0x00001de8      0x15e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x00001f46      0x95b /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_info    0x000019a6      0x456 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_info    0x00001dfc      0x15e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_info    0x00001f5a      0x96c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_abbrev   0x00000000      0xc42
+.debug_abbrev   0x00000000      0xc41
  .debug_abbrev  0x00000000      0x13e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x0000013e      0x12c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_abbrev  0x0000026a      0x143 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_abbrev  0x000003ad      0x133 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_abbrev  0x000004e0      0x170 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_abbrev  0x00000650      0x1b3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_abbrev  0x00000803      0x1af /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_abbrev  0x000009b2       0xfa /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x00000aac      0x196 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_abbrev  0x00000803      0x1ae /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_abbrev  0x000009b1       0xfa /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_abbrev  0x00000aab      0x196 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_aranges  0x00000000      0x350
  .debug_aranges
@@ -621,7 +627,7 @@ LOAD linker stubs
                 0x00000308       0x48 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_rnglists
-                0x00000000      0x265
+                0x00000000      0x266
  .debug_rnglists
                 0x00000000       0x58 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_rnglists
@@ -635,11 +641,11 @@ LOAD linker stubs
  .debug_rnglists
                 0x0000014e       0x9f /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_rnglists
-                0x000001ed       0x2c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+                0x000001ed       0x2d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
  .debug_rnglists
-                0x00000219       0x1a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x0000021a       0x1a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
  .debug_rnglists
-                0x00000233       0x32 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x00000234       0x32 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_macro    0x00000000     0x1306
  .debug_macro   0x00000000       0x32 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -668,28 +674,28 @@ LOAD linker stubs
  .debug_macro   0x000011f6       0x9a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .debug_macro   0x00001290       0x76 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x1899
+.debug_line     0x00000000     0x18b3
  .debug_line    0x00000000      0x2e5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002e5      0x206 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004eb      0x1da /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_line    0x000006c5      0x2b9 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_line    0x0000097e      0x367 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_line    0x00000ce5      0x60c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_line    0x000012f1      0x2f4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_line    0x000015e5       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x000016a8      0x1f1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_line    0x000012f1      0x30b /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_line    0x000015fc       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_line    0x000016bf      0x1f4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x562a
- .debug_str     0x00000000     0x562a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.debug_str      0x00000000     0x564d
+ .debug_str     0x00000000     0x564d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x36ad (size before relaxing)
- .debug_str     0x0000562a     0x341f /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .debug_str     0x0000562a     0x3297 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .debug_str     0x0000562a     0x343d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .debug_str     0x0000562a     0x3453 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- .debug_str     0x0000562a     0x37ce /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_str     0x0000562a     0x3a4c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_str     0x0000562a     0x2f1d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_str     0x0000562a     0x49ec /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_str     0x0000564d     0x341f /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
+ .debug_str     0x0000564d     0x3297 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .debug_str     0x0000564d     0x343d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .debug_str     0x0000564d     0x3453 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ .debug_str     0x0000564d     0x37ce /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
+ .debug_str     0x0000564d     0x3a5a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_str     0x0000564d     0x2f1d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_str     0x0000564d     0x4a01 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .comment        0x00000000       0x26
  .comment       0x00000000       0x26 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o

@@ -17,7 +17,7 @@ RCC_Config_t RCC_Configuration=
   APB_PRE_1
 };
 
-UART_Config_t Uart_configuration={
+UART_Config_t Uart1_configuration={
   115200,
   UART_MODE_TX_RX,
   UART_PARITY_NONE,
@@ -25,7 +25,14 @@ UART_Config_t Uart_configuration={
   UART_WORDLEN_8B,
   Interrupt
 };
-
+UART_Config_t Uart2_configuration={
+  115200,
+  UART_MODE_TX_RX,
+  UART_PARITY_NONE,
+  UART_STOPBITS_1,
+  UART_WORDLEN_8B,
+  Interrupt
+};
 /**************************************************************/
 /*           function prototype              */
 void GPIO_PIN_CONFIG(void);
@@ -58,8 +65,8 @@ while(1)
 
 void APP_init(void)
 {
- //UART_Init(UART2, &Uart_configuration, 16000000);
- UART_Init(UART1, &Uart_configuration, 16000000);
+ UART_Init(UART2, &Uart2_configuration, 16000000);
+ UART_Init(UART1, &Uart1_configuration, 16000000);
 }
 
 void GPIO_PIN_CONFIG(void)
@@ -83,7 +90,7 @@ void SystemInit(void)
 RCC_Init(&RCC_Configuration);
 RCC_EnableClock(RCC_AHB1, AHB1_GPIOA);
 RCC_EnableClock(RCC_APB2, APB2_USART1);
-//RCC_EnableClock(RCC_APB1,APB1_USART2);
+RCC_EnableClock(RCC_APB1,APB1_USART2);
 
 }
 

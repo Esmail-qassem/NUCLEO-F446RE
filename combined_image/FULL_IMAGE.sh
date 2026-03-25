@@ -13,6 +13,10 @@ echo "Building APP..."
 cd $ROOT/APP/Build/
 ./m.sh -j
 
+echo "Creating the Btld+App image..."
+cd $ROOT/combined_image
+python BTLD_APP_IMAGE.py
+
 echo "Generating combined hex..."
 cd $COMBINED_DIR
 srec_cat \
