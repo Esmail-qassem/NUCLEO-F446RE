@@ -10,8 +10,9 @@ endif
 SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/NVIC/src \
            $(MCAL_path)/SysTick/src \
-           $(MCAL_path)/GPIO/src \
-           $(MCAL_path)/EXTI/src \
+           $(MCAL_path)/GPIO/src\
+           $(MCAL_path)/EXTI/src\
+		   $(MCAL_path)/ADC/src\
            $(MCAL_path)/AFIO/src \
            $(MCAL_path)/UART/src \
            $(MCAL_path)/FPEC/src \
