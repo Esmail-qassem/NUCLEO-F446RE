@@ -54,9 +54,9 @@ void TIM1_BRK_TIM9_IRQHandler          (void) __attribute__ ((alias ("Default_Ha
 void TIM1_UP_TIM10_IRQHandler          (void) __attribute__ ((alias ("Default_Handler")));
 void TIM1_TRG_COM_TIM11_IRQHandler     (void) __attribute__ ((alias ("Default_Handler")));
 void TIM1_CC_IRQHandler                (void) __attribute__ ((alias ("Default_Handler")));
-void TIM2_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
-void TIM3_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
-void TIM4_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
+void TIM2_IRQHandler                   (void) ;
+void TIM3_IRQHandler                   (void) ;
+void TIM4_IRQHandler                   (void) ;
 void I2C1_EV_IRQHandler                (void);
 void I2C1_ER_IRQHandler                (void);
 void I2C2_EV_IRQHandler                (void);
@@ -76,7 +76,7 @@ void TIM8_CC_IRQHandler                (void) __attribute__ ((alias ("Default_Ha
 void DMA1_Stream7_IRQHandler           (void) __attribute__ ((alias ("Default_Handler")));
 void FMC_IRQHandler                    (void) __attribute__ ((alias ("Default_Handler")));
 void SDIO_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
-void TIM5_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
+void TIM5_IRQHandler                   (void) ;
 void SPI3_IRQHandler                   (void) __attribute__ ((alias ("Default_Handler")));
 void UART4_IRQHandler                  (void) __attribute__ ((alias ("Default_Handler")));
 void UART5_IRQHandler                  (void) __attribute__ ((alias ("Default_Handler")));

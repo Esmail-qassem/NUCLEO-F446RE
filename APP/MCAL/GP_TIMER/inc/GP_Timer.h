@@ -15,8 +15,8 @@
 /* 32bit timers */
 #define TIMER2_BASE     0x40000000
 #define TIMER5_BASE     0x40000C00
-/* 16bit timers */
-#define TIMER3_BASE     0x40000400
+/* 16bit timers  for pwm*/
+#define TIMER3_BASE     0x40000400  
 #define TIMER4_BASE     0x40000800
 
 #define TIM_CR1(base)   *((volatile uint16*)(base + 0x00))
@@ -27,8 +27,13 @@
 #define TIM_CNT(base)    *((volatile uint16*)(base + 0x24))
 #define TIM_PSC(base)   *((volatile uint16*)(base + 0x28))
 #define TIM_ARR(base)   *((volatile uint16*)(base + 0x2C))
-
-
+#define TIM_CCMR1(base)   *((volatile uint32*)(base + 0x18))
+#define TIM_CCER(base)    *((volatile uint32*)(base + 0x20))
+#define TIM_CCR1(base)    *((volatile uint32*)(base + 0x34))
+#define TIM_CCR2(base)    *((volatile uint32*)(base + 0x38))
+#define TIM_CCMR2(base)   *((volatile uint32*)(base + 0x1C))
+#define TIM_CCR3(base)    *((volatile uint32*)(base + 0x3C))
+#define TIM_CCR4(base)    *((volatile uint32*)(base + 0x40))
 /* === IRQ numbers from stm32f103 vector table === */
 #define TIM2_IRQn      28
 #define TIM3_IRQn      29
@@ -57,10 +62,11 @@ typedef enum {
 typedef void (*TimerCallback_t)(void);
 
 /* === Functions === */
-void Timer_Init(Timer_t timer);
-void Timer_Start(Timer_t timer);
-void Timer_Stop(Timer_t timer);
-void Timer_SetCallback(Timer_t timer, TimerCallback_t cb);
-
+void GP_Timer_Init(Timer_t timer);
+void GP_Timer_Start(Timer_t timer);
+void GP_Timer_Stop(Timer_t timer);
+void GP_Timer_SetCallback(Timer_t timer, TimerCallback_t cb);
+void GP_Timer_PWM_Init(Timer_t timer);
+void GP_Timer_PWM_SetDuty(Timer_t timer, uint8 channel, uint8 duty);
 
 #endif

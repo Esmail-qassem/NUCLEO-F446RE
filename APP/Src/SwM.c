@@ -1,7 +1,9 @@
 #include "STD_TYPES.h"
+#include "SwM.h"
 #include "NVIC_interface.h"
 #include "RTOS.h"
 #include "GPIO_interface.h"
+#include "GP_Timer.h"
 #include "UART.h"
 #include "ADC.h"
 
@@ -28,28 +30,75 @@ uint32 voltage;
 
 /*MACROS*/
 #define CMD_GET_VERSION 0xA1
+#define VREF 5U // Reference voltage in volts
+#define ADC_RESOLUTION 4096U // 12-bit ADC resolution (2^12 =
 
 
-/*Function Prototypes*/
-void OS_IDLE_TASK(void);
-void LED(void);
-void LifeCounter(void);
-void SW_VERSION(void);
-void ADC_TASK(void);
-void UART1_ISR(uint8 num);
-void UART2_ISR(uint8 num);
 /*************************************************/
 
 void Schedular(void)
 {
-  RTOS_voidCreateTask(0, 100, LED);
-  RTOS_voidCreateTask(1, 500, LifeCounter);
+  RTOS_voidCreateTask(0, 5, LED);
+  RTOS_voidCreateTask(1, 1000, LifeCounter);
   RTOS_voidCreateTask(2, 1000, SW_VERSION);
-  RTOS_voidCreateTask(3, 100, ADC_TASK);
+  RTOS_voidCreateTask(3, 110, LDR_TASK);
+  RTOS_voidCreateTask(4, 100, INTERNAL_TEMP_TASK);
+  RTOS_voidCreateTask(5, 10, duty_cycle_task);
+  RTOS_voidStart();
 }
 
+void duty_cycle_task(void)
+{
+  static uint8 i = 0;
+  i++;
+  if(i == 100)
+  {
+    i = 0;
+  }
+    GP_Timer_PWM_SetDuty(TIMER3, 2, i); // Gradually increase duty cycle on channel 1
 
+}
+void LDR_TASK(void)
+{
+    uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_0);
+    uint32 voltage_mV = ((uint32)raw * 3300) / 4096;
 
+    /* Inverted mapping: raw=4095 → bright, raw=0 → dark */
+    uint8 light = (raw * 100) / 4095;  // Direct mapping instead of inverted
+    uint8 darkness = 100 - light;
+
+    UART_SendSyncBuffer(UART2, "RAW: ", 5);
+    UART_voidSendNumber(UART2, raw);
+    UART_SendSyncBuffer(UART2, " | V: ", 6);
+    UART_voidSendNumber(UART2, voltage_mV);
+    UART_SendSyncBuffer(UART2, "mV | Light: ", 12);
+    UART_voidSendNumber(UART2, light);
+    UART_SendSyncBuffer(UART2, "%\r\n", 3);
+    UART_SendSyncBuffer(UART2, "\r\n", 2);
+}
+void INTERNAL_TEMP_TASK(void)
+{
+    /* Read channel 16 — internal temperature sensor */
+    uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_TEMP);
+    uint32 voltage_mV = ((uint32)raw * 3300) / 4095;
+
+    /* STM32F446 internal temp sensor formula from datasheet:
+     * Temperature = ((V25 - Vsense) / Avg_Slope) + 25
+     * V25       = 760mV  (voltage at 25°C)
+     * Avg_Slope = 2.5mV/°C
+     * Vsense    = measured voltage in mV */
+
+    sint32 temp = (((sint32)760 - (sint32)voltage_mV) * 10) / 25 + 25;
+
+    UART_SendSyncBuffer(UART2, "Internal RAW: ", 14);
+    UART_voidSendNumber(UART2, raw);
+    UART_SendSyncBuffer(UART2, " | V: ", 6);
+    UART_voidSendNumber(UART2, voltage_mV);
+    UART_SendSyncBuffer(UART2, "mV | Temp: ", 11);
+    UART_voidSendNumber(UART2, temp);
+    UART_SendSyncBuffer(UART2, " C\r\n", 4);
+    UART_SendSyncBuffer(UART2, "\r\n", 2);
+}
 
 
 
@@ -59,7 +108,7 @@ void APP_init(void)
   UART_Init(UART1, &Uart1_configuration, 16000000);
   UART_Init(UART2, &Uart2_configuration, 16000000);
   ADC_Init();
-  RTOS_voidStart();
+  GP_Timer_PWM_Init(TIMER3);
 }
 
 void GPIO_PIN_CONFIG(void)
@@ -83,6 +132,13 @@ void GPIO_PIN_CONFIG(void)
   GPIO_SetAF(GPIO_PORTA, PIN3, 7);
   /* ADC1  NO NEED TO SET AF */
   GPIO_InitPin(GPIO_PORTA, PIN0, GPIO_MODE_ANALOG, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_NO_PULL);
+  GPIO_InitPin(GPIO_PORTA, PIN1, GPIO_MODE_ANALOG, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_NO_PULL);
+
+  /* PWM */
+  /* CHANNEL 2 TIMER 3 */
+  GPIO_InitPin(GPIO_PORTC, PIN7, GPIO_MODE_AF, GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
+  GPIO_SetAF(GPIO_PORTC, PIN7, 2);
+
 }
 
 void ENABLE_NVIC_INTERRUPTS(void)
@@ -126,18 +182,6 @@ void SW_VERSION(void)
     UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION)-1U);
     UART_SendSyncBuffer(UART2, "\r\n", 2);
 
-}
-
-void ADC_TASK(void)
-{
-  adc_value = ADC_Read(ADC_CHANNEL_0);
-  voltage = (adc_value* 5000) / 4095;
-  UART_SendSyncBuffer(UART2, "ADC Value: ", 11);
-  UART_voidSendNumber(UART2, adc_value);
-  UART_SendSyncBuffer(UART2, "\r\n", 2);
-  UART_SendSyncBuffer(UART2, "Voltage: ", 9);
-  UART_voidSendNumber(UART2, voltage); // Send voltage in mV
-  UART_SendSyncBuffer(UART2, " mV\r\n", 5);
 }
 
 
