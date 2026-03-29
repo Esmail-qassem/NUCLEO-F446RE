@@ -19,6 +19,10 @@ uint32 static GET_TIMER_BASE_ADD(Timer_t value)
     {
         return  0x40001400  ;
     }
+    else
+    {
+        return 0;
+    }
 }
 void Timer_Init(Timer_t timer)
 {
@@ -66,7 +70,6 @@ void Timer_Stop(Timer_t timer)
 
 void Timer_SetCallback(Timer_t timer, TimerCallback_t cb)
 {
-    uint32 Base = GET_TIMER_BASE_ADD(timer);
     switch(timer) {
         case TIMER6: tim6_callback = cb; break;
         case TIMER7: tim7_callback = cb; break;

@@ -23,7 +23,7 @@ UART_Config_t Uart2_configuration = {
     UART_STOPBITS_1,
     UART_WORDLEN_8B,
     Polling};
-const char FIRMWARE_VERSION[] = "1.0.0";
+const uint8 FIRMWARE_VERSION[] = "1.0.0";
 uint16 adc_value;
 uint32 voltage;
 
@@ -62,16 +62,15 @@ void LDR_TASK(void)
 
   /* Inverted mapping: raw=4095 → bright, raw=0 → dark */
   uint8 light = (raw * 100) / 4095; // Direct mapping instead of inverted
-  uint8 darkness = 100 - light;
 
-  UART_SendSyncBuffer(UART2, "RAW: ", 5);
+  UART_SendSyncBuffer(UART2, (uint8 *)"RAW: ", 5);
   UART_voidSendNumber(UART2, raw);
-  UART_SendSyncBuffer(UART2, " | V: ", 6);
+  UART_SendSyncBuffer(UART2, (uint8 *)" | V: ", 6);
   UART_voidSendNumber(UART2, voltage_mV);
-  UART_SendSyncBuffer(UART2, "mV | Light: ", 12);
+  UART_SendSyncBuffer(UART2, (uint8 *)"mV | Light: ", 12);
   UART_voidSendNumber(UART2, light);
-  UART_SendSyncBuffer(UART2, "%\r\n", 3);
-  UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, (uint8 *)"%\r\n", 3);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
 }
 void INTERNAL_TEMP_TASK(void)
 {
@@ -87,14 +86,14 @@ void INTERNAL_TEMP_TASK(void)
 
   sint32 temp = (((sint32)760 - (sint32)voltage_mV) * 10) / 25 + 25;
 
-  UART_SendSyncBuffer(UART2, "Internal RAW: ", 14);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Internal RAW: ", 14);
   UART_voidSendNumber(UART2, raw);
-  UART_SendSyncBuffer(UART2, " | V: ", 6);
+  UART_SendSyncBuffer(UART2, (uint8 *)" | V: ", 6);
   UART_voidSendNumber(UART2, voltage_mV);
-  UART_SendSyncBuffer(UART2, "mV | Temp: ", 11);
+  UART_SendSyncBuffer(UART2, (uint8 *)"mV | Temp: ", 11);
   UART_voidSendNumber(UART2, temp);
-  UART_SendSyncBuffer(UART2, " C\r\n", 4);
-  UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, (uint8 *)" C\r\n", 4);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
 }
 
 void APP_init(void)
@@ -146,7 +145,6 @@ void CallBackFunctions(void)
 
 void UART1_ISR(uint8 num)
 {
-  uint8 Str[] = {num};
   if (num == CMD_GET_VERSION)
   {
     UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
@@ -154,22 +152,22 @@ void UART1_ISR(uint8 num)
 }
 void LED(void)
 {
-  GPIO_ToggccclePin(GPIO_PORTA, PIN5);
+  GPIO_TogglePin(GPIO_PORTA, PIN5);
 }
 
 void OS_IDLE_TASK(void) {}
 void LifeCounter(void)
 {
   static uint32 counter = 0;
-  UART_SendSyncBuffer(UART2, "Life counter: ", 14);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Life counter: ", 14);
   UART_voidSendNumber(UART2, counter);
-  UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
   counter++;
 }
 void SW_VERSION(void)
 {
 
-  UART_SendSyncBuffer(UART2, "STM Application Version: ", 25);
+  UART_SendSyncBuffer(UART2, (uint8 *)"STM Application Version: ", 25);
   UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
-  UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
 }

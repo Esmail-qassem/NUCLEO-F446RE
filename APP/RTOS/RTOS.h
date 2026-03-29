@@ -35,7 +35,7 @@ typedef struct {
     uint8 cpu_load_percent;
 } cpu_load_type;
 
-
+void OS_IDLE_TASK(void);
 Task_status RTOS_voidCreateTask(uint8 Copy_priority,uint16 Copy_priodicity,void(*Copy_pvTaskFunc)(void));
 void RTOS_voidSchedular(void);
 void RTOS_voidStart(void);

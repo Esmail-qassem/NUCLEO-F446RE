@@ -11,7 +11,7 @@ void (*Pt2Func_App)(void)=NULL;
 RCC_Config_t RCC_Configuration=
 {
   RCC_CLK_HSI,
-  0,
+  {0, 0, 0, 0, 0},
   AHB_PRE_1,
   APB_PRE_1,
   APB_PRE_1
@@ -43,7 +43,7 @@ void systick_handler(void)
 {
   ms_ticks++;
 }
-void main (void)
+int main (void)
 {
   GPIO_PIN_CONFIG();
   APP_init();
@@ -51,7 +51,7 @@ void main (void)
   NVIC_EnableInterrupt(UART1_IQ_NUM);
   NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
-  UART_SendSyncBuffer(UART2, "\n BTLD \n",8);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\n BTLD \n",8);
   CRC32_Init();
   FlashDrv_EraseSector(2);
   CallBackFunctions();

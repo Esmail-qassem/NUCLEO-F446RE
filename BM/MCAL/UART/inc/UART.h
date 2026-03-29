@@ -72,8 +72,9 @@ typedef struct {
     UART_Parity_t Parity;
     UART_StopBits_t StopBits;
     UART_WordLength_t WordLength;
-    UART_Synch_t Sync_Mode
+    UART_Synch_t Sync_Mode;
 } UART_Config_t;
+
 #define UART1_IQ_NUM  37
 #define UART2_IQ_NUM  38
 #define UART3_IQ_NUM  39

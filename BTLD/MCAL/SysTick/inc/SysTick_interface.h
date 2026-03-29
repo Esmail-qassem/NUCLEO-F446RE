@@ -12,8 +12,6 @@
 #include "SysTick_config.h"
 
 
-static void(*Local_PvFunction)(void)=NULL;
-
 #define AHB_BY_8 0
 #define AHB 1
 

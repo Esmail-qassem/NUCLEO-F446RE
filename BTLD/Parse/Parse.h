@@ -30,7 +30,7 @@ static const uint8 asciiToHex[105] = {
 uint8 parseByte(uint8 high, uint8 low);
 uint8 processRecord(uint8 *recordBuffer);
 void BootLoader_Handler(uint8 data);
-
+void CRC32_Init(void);
 void BootLoader_MainFunction(void);
 
 #endif

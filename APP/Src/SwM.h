@@ -11,7 +11,6 @@ void Schedular(void);
 /**************************************************************/
 /**************************************************************/
 /*Function Prototypes*/
-void OS_IDLE_TASK(void);
 void LED(void);
 void LifeCounter(void);
 void SW_VERSION(void);

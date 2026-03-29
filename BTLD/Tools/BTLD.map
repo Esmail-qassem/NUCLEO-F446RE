@@ -489,7 +489,7 @@ Linker script and memory map
 .igot.plt       0x2000001c        0x0 load address 0x08006138
  .igot.plt      0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x2000001c      0x450 load address 0x08006138
+.bss            0x2000001c      0x44c load address 0x08006138
                 0x2000001c                        _sbss = .
  *(.bss)
  .bss           0x2000001c        0x0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -550,28 +550,25 @@ Linker script and memory map
  .bss.sync_received
                 0x20000450        0x1 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
  *fill*         0x20000451        0x3 
- .bss.Local_PvFunction
-                0x20000454        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .bss.Pt2Func_App
-                0x20000458        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x20000458                Pt2Func_App
+                0x20000454        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000454                Pt2Func_App
  .bss.RCC_Configuration
-                0x2000045c        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x2000045c                RCC_Configuration
- .bss.ms_ticks  0x20000468        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x20000468                ms_ticks
-                0x2000046c                        . = ALIGN (0x4)
-                0x2000046c                        _ebss = .
+                0x20000458        0xc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000458                RCC_Configuration
+ .bss.ms_ticks  0x20000464        0x4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x20000464                ms_ticks
+                0x20000468                        . = ALIGN (0x4)
+                0x20000468                        _ebss = .
 
 ._user_heap_stack
-                0x2000046c     0x1204 load address 0x08006138
-                0x20000470                        . = ALIGN (0x8)
- *fill*         0x2000046c        0x4 
-                0x20000670                        . = (. + _Min_Heap_Size)
- *fill*         0x20000470      0x200 
-                0x20001670                        . = (. + _Min_Stack_Size)
- *fill*         0x20000670     0x1000 
-                0x20001670                        . = ALIGN (0x8)
+                0x20000468     0x1200 load address 0x08006138
+                0x20000468                        . = ALIGN (0x8)
+                0x20000668                        . = (. + _Min_Heap_Size)
+ *fill*         0x20000468      0x200 
+                0x20001668                        . = (. + _Min_Stack_Size)
+ *fill*         0x20000668     0x1000 
+                0x20001668                        . = ALIGN (0x8)
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -584,27 +581,27 @@ LOAD /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 OUTPUT(/home/esmail/Desktop/NUCLEO-F446RE/BTLD/Tools/BTLD.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x28c6
+.debug_info     0x00000000     0x2893
  .debug_info    0x00000000      0x3a5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003a5      0x2d5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .debug_info    0x0000067a      0x24b /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .debug_info    0x000008c5      0x4dc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .debug_info    0x00000da1      0x5dd /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- .debug_info    0x0000137e      0x628 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_info    0x000019a6      0x456 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_info    0x00001dfc      0x15e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x00001f5a      0x96c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_info    0x0000067a      0x247 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .debug_info    0x000008c1      0x4dc /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .debug_info    0x00000d9d      0x5dd /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ .debug_info    0x0000137a      0x628 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
+ .debug_info    0x000019a2      0x453 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_info    0x00001df5      0x15e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_info    0x00001f53      0x940 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_abbrev   0x00000000      0xc41
+.debug_abbrev   0x00000000      0xc16
  .debug_abbrev  0x00000000      0x13e /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x0000013e      0x12c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
- .debug_abbrev  0x0000026a      0x143 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
- .debug_abbrev  0x000003ad      0x133 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
- .debug_abbrev  0x000004e0      0x170 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- .debug_abbrev  0x00000650      0x1b3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_abbrev  0x00000803      0x1ae /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_abbrev  0x000009b1       0xfa /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x00000aab      0x196 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_abbrev  0x0000026a      0x144 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
+ .debug_abbrev  0x000003ae      0x133 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
+ .debug_abbrev  0x000004e1      0x170 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ .debug_abbrev  0x00000651      0x1b3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
+ .debug_abbrev  0x00000804      0x1af /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_abbrev  0x000009b3       0xfa /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_abbrev  0x00000aad      0x169 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_aranges  0x00000000      0x350
  .debug_aranges
@@ -674,16 +671,16 @@ LOAD linker stubs
  .debug_macro   0x000011f6       0x9a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .debug_macro   0x00001290       0x76 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x18b3
+.debug_line     0x00000000     0x18bf
  .debug_line    0x00000000      0x2e5 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002e5      0x206 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004eb      0x1da /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_line    0x000006c5      0x2b9 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_line    0x0000097e      0x367 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
  .debug_line    0x00000ce5      0x60c /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
- .debug_line    0x000012f1      0x30b /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- .debug_line    0x000015fc       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x000016bf      0x1f4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_line    0x000012f1      0x317 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ .debug_line    0x00001608       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+ .debug_line    0x000016cb      0x1f4 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_str      0x00000000     0x564d
  .debug_str     0x00000000     0x564d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -695,7 +692,7 @@ LOAD linker stubs
  .debug_str     0x0000564d     0x37ce /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_str     0x0000564d     0x3a5a /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
  .debug_str     0x0000564d     0x2f1d /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_str     0x0000564d     0x4a01 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_str     0x0000564d     0x49f0 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .comment        0x00000000       0x26
  .comment       0x00000000       0x26 /home/esmail/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o

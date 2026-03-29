@@ -423,23 +423,23 @@ LOAD /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 OUTPUT(/home/esmail/Desktop/NUCLEO-F446RE/BM/Tools/BM.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x1cba
+.debug_info     0x00000000     0x1cc7
  .debug_info    0x00000000      0x3a5 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003a5      0x2d5 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x0000067a      0x24b /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_info    0x000008c5      0x4dc /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_info    0x00000da1      0x5dd /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_info    0x0000137e      0x15e /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
- .debug_info    0x000014dc      0x7de /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_info    0x000014dc      0x7eb /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
-.debug_abbrev   0x00000000      0x834
+.debug_abbrev   0x00000000      0x85a
  .debug_abbrev  0x00000000      0x13e /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x0000013e      0x12c /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_abbrev  0x0000026a      0x143 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_abbrev  0x000003ad      0x133 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_abbrev  0x000004e0      0x170 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_abbrev  0x00000650       0xfa /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
- .debug_abbrev  0x0000074a       0xea /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_abbrev  0x0000074a      0x110 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
 .debug_aranges  0x00000000      0x230
  .debug_aranges
@@ -496,14 +496,14 @@ LOAD linker stubs
  .debug_macro   0x00000ef7       0xd6 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
  .debug_macro   0x00000fcd       0x76 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
-.debug_line     0x00000000      0xf09
+.debug_line     0x00000000      0xf0d
  .debug_line    0x00000000      0x2e5 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002e5      0x206 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004eb      0x1da /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_line    0x000006c5      0x2b9 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_line    0x0000097e      0x367 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_line    0x00000ce5       0xc3 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00000da8      0x161 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_line    0x00000da8      0x165 /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
 .debug_str      0x00000000     0x4bcf
  .debug_str     0x00000000     0x4bcf /home/esmail/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o

@@ -9,7 +9,7 @@ RCC_Config_t RCC_Configuration =
         APB_PRE_1,
         APB_PRE_1};
 
-void main(void)
+int main(void)
 {
   GPIO_PIN_CONFIG();
   ENABLE_NVIC_INTERRUPTS();

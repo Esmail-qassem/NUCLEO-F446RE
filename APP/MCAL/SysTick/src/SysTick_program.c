@@ -1,7 +1,7 @@
 
 
 #include "SysTick_interface.h"
-
+static void(*Local_PvFunction)(void)=NULL;
 
 void SysTick_voidInit(void)
 {

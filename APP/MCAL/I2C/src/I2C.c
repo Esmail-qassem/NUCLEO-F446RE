@@ -12,7 +12,7 @@ static uint32 I2C_GetBase(I2C_Port_t port) {
         case I2C1_PORT : return I2C1_BASE;break;
         case I2C2_PORT : return I2C2_BASE;break;
         case I2C3_PORT : return I2C3_BASE;break;
-        default : break;
+        default : return 0; break;
     }
 }
 
@@ -210,7 +210,6 @@ uint8 I2C_ReadStatus(uint32 base)
 /*-----------------------------------------------------------*/
 I2C_Status_t I2C_MasterReceive(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size, uint8 repeated_start)
 {
-    uint32 base = I2C_GetBase(port);
     I2C_Status_t status;
 
     // Generate START condition

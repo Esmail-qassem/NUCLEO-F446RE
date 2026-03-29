@@ -118,7 +118,6 @@ void CRC32_Init(void)
 
 uint32 CRC32_Calculate(const uint8 *data, uint32 length)
 {
-    // if (!crc32_table_ready) CRC32_Init();
 
     uint32 crc = 0xFFFFFFFF;
     for (uint32 i = 0; i < length; i++)
@@ -260,12 +259,12 @@ void BootLoader_MainFunction(void)
 
         if (calculated_crc == received_crc)
         {
-            UART_SendSyncBuffer(UART2, "\nCRC OK!\n", 9);
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC OK!\n", 9);
             Binary_receivingfinished = 1;
         }
         else
         {
-            UART_SendSyncBuffer(UART2, "\nCRC FAILED!\n", 13);
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC FAILED!\n", 13);
             counter = 0;
             Header = 0;
             received_crc = 0;
@@ -282,7 +281,7 @@ void BootLoader_MainFunction(void)
         if ((stack_ptr >= 0x20000000 && stack_ptr <= 0x20020000) &&
             (reset_handler >= 0x08008000 && reset_handler <= 0x08080000))
         {
-            UART_SendSyncBuffer(UART2, "\nVerification OK!\n", 18);
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification OK!\n", 18);
             flash_address = APP_START_ADDRESS;
             Binary_receivingfinished = 0;
             counter = 0;
@@ -292,7 +291,7 @@ void BootLoader_MainFunction(void)
         }
         else
         {
-            UART_SendSyncBuffer(UART2, "\nVerification FAILED!\n", 21);
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification FAILED!\n", 21);
             counter = 0;
             received_crc = 0;
             sync_received = 0;
