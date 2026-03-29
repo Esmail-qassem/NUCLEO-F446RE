@@ -10,7 +10,7 @@ RCC_Config_t RCC_Configuration =
         APB_PRE_1};
 
 void main(void)
-{ 
+{
   GPIO_PIN_CONFIG();
   ENABLE_NVIC_INTERRUPTS();
   CallBackFunctions();
@@ -20,7 +20,6 @@ void main(void)
   {
   }
 }
-
 
 void SystemInit(void)
 {

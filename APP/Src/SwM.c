@@ -27,12 +27,10 @@ const char FIRMWARE_VERSION[] = "1.0.0";
 uint16 adc_value;
 uint32 voltage;
 
-
 /*MACROS*/
 #define CMD_GET_VERSION 0xA1
-#define VREF 5U // Reference voltage in volts
+#define VREF 5U              // Reference voltage in volts
 #define ADC_RESOLUTION 4096U // 12-bit ADC resolution (2^12 =
-
 
 /*************************************************/
 
@@ -51,57 +49,53 @@ void duty_cycle_task(void)
 {
   static uint8 i = 0;
   i++;
-  if(i == 100)
+  if (i == 100)
   {
     i = 0;
   }
-    GP_Timer_PWM_SetDuty(TIMER3, 2, i); // Gradually increase duty cycle on channel 1
-
+  GP_Timer_PWM_SetDuty(TIMER3, 2, i); // Gradually increase duty cycle on channel 1
 }
 void LDR_TASK(void)
 {
-    uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_0);
-    uint32 voltage_mV = ((uint32)raw * 3300) / 4096;
+  uint16 raw = ADC_ReadAveraged(ADC_CHANNEL_0);
+  uint32 voltage_mV = ((uint32)raw * 3300) / 4096;
 
-    /* Inverted mapping: raw=4095 → bright, raw=0 → dark */
-    uint8 light = (raw * 100) / 4095;  // Direct mapping instead of inverted
-    uint8 darkness = 100 - light;
+  /* Inverted mapping: raw=4095 → bright, raw=0 → dark */
+  uint8 light = (raw * 100) / 4095; // Direct mapping instead of inverted
+  uint8 darkness = 100 - light;
 
-    UART_SendSyncBuffer(UART2, "RAW: ", 5);
-    UART_voidSendNumber(UART2, raw);
-    UART_SendSyncBuffer(UART2, " | V: ", 6);
-    UART_voidSendNumber(UART2, voltage_mV);
-    UART_SendSyncBuffer(UART2, "mV | Light: ", 12);
-    UART_voidSendNumber(UART2, light);
-    UART_SendSyncBuffer(UART2, "%\r\n", 3);
-    UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, "RAW: ", 5);
+  UART_voidSendNumber(UART2, raw);
+  UART_SendSyncBuffer(UART2, " | V: ", 6);
+  UART_voidSendNumber(UART2, voltage_mV);
+  UART_SendSyncBuffer(UART2, "mV | Light: ", 12);
+  UART_voidSendNumber(UART2, light);
+  UART_SendSyncBuffer(UART2, "%\r\n", 3);
+  UART_SendSyncBuffer(UART2, "\r\n", 2);
 }
 void INTERNAL_TEMP_TASK(void)
 {
-    /* Read channel 16 — internal temperature sensor */
-    uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_TEMP);
-    uint32 voltage_mV = ((uint32)raw * 3300) / 4095;
+  /* Read channel 16 — internal temperature sensor */
+  uint16 raw = ADC_ReadAveraged(ADC_CHANNEL_TEMP);
+  uint32 voltage_mV = ((uint32)raw * 3300) / 4095;
 
-    /* STM32F446 internal temp sensor formula from datasheet:
-     * Temperature = ((V25 - Vsense) / Avg_Slope) + 25
-     * V25       = 760mV  (voltage at 25°C)
-     * Avg_Slope = 2.5mV/°C
-     * Vsense    = measured voltage in mV */
+  /* STM32F446 internal temp sensor formula from datasheet:
+   * Temperature = ((V25 - Vsense) / Avg_Slope) + 25
+   * V25       = 760mV  (voltage at 25°C)
+   * Avg_Slope = 2.5mV/°C
+   * Vsense    = measured voltage in mV */
 
-    sint32 temp = (((sint32)760 - (sint32)voltage_mV) * 10) / 25 + 25;
+  sint32 temp = (((sint32)760 - (sint32)voltage_mV) * 10) / 25 + 25;
 
-    UART_SendSyncBuffer(UART2, "Internal RAW: ", 14);
-    UART_voidSendNumber(UART2, raw);
-    UART_SendSyncBuffer(UART2, " | V: ", 6);
-    UART_voidSendNumber(UART2, voltage_mV);
-    UART_SendSyncBuffer(UART2, "mV | Temp: ", 11);
-    UART_voidSendNumber(UART2, temp);
-    UART_SendSyncBuffer(UART2, " C\r\n", 4);
-    UART_SendSyncBuffer(UART2, "\r\n", 2);
+  UART_SendSyncBuffer(UART2, "Internal RAW: ", 14);
+  UART_voidSendNumber(UART2, raw);
+  UART_SendSyncBuffer(UART2, " | V: ", 6);
+  UART_voidSendNumber(UART2, voltage_mV);
+  UART_SendSyncBuffer(UART2, "mV | Temp: ", 11);
+  UART_voidSendNumber(UART2, temp);
+  UART_SendSyncBuffer(UART2, " C\r\n", 4);
+  UART_SendSyncBuffer(UART2, "\r\n", 2);
 }
-
-
-
 
 void APP_init(void)
 {
@@ -138,13 +132,11 @@ void GPIO_PIN_CONFIG(void)
   /* CHANNEL 2 TIMER 3 */
   GPIO_InitPin(GPIO_PORTC, PIN7, GPIO_MODE_AF, GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
   GPIO_SetAF(GPIO_PORTC, PIN7, 2);
-
 }
 
 void ENABLE_NVIC_INTERRUPTS(void)
 {
   NVIC_EnableInterrupt(UART1_IQ_NUM);
-
 }
 
 void CallBackFunctions(void)
@@ -155,17 +147,17 @@ void CallBackFunctions(void)
 void UART1_ISR(uint8 num)
 {
   uint8 Str[] = {num};
-  if(num == CMD_GET_VERSION )
+  if (num == CMD_GET_VERSION)
   {
-    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION)-1U);
+    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
   }
 }
 void LED(void)
 {
-  GPIO_TogglePin(GPIO_PORTA, PIN5);
+  GPIO_ToggccclePin(GPIO_PORTA, PIN5);
 }
 
-void OS_IDLE_TASK(void){}
+void OS_IDLE_TASK(void) {}
 void LifeCounter(void)
 {
   static uint32 counter = 0;
@@ -176,12 +168,8 @@ void LifeCounter(void)
 }
 void SW_VERSION(void)
 {
-  
-  
-    UART_SendSyncBuffer(UART2, "STM Application Version: ", 25);
-    UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION)-1U);
-    UART_SendSyncBuffer(UART2, "\r\n", 2);
 
+  UART_SendSyncBuffer(UART2, "STM Application Version: ", 25);
+  UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
+  UART_SendSyncBuffer(UART2, "\r\n", 2);
 }
-
-
