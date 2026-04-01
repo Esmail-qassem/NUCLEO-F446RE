@@ -70,8 +70,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           enable: all
           force: true
-          inconclusive: true
-          std: c99,c11,c++03,c++11  # Adjust based on your code
+          inconclusive: false
+          std: c99,c11,c++03,c++11
           error_exitcode: 1
           output_file: cppcheck-report.xml
           other_options: --suppress=*:/usr/include/*
