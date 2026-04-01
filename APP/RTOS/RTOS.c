@@ -1,16 +1,27 @@
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
 #include "RTOS.h"
-//#include "Timer.h"
 #include "SysTick_interface.h"
 #include "RTOS.h"
 task_type SysTask[TASK_NUMBER]={{0}};
 cpu_load_type CPU_Load = {0};
-
+volatile uint8 OS_TickFlag = 0;
+void RTOS_SCHEDULAR_FLAG(void)
+{
+    OS_TickFlag = 1;
+}
 void RTOS_voidStart(void)
 {
 	SysTick_voidInit();
-    SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&RTOS_voidSchedular);
+    SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&RTOS_SCHEDULAR_FLAG);
+    while(1)
+    {
+        if (OS_TickFlag)
+        {
+            OS_TickFlag = 0;
+            RTOS_voidSchedular();
+        }
+    }
 }
 
 Task_status RTOS_voidCreateTask(uint8 Copy_priority,uint16 Copy_periodicity,void(*Copy_pvTaskFunc)(void))
@@ -23,10 +34,10 @@ Task_status RTOS_voidCreateTask(uint8 Copy_priority,uint16 Copy_periodicity,void
 	{
         return TASK_ERROR_ALREADY_NULL;
     }
-	SysTask[Copy_priority].periodicity=Copy_periodicity;
-	SysTask[Copy_priority].remaining_ticks= 1;
-	SysTask[Copy_priority].TaskFunc=Copy_pvTaskFunc;
-	SysTask[Copy_priority].state=READY;
+	SysTask[Copy_priority].periodicity = Copy_periodicity;
+	SysTask[Copy_priority].remaining_ticks = Copy_periodicity;
+	SysTask[Copy_priority].TaskFunc = Copy_pvTaskFunc;
+	SysTask[Copy_priority].state = READY;
 	return TASK_OK;
 }
 

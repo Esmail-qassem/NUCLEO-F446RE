@@ -16,9 +16,6 @@ int main(void)
   CallBackFunctions();
   APP_init();
   Schedular();
-  while (1)
-  {
-  }
 }
 
 void SystemInit(void)
