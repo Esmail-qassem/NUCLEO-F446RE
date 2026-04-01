@@ -1,3 +1,4 @@
+#!/bin/bash
 ROOT=$(dirname $(realpath $0))/..
 COMBINED_DIR=$(dirname $(realpath $0))
 
