@@ -59,11 +59,11 @@ jobs:
         run: arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf APP/Tools/*.elf      
   Static_Analysis:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      
       - name: Run cppcheck
         uses: deep5050/cppcheck-action@main
         with:
@@ -71,11 +71,11 @@ jobs:
           enable: all
           force: true
           inconclusive: false
-          std=c11 # Assuming C11 standard, adjust if needed
+          std: c11
           error_exitcode: 1
           output_file: cppcheck-report.xml
           other_options: --suppress=*:/usr/include/*
-
+      
       - name: Upload cppcheck report
         uses: actions/upload-artifact@v4
         with:
