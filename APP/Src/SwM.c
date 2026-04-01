@@ -38,10 +38,8 @@ void Schedular(void)
 {
   RTOS_voidCreateTask(0, 5, LED);
   RTOS_voidCreateTask(1, 10, LifeCounter);
-  RTOS_voidCreateTask(2, 1000, SW_VERSION);
-  //RTOS_voidCreateTask(3, 110, LDR_TASK);
-  //RTOS_voidCreateTask(3, 100, INTERNAL_TEMP_TASK);
-  //RTOS_voidCreateTask(5, 10, duty_cycle_task);
+  RTOS_voidCreateTask(2, 11, SW_VERSION);
+  RTOS_voidCreateTask(3, 100, INTERNAL_TEMP_TASK);
   RTOS_voidStart();
 }
 

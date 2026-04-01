@@ -23,6 +23,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/I2C/src\
            $(MCAL_path)/FLASH/src\
            $(MCAL_path)/GP_TIMER/src\
+		   $(MCAL_path)/PendSV/src\
            $(HAL_path)/ESP\
            $(HAL_path)/OLED\
            $(P1_path)/FLAPPY_Bird\

@@ -1,5 +1,6 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
+#include "PendSV.h"
 #include "SwM.h"
 RCC_Config_t RCC_Configuration =
     {
@@ -13,6 +14,7 @@ int main(void)
 {
   GPIO_PIN_CONFIG();
   ENABLE_NVIC_INTERRUPTS();
+  PendSV_Init();
   CallBackFunctions();
   APP_init();
   Schedular();

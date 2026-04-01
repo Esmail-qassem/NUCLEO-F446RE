@@ -2,10 +2,16 @@
 #include "BIT_MATH.h"
 #include "RTOS.h"
 #include "SysTick_interface.h"
-#include "RTOS.h"
+#include "PendSV.h"
 task_type SysTask[TASK_NUMBER]={{0}};
 cpu_load_type CPU_Load = {0};
 volatile uint8 OS_TickFlag = 0;
+
+
+uint8 Task_StackSize[STACK_SIZE];
+
+TCB_t *CurrentTask;
+TCB_t *NextTask;
 void RTOS_SCHEDULAR_FLAG(void)
 {
     OS_TickFlag = 1;

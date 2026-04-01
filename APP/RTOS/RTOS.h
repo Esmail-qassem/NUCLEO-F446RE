@@ -2,7 +2,7 @@
 #define RTOS_INTERFACE_H_
 
 #define TASK_NUMBER  4
-
+#define STACK_SIZE   128
 
 typedef enum
 {
@@ -13,27 +13,33 @@ typedef enum
 }
 Task_States;
 
-typedef struct
-{
-    uint16 periodicity;
-    uint16 remaining_ticks;
-    Task_States state;
-    void(*TaskFunc)(void);
-}task_type;
-
-
 typedef enum {
     TASK_OK,
     TASK_ERROR_INVALID_ID,
     TASK_ERROR_ALREADY_NULL
 } Task_status;
 
-// Add to your RTOS.h or global variables
 typedef struct {
     uint32 total_ticks;
     uint32 idle_ticks;
     uint8 cpu_load_percent;
 } cpu_load_type;
+
+typedef struct
+{
+    uint32 *stack_pointer;
+} TCB_t;
+
+typedef struct
+{
+    uint16 periodicity;
+    uint16 remaining_ticks;
+    Task_States state;
+    void(*TaskFunc)(void);
+    TCB_t *TCB;
+}task_type;
+
+
 
 void OS_IDLE_TASK(void);
 Task_status RTOS_voidCreateTask(uint8 Copy_priority,uint16 Copy_priodicity,void(*Copy_pvTaskFunc)(void));
