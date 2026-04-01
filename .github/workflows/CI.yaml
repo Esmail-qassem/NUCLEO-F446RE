@@ -71,10 +71,7 @@ jobs:
           enable: all
           force: true
           inconclusive: false
-          --std=c99   # or
-          --std=c11   # or
-          --std=c++03 # or
-          --std=c++11 # or
+          std=c11 # Assuming C11 standard, adjust if needed
           error_exitcode: 1
           output_file: cppcheck-report.xml
           other_options: --suppress=*:/usr/include/*
