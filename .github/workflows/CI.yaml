@@ -69,6 +69,7 @@ jobs:
       
       - name: Run cppcheck analysis
         id: cppcheck
+        continue-on-error: true  # Don't fail here, we'll handle it manually
         run: |
           # Run cppcheck and capture exit code
           cppcheck --enable=all \
@@ -80,27 +81,67 @@ jobs:
                    --suppress=*:/usr/include/* \
                    . 2>&1 | tee cppcheck-output.log
           
-          # Extract statistics
-          if [ -f cppcheck-report.xml ]; then
+          # Save the exit code
+          CPPCHECK_EXIT_CODE=${PIPESTATUS[0]}
+          echo "CPPCHECK_EXIT_CODE=$CPPCHECK_EXIT_CODE" >> $GITHUB_ENV
+          
+          # Extract statistics - safely handle if file doesn't exist or is empty
+          ERROR_COUNT=0
+          WARNING_COUNT=0
+          STYLE_COUNT=0
+          
+          if [ -f cppcheck-report.xml ] && [ -s cppcheck-report.xml ]; then
             ERROR_COUNT=$(grep -c 'severity="error"' cppcheck-report.xml || echo "0")
             WARNING_COUNT=$(grep -c 'severity="warning"' cppcheck-report.xml || echo "0")
             STYLE_COUNT=$(grep -c 'severity="style"' cppcheck-report.xml || echo "0")
-            
-            echo "ERROR_COUNT=$ERROR_COUNT" >> $GITHUB_OUTPUT
-            echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
-            echo "STYLE_COUNT=$STYLE_COUNT" >> $GITHUB_OUTPUT
-            
-            # Fail if errors
-            if [ $ERROR_COUNT -gt 0 ]; then
-              exit 1
-            fi
           fi
+          
+          # Ensure we have valid numbers (remove whitespace)
+          ERROR_COUNT=$(echo "$ERROR_COUNT" | tr -d '[:space:]')
+          WARNING_COUNT=$(echo "$WARNING_COUNT" | tr -d '[:space:]')
+          STYLE_COUNT=$(echo "$STYLE_COUNT" | tr -d '[:space:]')
+          
+          # Default to 0 if empty
+          ERROR_COUNT=${ERROR_COUNT:-0}
+          WARNING_COUNT=${WARNING_COUNT:-0}
+          STYLE_COUNT=${STYLE_COUNT:-0}
+          
+          # Set outputs
+          echo "ERROR_COUNT=$ERROR_COUNT" >> $GITHUB_OUTPUT
+          echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
+          echo "STYLE_COUNT=$STYLE_COUNT" >> $GITHUB_OUTPUT
+          
+          # Print summary
+          echo "=================================="
+          echo "CPPCHECK ANALYSIS SUMMARY"
+          echo "=================================="
+          echo "Errors: $ERROR_COUNT"
+          echo "Warnings: $WARNING_COUNT"
+          echo "Style issues: $STYLE_COUNT"
+          echo "=================================="
+          
+          # Show first few errors if any
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo ""
+            echo "First 5 errors found:"
+            echo "----------------------------------"
+            grep -A 2 'severity="error"' cppcheck-report.xml | head -20 || true
+          fi
+      
+      - name: Check for errors and fail if needed
+        if: steps.cppcheck.outputs.ERROR_COUNT != 0
+        run: |
+          echo "❌ Found ${{ steps.cppcheck.outputs.ERROR_COUNT }} errors!"
+          echo "Check the cppcheck-report artifact for details"
+          exit 1
       
       - name: Upload cppcheck report
         uses: actions/upload-artifact@v4
         with:
           name: cppcheck-report
-          path: cppcheck-report.xml
+          path: |
+            cppcheck-report.xml
+            cppcheck-output.log
         if: always()
       
       - name: Comment PR
@@ -108,12 +149,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const errors = ${{ steps.cppcheck.outputs.ERROR_COUNT || 0 }};
-            const warnings = ${{ steps.cppcheck.outputs.WARNING_COUNT || 0 }};
-            const style = ${{ steps.cppcheck.outputs.STYLE_COUNT || 0 }};
+            const errors = parseInt('${{ steps.cppcheck.outputs.ERROR_COUNT }}') || 0;
+            const warnings = parseInt('${{ steps.cppcheck.outputs.WARNING_COUNT }}') || 0;
+            const style = parseInt('${{ steps.cppcheck.outputs.STYLE_COUNT }}') || 0;
             
             let status = errors > 0 ? '❌ **FAILED**' : '✅ **PASSED**';
-            let color = errors > 0 ? '#ff0000' : '#00ff00';
             
             const comment = `
             ## 🔍 Static Analysis Results (CppCheck)
@@ -124,7 +164,7 @@ jobs:
             | ⚠️ Warnings | ${warnings} |
             | 💅 Style | ${style} |
             
-            ${errors > 0 ? '**Build failed due to static analysis errors!** Please check the artifacts for details.' : 'No critical errors found. Great job! 🎉'}
+            ${errors > 0 ? '⚠️ **Build failed due to static analysis errors!** Please check the artifacts for details.' : '✅ No critical errors found. Great job! 🎉'}
             
             <details>
             <summary>📥 Download Full Report</summary>
@@ -133,26 +173,30 @@ jobs:
             </details>
             `;
             
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            
-            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('Static Analysis Results'));
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: comment
-              });
-            } else {
-              await github.rest.issues.createComment({
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: comment
               });
+              
+              const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('Static Analysis Results'));
+              
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: comment
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment
+                });
+              }
+            } catch (error) {
+              console.log('Could not create PR comment:', error.message);
             }
