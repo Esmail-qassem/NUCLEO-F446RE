@@ -1,23 +1,23 @@
 ROOT=$(dirname $(realpath $0))/..
 COMBINED_DIR=$(dirname $(realpath $0))
 
-echo "Building BM..."
+printf "Building BM...\n"
 cd $ROOT/BM/Build/
 ./m.sh -j
 
-echo "Building BTLD..."
+printf "Building BTLD...\n"
 cd $ROOT/BTLD/Build/
 ./m.sh -j
 
-echo "Building APP..."
+printf "Building APP...\n"
 cd $ROOT/APP/Build/
 ./m.sh -j
 
-echo "Creating the Btld+App image..."
+printf "Creating the Btld+App image...\n"
 cd $ROOT/combined_image
 python BTLD_APP_IMAGE.py
 
-echo "Generating combined hex..."
+printf "Generating combined hex...\n"
 cd $COMBINED_DIR
 srec_cat \
     $ROOT/BM/Tools/BM.bin           -Binary -offset 0x08000000 \
@@ -25,4 +25,4 @@ srec_cat \
     $ROOT/APP/Tools/application.bin -Binary -offset 0x08008000 \
     -o full_image.hex -Intel
 
-echo "✅ Hex generated!"
+printf "✅ Hex generated!"
