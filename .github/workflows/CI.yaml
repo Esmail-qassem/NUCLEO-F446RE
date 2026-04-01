@@ -1,202 +1,309 @@
-name: STM32 Full Build CI
+name: STM32 Firmware CI
 
 on:
   push:
   pull_request:
 
+# ─────────────────────────────────────────────────────────────
+# Shared env across all jobs
+# ─────────────────────────────────────────────────────────────
+env:
+  ARM_TOOLCHAIN: gcc-arm-none-eabi
+  MAX_FLASH_BYTES: 524288   # 512 KB — STM32F446RE flash
+  MAX_RAM_BYTES:   131072   # 128 KB — STM32F446RE SRAM
+
+# ═════════════════════════════════════════════════════════════
+# JOB 1 — Build all three images (BM / BTLD / APP)
+# ═════════════════════════════════════════════════════════════
 jobs:
   build:
+    name: "🔨 Build"
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # 2. Install dependencies
-      - name: Install toolchain & tools
+      - name: Install ARM toolchain & tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            gcc-arm-none-eabi \
-            make \
-            python3 \
-            srecord 
+          sudo apt-get update -q
+          sudo apt-get install -y gcc-arm-none-eabi make python3 srecord
 
-      # 3. Make scripts executable
       - name: Make scripts executable
         run: find . -name "*.sh" -exec chmod +x {} \;
 
-      # 4. Run your build
-      - name: Run full build
+      - name: Build full image
         run: ./combined_image/FULL_IMAGE.sh
 
-      - name: Upload BM artifact
+      # ── Size gate: fail if firmware exceeds flash/RAM limits ──
+      - name: Check binary size limits
+        run: |
+          echo "=============================="
+          echo "  FIRMWARE SIZE REPORT"
+          echo "=============================="
+          arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf APP/Tools/*.elf
+
+          # Extract total flash (text+data) and RAM (data+bss) for each elf
+          check_size() {
+            local elf="$1"
+            local label="$2"
+            read text data bss < <(arm-none-eabi-size "$elf" | awk 'NR==2{print $1, $2, $3}')
+            local flash=$(( text + data ))
+            local ram=$(( data + bss ))
+            echo "$label → Flash: ${flash}B / ${{ env.MAX_FLASH_BYTES }}B  RAM: ${ram}B / ${{ env.MAX_RAM_BYTES }}B"
+            if [ "$flash" -gt "${{ env.MAX_FLASH_BYTES }}" ]; then
+              echo "❌ $label exceeds flash limit!"
+              exit 1
+            fi
+            if [ "$ram" -gt "${{ env.MAX_RAM_BYTES }}" ]; then
+              echo "❌ $label exceeds RAM limit!"
+              exit 1
+            fi
+          }
+
+          check_size BM/Tools/*.elf   "BM  "
+          check_size BTLD/Tools/*.elf "BTLD"
+          check_size APP/Tools/*.elf  "APP "
+
+      # ── Optional: section-level breakdown for debugging ──
+      - name: Section breakdown (APP)
+        run: arm-none-eabi-objdump -h APP/Tools/*.elf
+
+      - name: Upload BM ELF
         uses: actions/upload-artifact@v4
         with:
           name: BM
           path: BM/Tools/*.elf
 
-      - name: Upload BTLD artifact
+      - name: Upload BTLD ELF
         uses: actions/upload-artifact@v4
         with:
           name: BTLD
           path: BTLD/Tools/*.elf
 
-      - name: Upload Application artifact
+      - name: Upload APP ELF
         uses: actions/upload-artifact@v4
         with:
           name: Application
           path: APP/Tools/*.elf
 
-      # 5. Upload final hex
-      - name: Upload firmware
+      - name: Upload combined hex
         uses: actions/upload-artifact@v4
         with:
           name: full-image
           path: combined_image/full_image.hex
-      - name: Firmware size
-        run: arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf APP/Tools/*.elf      
-  Static_Analysis:
+
+
+# ═════════════════════════════════════════════════════════════
+# JOB 2 — Static Analysis (cppcheck + clang-tidy)
+# ═════════════════════════════════════════════════════════════
+  static_analysis:
+    name: "🔍 Static Analysis"
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-      
-      - name: Run cppcheck analysis
-        id: cppcheck
-        continue-on-error: true  # Don't fail here, we'll handle it manually
+      - uses: actions/checkout@v4
+
+      - name: Install analysis tools
         run: |
-          # Run cppcheck and capture exit code
-          cppcheck --enable=all \
-                   --force \
-                   --inconclusive \
-                   --xml \
-                   --xml-version=2 \
-                   --output-file=cppcheck-report.xml \
-                   --suppress=*:/usr/include/* \
-                   . 2>&1 | tee cppcheck-output.log
-          
-          # Save the exit code
-          CPPCHECK_EXIT_CODE=${PIPESTATUS[0]}
-          echo "CPPCHECK_EXIT_CODE=$CPPCHECK_EXIT_CODE" >> $GITHUB_ENV
-          
-          # Extract statistics - safely handle if file doesn't exist or is empty
+          sudo apt-get update -q
+          sudo apt-get install -y cppcheck clang-tidy gcc-arm-none-eabi
+
+      # ── cppcheck ──────────────────────────────────────────
+      # --platform=arm32-wchar_t2 models the Cortex-M4 ABI correctly,
+      # which suppresses many false positives from integer widths.
+      # The suppressions file lets you silence per-file noise.
+      - name: Run cppcheck
+        id: cppcheck
+        continue-on-error: true
+        run: |
+          # Create a suppressions file if one doesn't exist
+          SUPPRESS=""
+          if [ -f cppcheck-suppressions.txt ]; then
+            SUPPRESS="--suppressions-list=cppcheck-suppressions.txt"
+          fi
+
+          cppcheck \
+            --enable=warning,style,performance,portability \
+            --platform=arm32-wchar_t2 \
+            --std=c11 \
+            --force \
+            --xml --xml-version=2 \
+            --output-file=cppcheck-report.xml \
+            --suppress=missingIncludeSystem \
+            --suppress=unmatchedSuppression \
+            $SUPPRESS \
+            APP/Src BTLD/Src BM/Src 2>&1 | tee cppcheck-output.log || true
+
           ERROR_COUNT=0
           WARNING_COUNT=0
-          STYLE_COUNT=0
-          
+
           if [ -f cppcheck-report.xml ] && [ -s cppcheck-report.xml ]; then
-            ERROR_COUNT=$(grep -c 'severity="error"' cppcheck-report.xml || echo "0")
-            WARNING_COUNT=$(grep -c 'severity="warning"' cppcheck-report.xml || echo "0")
-            STYLE_COUNT=$(grep -c 'severity="style"' cppcheck-report.xml || echo "0")
+            ERROR_COUNT=$(grep -c 'severity="error"'   cppcheck-report.xml || echo 0)
+            WARNING_COUNT=$(grep -c 'severity="warning"' cppcheck-report.xml || echo 0)
           fi
-          
-          # Ensure we have valid numbers (remove whitespace)
-          ERROR_COUNT=$(echo "$ERROR_COUNT" | tr -d '[:space:]')
-          WARNING_COUNT=$(echo "$WARNING_COUNT" | tr -d '[:space:]')
-          STYLE_COUNT=$(echo "$STYLE_COUNT" | tr -d '[:space:]')
-          
-          # Default to 0 if empty
-          ERROR_COUNT=${ERROR_COUNT:-0}
-          WARNING_COUNT=${WARNING_COUNT:-0}
-          STYLE_COUNT=${STYLE_COUNT:-0}
-          
-          # Set outputs
-          echo "ERROR_COUNT=$ERROR_COUNT" >> $GITHUB_OUTPUT
+
+          ERROR_COUNT=${ERROR_COUNT//[[:space:]]/}
+          WARNING_COUNT=${WARNING_COUNT//[[:space:]]/}
+
+          echo "ERROR_COUNT=$ERROR_COUNT"     >> $GITHUB_OUTPUT
           echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
-          echo "STYLE_COUNT=$STYLE_COUNT" >> $GITHUB_OUTPUT
-          
-          # Print summary
-          echo "=================================="
-          echo "CPPCHECK ANALYSIS SUMMARY"
-          echo "=================================="
-          echo "Errors: $ERROR_COUNT"
-          echo "Warnings: $WARNING_COUNT"
-          echo "Style issues: $STYLE_COUNT"
-          echo "=================================="
-          
-          # Show first few errors if any
-          if [ $ERROR_COUNT -gt 0 ]; then
-            echo ""
-            echo "First 5 errors found:"
-            echo "----------------------------------"
-            grep -A 2 'severity="error"' cppcheck-report.xml | head -20 || true
-          fi
-      
-      - name: Check for errors and fail if needed
-        if: steps.cppcheck.outputs.ERROR_COUNT != 0
+
+          echo "cppcheck: $ERROR_COUNT errors, $WARNING_COUNT warnings"
+
+      # ── clang-tidy ────────────────────────────────────────
+      # clang-tidy runs on x86 but we feed it your actual source.
+      # It catches implicit conversions, bad casts, integer promotion bugs,
+      # and other things cppcheck completely misses.
+      - name: Run clang-tidy
+        id: clang_tidy
+        continue-on-error: true
         run: |
-          echo "❌ Found ${{ steps.cppcheck.outputs.ERROR_COUNT }} errors!"
-          echo "Check the cppcheck-report artifact for details"
+          # Build a minimal compile_commands.json so clang-tidy can parse includes.
+          # Adjust -I paths to match your actual include directories.
+          find APP/Src BTLD/Src BM/Src -name "*.c" 2>/dev/null | while read f; do
+            echo "$f"
+          done > source_files.txt
+
+          TIDY_ERRORS=0
+          while IFS= read -r src; do
+            # Run clang-tidy per file; -header-filter restricts noise to your own headers
+            clang-tidy "$src" \
+              --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity" \
+              --warnings-as-errors="" \
+              -- \
+              -std=c11 \
+              -DSTM32F446xx \
+              -DUSE_BARE_METAL \
+              -I APP/Inc -I BTLD/Inc -I BM/Inc \
+              2>&1 | tee -a clang-tidy-output.log || TIDY_ERRORS=$((TIDY_ERRORS + 1))
+          done < source_files.txt
+
+          echo "TIDY_ERRORS=$TIDY_ERRORS" >> $GITHUB_OUTPUT
+          echo "clang-tidy finished with $TIDY_ERRORS file(s) having issues"
+
+      # ── Gate: fail job on cppcheck errors ─────────────────
+      - name: Fail on cppcheck errors
+        if: steps.cppcheck.outputs.ERROR_COUNT != '0'
+        run: |
+          echo "❌ cppcheck found ${{ steps.cppcheck.outputs.ERROR_COUNT }} errors"
           exit 1
-      
-      - name: Upload cppcheck report
+
+      - name: Upload analysis reports
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: cppcheck-report
+          name: static-analysis-reports
           path: |
             cppcheck-report.xml
             cppcheck-output.log
-        if: always()
-      
-      - name: Comment PR
+            clang-tidy-output.log
+
+      - name: Comment PR with results
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
           script: |
-            const errors = parseInt('${{ steps.cppcheck.outputs.ERROR_COUNT }}') || 0;
+            const errors   = parseInt('${{ steps.cppcheck.outputs.ERROR_COUNT }}')   || 0;
             const warnings = parseInt('${{ steps.cppcheck.outputs.WARNING_COUNT }}') || 0;
-            const style = parseInt('${{ steps.cppcheck.outputs.STYLE_COUNT }}') || 0;
-            
-            let status = errors > 0 ? '❌ **FAILED**' : '✅ **PASSED**';
-            
-            const comment = `
-            ## 🔍 Static Analysis Results (CppCheck)
-            
-            | Status | ${status} |
-            |--------|----------|
-            | ❌ Errors | **${errors}** |
-            | ⚠️ Warnings | ${warnings} |
-            | 💅 Style | ${style} |
-            
-            ${errors > 0 ? '⚠️ **Build failed due to static analysis errors!** Please check the artifacts for details.' : '✅ No critical errors found. Great job! 🎉'}
-            
-            <details>
-            <summary>📥 Download Full Report</summary>
-            
-            Download the **cppcheck-report** artifact from the workflow run to see all issues.
-            </details>
-            `;
-            
-            try {
-              const { data: comments } = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-              });
-              
-              const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('Static Analysis Results'));
-              
-              if (botComment) {
-                await github.rest.issues.updateComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: botComment.id,
-                  body: comment
-                });
-              } else {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body: comment
-                });
-              }
-            } catch (error) {
-              console.log('Could not create PR comment:', error.message);
-            }
+            const tidy     = parseInt('${{ steps.clang_tidy.outputs.TIDY_ERRORS }}') || 0;
+            const status   = errors > 0 ? '❌ FAILED' : '✅ PASSED';
+
+            const body = `## 🔍 Static Analysis Results
+            | Tool | Status | Errors | Warnings |
+            |------|--------|--------|----------|
+            | cppcheck   | ${errors > 0 ? '❌' : '✅'} | **${errors}** | ${warnings} |
+            | clang-tidy | ${tidy  > 0 ? '⚠️' : '✅'} | — | ${tidy} files |
+
+            **Overall: ${status}**
+
+            Download the \`static-analysis-reports\` artifact for the full XML report.`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const bot = comments.find(c => c.user.type === 'Bot' && c.body.includes('Static Analysis Results'));
+
+            const fn = bot ? 'updateComment' : 'createComment';
+            const args = bot
+              ? { owner: context.repo.owner, repo: context.repo.repo, comment_id: bot.id, body }
+              : { owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body };
+            await github.rest.issues[fn](args);
+
+
+# ═════════════════════════════════════════════════════════════
+# JOB 3 — Unit Tests (Unity framework, runs on host x86)
+# ═════════════════════════════════════════════════════════════
+#
+# Strategy: compile your driver logic (CRC32, ADC averaging,
+# OTA packet parsing, bootloader state machine, etc.) for x86
+# with stub/mock headers replacing CMSIS register definitions.
+# Unity runs the tests on the CI runner — no hardware needed.
+#
+# Directory layout expected:
+#   tests/
+#     unity/          ← unity.c + unity.h + unity_internals.h
+#     mocks/          ← fake stm32f4xx.h, core_cm4.h, etc.
+#     test_crc.c      ← your test files
+#     test_ota.c
+#     test_adc.c
+#     Makefile        ← builds and runs all tests for x86
+# ─────────────────────────────────────────────────────────────
+  unit_tests:
+    name: "🧪 Unit Tests (Unity)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install host GCC
+        run: sudo apt-get update -q && sudo apt-get install -y gcc make
+
+      - name: Check for test directory
+        id: check_tests
+        run: |
+          if [ -d "tests" ] && [ -f "tests/Makefile" ]; then
+            echo "HAS_TESTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_TESTS=false" >> $GITHUB_OUTPUT
+            echo "⚠️  No tests/ directory found. Skipping unit tests."
+            echo "    See the README section 'Unit Testing' to get started."
+          fi
+
+      - name: Download Unity framework
+        if: steps.check_tests.outputs.HAS_TESTS == 'true'
+        run: |
+          mkdir -p tests/unity
+          curl -sSL https://raw.githubusercontent.com/ThrowTheSwitch/Unity/master/src/unity.c \
+            -o tests/unity/unity.c
+          curl -sSL https://raw.githubusercontent.com/ThrowTheSwitch/Unity/master/src/unity.h \
+            -o tests/unity/unity.h
+          curl -sSL https://raw.githubusercontent.com/ThrowTheSwitch/Unity/master/src/unity_internals.h \
+            -o tests/unity/unity_internals.h
+
+      - name: Build and run tests
+        if: steps.check_tests.outputs.HAS_TESTS == 'true'
+        run: |
+          cd tests
+          make all 2>&1 | tee ../test-output.log
+          make run  2>&1 | tee -a ../test-output.log
+
+      - name: Parse test results
+        if: steps.check_tests.outputs.HAS_TESTS == 'true'
+        run: |
+          PASSED=$(grep -c ":PASS"   test-output.log || echo 0)
+          FAILED=$(grep -c ":FAIL"   test-output.log || echo 0)
+          IGNORED=$(grep -c ":IGNORE" test-output.log || echo 0)
+          echo "Tests: $PASSED passed, $FAILED failed, $IGNORED ignored"
+          if [ "$FAILED" -gt 0 ]; then
+            echo "❌ $FAILED test(s) failed!"
+            grep ":FAIL" test-output.log
+            exit 1
+          fi
+
+      - name: Upload test output
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-output.log
