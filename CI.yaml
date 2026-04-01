@@ -1,0 +1,39 @@
+name: STM32 Full Build CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Install dependencies
+      - name: Install toolchain & tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-arm-none-eabi \
+            make \
+            python3 \
+            srecord
+
+      # 3. Make scripts executable
+      - name: Make scripts executable
+        run: find . -name "*.sh" -exec chmod +x {} \;
+
+      # 4. Run your build
+      - name: Run full build
+        run: ./combined_image/FULL_IMAGE.sh
+
+      # 5. Upload final hex
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-image
+          path: combined_image/full_image.hex
