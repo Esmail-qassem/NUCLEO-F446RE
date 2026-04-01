@@ -58,7 +58,7 @@ jobs:
           path: combined_image/full_image.hex
       - name: Firmware size
         run: arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf Application/Tools/*.elf    
-jobs:
+        
   Static_Analysis:
       - name: Run cppcheck
         run: cppcheck --enable=all --inconclusive --force .    
