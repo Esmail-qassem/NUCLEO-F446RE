@@ -57,17 +57,17 @@ all: $(Images)/application.bin size
 
 size: $(Images)/application.elf
 	@$(SIZE) $<
-	@echo  "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)"
+	@printf  "$(COLOR_GREEN)++ Build complete$(COLOR_RESET)\n"
 
 $(Images)/application.bin: $(Images)/application.elf
 	@$(BIN) -O binary $< $@
 	@$(BIN) -O ihex $< $(@:.bin=.hex)
 	@cp $(@:.bin=.hex) $(@:.bin=.txt)
-	@echo  "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)"
+	@printf  "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)\n"
 
 $(Images)/application.elf: $(OBJ_FILES)
 	@if [ -z "$(OBJ_FILES)" ]; then \
-		echo  "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
+		printf  "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)"; \
 		exit 1; \
 	fi
 # 	@$(info MCAL_path = $(MCAL_path))
@@ -75,19 +75,19 @@ $(Images)/application.elf: $(OBJ_FILES)
 # 	@$(info SRC_DIRS = $(SRC_DIRS))
 # 	@$(info SRC_FILES = $(SRC_FILES))
 # 	@$(info OBJ_FILES = $(OBJ_FILES))
-	@echo  "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)"
+	@printf  "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)\n"
 	@$(LD) -Map $(Images)/application.map -T $(LinkerDir)/LinkerScript.ld $(OBJ_FILES) -o $@
-	@echo  "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)"
+	@printf  "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)\n"
 
 
 $(OBJDIR)/%.o: ../%.c
 	@mkdir -p $(dir $@)
-	@echo  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)"
+	@printf  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)\n"
 	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -c $< -o $@
 
 clean:
 	@rm -rf $(OBJDIR)/* $(Images)/*.elf $(Images)/*.map $(Images)/*.bin $(Images)/*.hex $(Images)/*.txt
-	@echo  "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)"
+	@printf  "$(COLOR_GREEN)++ Clean complete$(COLOR_RESET)\n"
 
 flash: $(Images)/application.bin
 	@$(STL) --reset write $< 0x08000000
