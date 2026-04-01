@@ -56,7 +56,7 @@ jobs:
           name: full-image
           path: combined_image/full_image.hex
       - name: Firmware size
-        run: arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf Application/Tools/*.elf      
+        run: arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf APP/Tools/*.elf      
   Static_Analysis:
     runs-on: ubuntu-latest
     steps:
