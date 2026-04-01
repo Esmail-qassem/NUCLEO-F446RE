@@ -22,7 +22,7 @@ jobs:
             make \
             python3 \
             srecord \
-            sudo apt-get install -y cppcheck
+            cppcheck
 
       # 3. Make scripts executable
       - name: Make scripts executable
