@@ -67,4 +67,4 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
       - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive --force .
+        run: cppcheck --enable=all --severity=error --force . --error-exitcode=1
