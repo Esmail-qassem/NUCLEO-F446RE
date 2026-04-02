@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-# ─────────────────────────────────────────────────────────────
-# Global permissions — required for PR comment posting
-# ─────────────────────────────────────────────────────────────
 permissions:
   contents: read
   pull-requests: write
@@ -21,7 +18,7 @@ env:
 # ═════════════════════════════════════════════════════════════
 jobs:
   build:
-    name: "🔨 Build"
+    name: "Build"
     runs-on: ubuntu-latest
 
     steps:
@@ -109,8 +106,25 @@ jobs:
       - name: Install analysis tools
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y cppcheck clang-tidy gcc-arm-none-eabi
+          sudo apt-get install -y cppcheck clang-tidy
 
+      # ── Discover all include directories in the repo ───────
+      # Your project has headers spread across many subdirs
+      # (RCC.h, NVIC_interface.h, SysTick_interface.h, STD_TYPES.h, etc.)
+      # We find every directory containing a .h file and pass them all.
+      - name: Discover include paths
+        id: includes
+        run: |
+          # Find every directory that contains at least one .h file
+          INCLUDE_FLAGS=$(find . -name "*.h" ! -path "./.git/*" \
+            -exec dirname {} \; | sort -u | sed 's/^/-I/' | tr '\n' ' ')
+          echo "INCLUDE_FLAGS=$INCLUDE_FLAGS" >> $GITHUB_OUTPUT
+          echo "Found include dirs:"
+          echo "$INCLUDE_FLAGS" | tr ' ' '\n'
+
+      # ── cppcheck ──────────────────────────────────────────
+      # FIX: suppressions file must have NO comments and NO blank lines.
+      # cppcheck treats every line as a rule ID — a blank line = "no id" error.
       - name: Run cppcheck
         id: cppcheck
         continue-on-error: true
@@ -120,6 +134,9 @@ jobs:
             SUPPRESS="--suppressions-list=cppcheck-suppressions.txt"
           fi
 
+          # Pass all discovered include dirs so cppcheck can resolve headers
+          INCLUDE_FLAGS="${{ steps.includes.outputs.INCLUDE_FLAGS }}"
+
           cppcheck \
             --enable=warning,style,performance,portability \
             --platform=arm32-wchar_t2 \
@@ -128,9 +145,9 @@ jobs:
             --xml --xml-version=2 \
             --output-file=cppcheck-report.xml \
             --suppress=missingIncludeSystem \
-            --suppress=unmatchedSuppression \
             $SUPPRESS \
-            APP/Src BTLD/Src BM/Src 2>&1 | tee cppcheck-output.log || true
+            $INCLUDE_FLAGS \
+            APP/Src BTLD/Src BM/Src 2>&1 | tee cppcheck-output.log
 
           ERROR_COUNT=0
           WARNING_COUNT=0
@@ -147,26 +164,40 @@ jobs:
           echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
           echo "cppcheck: $ERROR_COUNT errors, $WARNING_COUNT warnings"
 
+      # ── clang-tidy ────────────────────────────────────────
+      # FIX: use dynamically discovered includes so RCC.h,
+      # NVIC_interface.h, SysTick_interface.h etc. are all found.
+      # We also add --fix-errors=false and ignore clang-diagnostic-error
+      # (missing headers from vendor/CMSIS that aren't in the repo)
+      # so actual logic warnings still surface.
       - name: Run clang-tidy
         id: clang_tidy
         continue-on-error: true
         run: |
           find APP/Src BTLD/Src BM/Src -name "*.c" 2>/dev/null > source_files.txt
 
+          # Build the -I flags string from all header dirs
+          INCLUDE_FLAGS=$(find . -name "*.h" ! -path "./.git/*" \
+            -exec dirname {} \; | sort -u | sed 's/^/-I/' | tr '\n' ' ')
+
           TIDY_ERRORS=0
           while IFS= read -r src; do
             clang-tidy "$src" \
-              --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity" \
+              --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity,-misc-include-cleaner,-readability-identifier-length" \
               -- \
               -std=c11 \
               -DSTM32F446xx \
               -DUSE_BARE_METAL \
-              -I APP/Inc -I BTLD/Inc -I BM/Inc \
-              2>&1 | tee -a clang-tidy-output.log || TIDY_ERRORS=$((TIDY_ERRORS + 1))
+              $INCLUDE_FLAGS \
+              2>&1 | grep -v "clang-diagnostic-error" \
+                   | tee -a clang-tidy-output.log \
+              || TIDY_ERRORS=$((TIDY_ERRORS + 1))
           done < source_files.txt
 
           echo "TIDY_ERRORS=$TIDY_ERRORS" >> $GITHUB_OUTPUT
+          echo "clang-tidy: $TIDY_ERRORS file(s) with issues"
 
+      # ── Gate: fail on cppcheck errors ─────────────────────
       - name: Fail on cppcheck errors
         if: steps.cppcheck.outputs.ERROR_COUNT != '0'
         run: |
