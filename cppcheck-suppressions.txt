@@ -1,25 +1,6 @@
-# cppcheck-suppressions.txt
-#
-# Suppress known false-positives for bare-metal STM32 register-level code.
-# Add file-specific suppressions as: rule:filename.c
-#
-# Format: rule_id:file_path (or just rule_id to suppress globally)
-# ─────────────────────────────────────────────────────────────
-
-# MMIO volatile pointer dereferences look like "unused writes" to cppcheck
 unusedVariable
-
-# Bitfield operations on volatile registers appear as redundant assignments
 redundantAssignment
-
-# Startup/linker-symbol references (e.g., &_estack) appear as uninit vars
-uninitvar:startup.c
-
-# Struct padding warnings on packed hardware register maps
 padded
-
-# Function-like macros used for CMSIS register access
-preprocessorErrorDirective
-
-# Missing include for system headers — we suppress, not fix
 missingInclude
+missingIncludeSystem
+unmatchedSuppression

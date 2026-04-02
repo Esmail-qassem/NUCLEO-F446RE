@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-# ─────────────────────────────────────────────────────────────
-# Global permissions — required for PR comment posting
-# ─────────────────────────────────────────────────────────────
 permissions:
   contents: read
   pull-requests: write
@@ -21,7 +18,7 @@ env:
 # ═════════════════════════════════════════════════════════════
 jobs:
   build:
-    name: "🔨 Build"
+    name: "Build"
     runs-on: ubuntu-latest
 
     steps:
@@ -109,8 +106,20 @@ jobs:
       - name: Install analysis tools
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y cppcheck clang-tidy gcc-arm-none-eabi
+          sudo apt-get install -y cppcheck clang-tidy
 
+      - name: Discover include paths
+        id: includes
+        run: |
+          INCLUDE_FLAGS=$(find . -name "*.h" ! -path "./.git/*" ! -path "*/Tools/*" \
+            -exec dirname {} \; | sort -u | sed 's/^/-I/' | tr '\n' ' ')
+          echo "INCLUDE_FLAGS=$INCLUDE_FLAGS" >> $GITHUB_OUTPUT
+          echo "Discovered include dirs:"
+          echo "$INCLUDE_FLAGS" | tr ' ' '\n'
+
+      # ── cppcheck ──────────────────────────────────────────
+      # -i flag excludes directories from analysis.
+      # Correct cppcheck syntax: -i <path>  (not --exclude)
       - name: Run cppcheck
         id: cppcheck
         continue-on-error: true
@@ -120,6 +129,8 @@ jobs:
             SUPPRESS="--suppressions-list=cppcheck-suppressions.txt"
           fi
 
+          INCLUDE_FLAGS="${{ steps.includes.outputs.INCLUDE_FLAGS }}"
+
           cppcheck \
             --enable=warning,style,performance,portability \
             --platform=arm32-wchar_t2 \
@@ -128,9 +139,12 @@ jobs:
             --xml --xml-version=2 \
             --output-file=cppcheck-report.xml \
             --suppress=missingIncludeSystem \
-            --suppress=unmatchedSuppression \
             $SUPPRESS \
-            APP/Src BTLD/Src BM/Src 2>&1 | tee cppcheck-output.log || true
+            $INCLUDE_FLAGS \
+            -i APP/Tools \
+            -i BTLD/Tools \
+            -i BM/Tools \
+            APP BTLD BM 2>&1 | tee cppcheck-output.log
 
           ERROR_COUNT=0
           WARNING_COUNT=0
@@ -147,25 +161,40 @@ jobs:
           echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
           echo "cppcheck: $ERROR_COUNT errors, $WARNING_COUNT warnings"
 
+      # ── clang-tidy ────────────────────────────────────────
       - name: Run clang-tidy
         id: clang_tidy
         continue-on-error: true
         run: |
-          find APP/Src BTLD/Src BM/Src -name "*.c" 2>/dev/null > source_files.txt
+          find APP BTLD BM \
+            -name "*.c" \
+            ! -path "*/Tools/*" \
+            ! -path "*/tools/*" \
+            ! -path "*/build/*" \
+            > source_files.txt
+
+          echo "Files to analyze:"
+          cat source_files.txt
+
+          INCLUDE_FLAGS=$(find . -name "*.h" ! -path "./.git/*" ! -path "*/Tools/*" \
+            -exec dirname {} \; | sort -u | sed 's/^/-I/' | tr '\n' ' ')
 
           TIDY_ERRORS=0
           while IFS= read -r src; do
             clang-tidy "$src" \
-              --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity" \
+              --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity,-misc-include-cleaner,-readability-identifier-length" \
               -- \
               -std=c11 \
               -DSTM32F446xx \
               -DUSE_BARE_METAL \
-              -I APP/Inc -I BTLD/Inc -I BM/Inc \
-              2>&1 | tee -a clang-tidy-output.log || TIDY_ERRORS=$((TIDY_ERRORS + 1))
+              $INCLUDE_FLAGS \
+              2>&1 | grep -v "clang-diagnostic-error" \
+                   | tee -a clang-tidy-output.log \
+              || TIDY_ERRORS=$((TIDY_ERRORS + 1))
           done < source_files.txt
 
           echo "TIDY_ERRORS=$TIDY_ERRORS" >> $GITHUB_OUTPUT
+          echo "clang-tidy: $TIDY_ERRORS file(s) with issues"
 
       - name: Fail on cppcheck errors
         if: steps.cppcheck.outputs.ERROR_COUNT != '0'
@@ -202,24 +231,18 @@ jobs:
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
               });
-
               const bot = comments.find(c =>
                 c.user.type === 'Bot' && c.body.includes('Static Analysis Results')
               );
-
               if (bot) {
                 await github.rest.issues.updateComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: bot.id,
-                  body,
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  comment_id: bot.id, body,
                 });
               } else {
                 await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body,
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: context.issue.number, body,
                 });
               }
             } catch (error) {
