@@ -5,15 +5,19 @@ on:
   pull_request:
 
 # ─────────────────────────────────────────────────────────────
-# Shared env across all jobs
+# Global permissions — required for PR comment posting
 # ─────────────────────────────────────────────────────────────
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 env:
-  ARM_TOOLCHAIN: gcc-arm-none-eabi
-  MAX_FLASH_BYTES: 524288   # 512 KB — STM32F446RE flash
-  MAX_RAM_BYTES:   131072   # 128 KB — STM32F446RE SRAM
+  MAX_FLASH_BYTES: 524288   # 512 KB
+  MAX_RAM_BYTES:   131072   # 128 KB
 
 # ═════════════════════════════════════════════════════════════
-# JOB 1 — Build all three images (BM / BTLD / APP)
+# JOB 1 — Build
 # ═════════════════════════════════════════════════════════════
 jobs:
   build:
@@ -34,7 +38,6 @@ jobs:
       - name: Build full image
         run: ./combined_image/FULL_IMAGE.sh
 
-      # ── Size gate: fail if firmware exceeds flash/RAM limits ──
       - name: Check binary size limits
         run: |
           echo "=============================="
@@ -42,21 +45,18 @@ jobs:
           echo "=============================="
           arm-none-eabi-size BM/Tools/*.elf BTLD/Tools/*.elf APP/Tools/*.elf
 
-          # Extract total flash (text+data) and RAM (data+bss) for each elf
           check_size() {
             local elf="$1"
             local label="$2"
             read text data bss < <(arm-none-eabi-size "$elf" | awk 'NR==2{print $1, $2, $3}')
             local flash=$(( text + data ))
             local ram=$(( data + bss ))
-            echo "$label → Flash: ${flash}B / ${{ env.MAX_FLASH_BYTES }}B  RAM: ${ram}B / ${{ env.MAX_RAM_BYTES }}B"
+            echo "$label => Flash: ${flash}B / ${{ env.MAX_FLASH_BYTES }}B  RAM: ${ram}B / ${{ env.MAX_RAM_BYTES }}B"
             if [ "$flash" -gt "${{ env.MAX_FLASH_BYTES }}" ]; then
-              echo "❌ $label exceeds flash limit!"
-              exit 1
+              echo "FAIL: $label exceeds flash limit!"; exit 1
             fi
             if [ "$ram" -gt "${{ env.MAX_RAM_BYTES }}" ]; then
-              echo "❌ $label exceeds RAM limit!"
-              exit 1
+              echo "FAIL: $label exceeds RAM limit!"; exit 1
             fi
           }
 
@@ -64,7 +64,6 @@ jobs:
           check_size BTLD/Tools/*.elf "BTLD"
           check_size APP/Tools/*.elf  "APP "
 
-      # ── Optional: section-level breakdown for debugging ──
       - name: Section breakdown (APP)
         run: arm-none-eabi-objdump -h APP/Tools/*.elf
 
@@ -94,11 +93,15 @@ jobs:
 
 
 # ═════════════════════════════════════════════════════════════
-# JOB 2 — Static Analysis (cppcheck + clang-tidy)
+# JOB 2 — Static Analysis
 # ═════════════════════════════════════════════════════════════
   static_analysis:
-    name: "🔍 Static Analysis"
+    name: "Static Analysis"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
 
     steps:
       - uses: actions/checkout@v4
@@ -108,15 +111,10 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y cppcheck clang-tidy gcc-arm-none-eabi
 
-      # ── cppcheck ──────────────────────────────────────────
-      # --platform=arm32-wchar_t2 models the Cortex-M4 ABI correctly,
-      # which suppresses many false positives from integer widths.
-      # The suppressions file lets you silence per-file noise.
       - name: Run cppcheck
         id: cppcheck
         continue-on-error: true
         run: |
-          # Create a suppressions file if one doesn't exist
           SUPPRESS=""
           if [ -f cppcheck-suppressions.txt ]; then
             SUPPRESS="--suppressions-list=cppcheck-suppressions.txt"
@@ -147,29 +145,18 @@ jobs:
 
           echo "ERROR_COUNT=$ERROR_COUNT"     >> $GITHUB_OUTPUT
           echo "WARNING_COUNT=$WARNING_COUNT" >> $GITHUB_OUTPUT
-
           echo "cppcheck: $ERROR_COUNT errors, $WARNING_COUNT warnings"
 
-      # ── clang-tidy ────────────────────────────────────────
-      # clang-tidy runs on x86 but we feed it your actual source.
-      # It catches implicit conversions, bad casts, integer promotion bugs,
-      # and other things cppcheck completely misses.
       - name: Run clang-tidy
         id: clang_tidy
         continue-on-error: true
         run: |
-          # Build a minimal compile_commands.json so clang-tidy can parse includes.
-          # Adjust -I paths to match your actual include directories.
-          find APP/Src BTLD/Src BM/Src -name "*.c" 2>/dev/null | while read f; do
-            echo "$f"
-          done > source_files.txt
+          find APP/Src BTLD/Src BM/Src -name "*.c" 2>/dev/null > source_files.txt
 
           TIDY_ERRORS=0
           while IFS= read -r src; do
-            # Run clang-tidy per file; -header-filter restricts noise to your own headers
             clang-tidy "$src" \
               --checks="-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity" \
-              --warnings-as-errors="" \
               -- \
               -std=c11 \
               -DSTM32F446xx \
@@ -179,13 +166,11 @@ jobs:
           done < source_files.txt
 
           echo "TIDY_ERRORS=$TIDY_ERRORS" >> $GITHUB_OUTPUT
-          echo "clang-tidy finished with $TIDY_ERRORS file(s) having issues"
 
-      # ── Gate: fail job on cppcheck errors ─────────────────
       - name: Fail on cppcheck errors
         if: steps.cppcheck.outputs.ERROR_COUNT != '0'
         run: |
-          echo "❌ cppcheck found ${{ steps.cppcheck.outputs.ERROR_COUNT }} errors"
+          echo "cppcheck found ${{ steps.cppcheck.outputs.ERROR_COUNT }} errors"
           exit 1
 
       - name: Upload analysis reports
@@ -202,55 +187,51 @@ jobs:
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const errors   = parseInt('${{ steps.cppcheck.outputs.ERROR_COUNT }}')   || 0;
             const warnings = parseInt('${{ steps.cppcheck.outputs.WARNING_COUNT }}') || 0;
             const tidy     = parseInt('${{ steps.clang_tidy.outputs.TIDY_ERRORS }}') || 0;
-            const status   = errors > 0 ? '❌ FAILED' : '✅ PASSED';
+            const status   = errors > 0 ? 'FAILED' : 'PASSED';
 
-            const body = `## 🔍 Static Analysis Results
-            | Tool | Status | Errors | Warnings |
-            |------|--------|--------|----------|
-            | cppcheck   | ${errors > 0 ? '❌' : '✅'} | **${errors}** | ${warnings} |
-            | clang-tidy | ${tidy  > 0 ? '⚠️' : '✅'} | — | ${tidy} files |
+            const body = `## Static Analysis Results\n| Tool | Status | Errors | Warnings |\n|------|--------|--------|----------|\n| cppcheck   | ${errors > 0 ? 'FAIL' : 'PASS'} | **${errors}** | ${warnings} |\n| clang-tidy | ${tidy  > 0 ? 'WARN' : 'PASS'} | - | ${tidy} files |\n\n**Overall: ${status}**\n\nDownload the \`static-analysis-reports\` artifact for the full XML report.`;
 
-            **Overall: ${status}**
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
 
-            Download the \`static-analysis-reports\` artifact for the full XML report.`;
+              const bot = comments.find(c =>
+                c.user.type === 'Bot' && c.body.includes('Static Analysis Results')
+              );
 
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner, repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const bot = comments.find(c => c.user.type === 'Bot' && c.body.includes('Static Analysis Results'));
-
-            const fn = bot ? 'updateComment' : 'createComment';
-            const args = bot
-              ? { owner: context.repo.owner, repo: context.repo.repo, comment_id: bot.id, body }
-              : { owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body };
-            await github.rest.issues[fn](args);
+              if (bot) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: bot.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body,
+                });
+              }
+            } catch (error) {
+              core.warning('PR comment failed: ' + error.message);
+            }
 
 
 # ═════════════════════════════════════════════════════════════
-# JOB 3 — Unit Tests (Unity framework, runs on host x86)
+# JOB 3 — Unit Tests (Unity, runs on host x86)
 # ═════════════════════════════════════════════════════════════
-#
-# Strategy: compile your driver logic (CRC32, ADC averaging,
-# OTA packet parsing, bootloader state machine, etc.) for x86
-# with stub/mock headers replacing CMSIS register definitions.
-# Unity runs the tests on the CI runner — no hardware needed.
-#
-# Directory layout expected:
-#   tests/
-#     unity/          ← unity.c + unity.h + unity_internals.h
-#     mocks/          ← fake stm32f4xx.h, core_cm4.h, etc.
-#     test_crc.c      ← your test files
-#     test_ota.c
-#     test_adc.c
-#     Makefile        ← builds and runs all tests for x86
-# ─────────────────────────────────────────────────────────────
   unit_tests:
-    name: "🧪 Unit Tests (Unity)"
+    name: "Unit Tests (Unity)"
     runs-on: ubuntu-latest
 
     steps:
@@ -266,8 +247,7 @@ jobs:
             echo "HAS_TESTS=true" >> $GITHUB_OUTPUT
           else
             echo "HAS_TESTS=false" >> $GITHUB_OUTPUT
-            echo "⚠️  No tests/ directory found. Skipping unit tests."
-            echo "    See the README section 'Unit Testing' to get started."
+            echo "No tests/ directory found. Skipping."
           fi
 
       - name: Download Unity framework
@@ -293,10 +273,8 @@ jobs:
         run: |
           PASSED=$(grep -c ":PASS"   test-output.log || echo 0)
           FAILED=$(grep -c ":FAIL"   test-output.log || echo 0)
-          IGNORED=$(grep -c ":IGNORE" test-output.log || echo 0)
-          echo "Tests: $PASSED passed, $FAILED failed, $IGNORED ignored"
+          echo "Tests: $PASSED passed, $FAILED failed"
           if [ "$FAILED" -gt 0 ]; then
-            echo "❌ $FAILED test(s) failed!"
             grep ":FAIL" test-output.log
             exit 1
           fi
