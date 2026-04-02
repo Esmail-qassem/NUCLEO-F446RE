@@ -108,8 +108,6 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y cppcheck clang-tidy
 
-      # Discover ALL header directories in the repo so every
-      # driver's Inc/ folder is covered (RCC, UART, NVIC, etc.)
       - name: Discover include paths
         id: includes
         run: |
@@ -120,9 +118,8 @@ jobs:
           echo "$INCLUDE_FLAGS" | tr ' ' '\n'
 
       # ── cppcheck ──────────────────────────────────────────
-      # Scans APP, BTLD, BM entirely — not just their Src/ subdirs.
-      # This covers RCC/Src/RCC.c, UART/Src/UART.c, etc.
-      # Excludes Tools/ (compiled output) and combined_image/.
+      # -i flag excludes directories from analysis.
+      # Correct cppcheck syntax: -i <path>  (not --exclude)
       - name: Run cppcheck
         id: cppcheck
         continue-on-error: true
@@ -144,8 +141,9 @@ jobs:
             --suppress=missingIncludeSystem \
             $SUPPRESS \
             $INCLUDE_FLAGS \
-            --exclude=combined_image \
-            -i APP/Tools -i BTLD/Tools -i BM/Tools \
+            -i APP/Tools \
+            -i BTLD/Tools \
+            -i BM/Tools \
             APP BTLD BM 2>&1 | tee cppcheck-output.log
 
           ERROR_COUNT=0
@@ -164,13 +162,10 @@ jobs:
           echo "cppcheck: $ERROR_COUNT errors, $WARNING_COUNT warnings"
 
       # ── clang-tidy ────────────────────────────────────────
-      # Now scans ALL .c files under APP, BTLD, BM —
-      # excluding Tools/ build output directories.
       - name: Run clang-tidy
         id: clang_tidy
         continue-on-error: true
         run: |
-          # Find every .c in the project, skip build output dirs
           find APP BTLD BM \
             -name "*.c" \
             ! -path "*/Tools/*" \
