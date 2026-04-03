@@ -32,5 +32,6 @@ uint8 processRecord(uint8 *recordBuffer);
 void BootLoader_Handler(uint8 data);
 void CRC32_Init(void);
 void BootLoader_MainFunction(void);
+extern volatile uint8 UART_START;
 
 #endif

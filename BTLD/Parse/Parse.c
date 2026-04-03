@@ -3,11 +3,17 @@
 /*===========================================================================
                         GLOBAL VARIABLES
 ===========================================================================*/
-uint8 UART_START = 0;
+volatile uint8 UART_START = 0;
 static uint8 flush_done = 0;
 static uint8 verify_done = 0;
-extern uint32 ms_ticks;
-#define UART_TIMEOUT_MS 10000 // 10 seconds
+extern volatile uint32 ms_ticks;
+#define UART_TIMEOUT_MS      10000u /* 10 seconds */
+#define VERIFY_DELAY_MS      2000u
+#define APP_END_ADDRESS      0x08080000UL
+#define SRAM_START_ADDRESS   0x20000000UL
+#define SRAM_END_ADDRESS     0x20020000UL
+#define SCB_AIRCR_SYSRESET    0x5FA0004u
+#define VERIFY_OK_MSG        "\nVerification OK!\n"
 static uint32 counter = 0;
 uint32 Header = 0;
 uint8 Binary_receivingfinished = 0;
@@ -81,7 +87,7 @@ uint8 processRecord(uint8 *recordBuffer)
     else if (record_type == 0x01) /* End of File record */
     {
         UART_SendSyncBuffer(UART2, "\nEOF record received - firmware upload complete\n", 48);
-        SCB_AIRCR = 0x5FA0004;
+        SCB_AIRCR = SCB_AIRCR_SYSRESET;
         return 0xFF;
     }
 
@@ -273,15 +279,16 @@ void BootLoader_MainFunction(void)
     }
 
     /*--- Verify after 2s silence ---*/
-    if ((ms_ticks > 2000 || Binary_receivingfinished == 1) && UART_START == 1 && verify_done == 0)
+    if ((ms_ticks > VERIFY_DELAY_MS || Binary_receivingfinished == 1) && UART_START == 1 && verify_done == 0)
     {
-        uint32 stack_ptr = *((volatile uint32 *)0x08008000);
-        uint32 reset_handler = *((volatile uint32 *)0x08008004);
+        uint32 stack_ptr = *((volatile uint32 *)APP_START_ADDRESS);
+        uint32 reset_handler = *((volatile uint32 *)(APP_START_ADDRESS + 4u));
 
-        if ((stack_ptr >= 0x20000000 && stack_ptr <= 0x20020000) &&
-            (reset_handler >= 0x08008000 && reset_handler <= 0x08080000))
+        if ((stack_ptr >= SRAM_START_ADDRESS && stack_ptr <= SRAM_END_ADDRESS) &&
+            (reset_handler >= APP_START_ADDRESS && reset_handler <= APP_END_ADDRESS))
         {
-            UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification OK!\n", 18);
+            UART_SendSyncBuffer(UART2, (uint8 *)VERIFY_OK_MSG,
+                                (uint8)(sizeof(VERIFY_OK_MSG) - 1u));
             flash_address = APP_START_ADDRESS;
             Binary_receivingfinished = 0;
             counter = 0;
