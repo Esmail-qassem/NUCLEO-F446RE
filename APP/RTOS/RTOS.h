@@ -2,7 +2,7 @@
 #define RTOS_INTERFACE_H_
 
 #define TASK_NUMBER  4
-#define STACK_SIZE   128
+#define STACK_SIZE   64
 
 typedef enum
 {
@@ -25,18 +25,38 @@ typedef struct {
     uint8 cpu_load_percent;
 } cpu_load_type;
 
+/* stack frame that saved by hardware*/
 typedef struct
 {
-    uint32 *stack_pointer;
-} TCB_t;
+    uint32 r0;
+    uint32 r1;
+    uint32 r2;
+    uint32 r3;
+    uint32 r12;
+    uint32 lr;
+    uint32 pc;
+    uint32 psr;
+}HW_STACK_FRAME_t;
 
+/* stack frame that saved by Software*/
+typedef struct
+{
+    uint32 r4;
+    uint32 r5;
+    uint32 r6;
+    uint32 r7;
+    uint32 r8;
+    uint32 r9;
+    uint32 r10;
+    uint32 r11;
+}SW_STACK_FRAME_t;
 typedef struct
 {
     uint16 periodicity;
     uint16 remaining_ticks;
     Task_States state;
     void(*TaskFunc)(void);
-    TCB_t *TCB;
+    uint32 *pStackTop;
 }task_type;
 
 

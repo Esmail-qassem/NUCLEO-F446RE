@@ -1,4 +1,4 @@
-/home/esmail/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o: \
+C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o: \
  ../Src/SwM.c ../Inc/STD_TYPES.h ../Src/SwM.h \
  ../MCAL/NVIC/inc/NVIC_interface.h ../RTOS/RTOS.h \
  ../MCAL/GPIO/inc/GPIO_interface.h ../MCAL/GPIO/inc/GPIO_private.h \
