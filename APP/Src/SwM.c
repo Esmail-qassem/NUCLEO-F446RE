@@ -22,11 +22,11 @@ UART_Config_t Uart2_configuration = {
     UART_PARITY_NONE,
     UART_STOPBITS_1,
     UART_WORDLEN_8B,
-    Polling};
+    Interrupt};
 const uint8 FIRMWARE_VERSION[] = "1.0.0";
 uint16 adc_value;
 uint32 voltage;
-
+uint8 LED_Global=0;
 /*MACROS*/
 #define CMD_GET_VERSION 0xA1
 #define VREF 5U              // Reference voltage in volts
@@ -37,9 +37,9 @@ uint32 voltage;
 void Schedular(void)
 {
   RTOS_voidCreateTask(0, 5, LED);
-  RTOS_voidCreateTask(1, 10, LifeCounter);
-  RTOS_voidCreateTask(2, 11, SW_VERSION);
-  RTOS_voidCreateTask(3, 100, INTERNAL_TEMP_TASK);
+  RTOS_voidCreateTask(1, 1000, LifeCounter);
+  RTOS_voidCreateTask(2, 900, SW_VERSION);
+  RTOS_voidCreateTask(3, 1100, INTERNAL_TEMP_TASK);
   RTOS_voidStart();
 }
 
@@ -134,11 +134,13 @@ void GPIO_PIN_CONFIG(void)
 void ENABLE_NVIC_INTERRUPTS(void)
 {
   NVIC_EnableInterrupt(UART1_IQ_NUM);
+  NVIC_EnableInterrupt(UART2_IQ_NUM);
 }
 
 void CallBackFunctions(void)
 {
   UART1_CALLBACK(UART1_ISR);
+  UART2_CALLBACK(UART2_ISR);
 }
 
 void UART1_ISR(uint8 num)
@@ -148,9 +150,36 @@ void UART1_ISR(uint8 num)
     UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
   }
 }
+void LED_ON (void)
+{
+  LED_Global= 1;
+}
+void LED_OFF (void)
+{
+  LED_Global= 0;
+}
+void BTLD_Jump (void)
+{
+  
+}
+void BTLD_Update (void)
+{
+  
+}
+void UART2_ISR (uint8 num)
+{
+  switch (num) {
+         case 0x01: LED_ON();       break;
+         case 0x02: LED_OFF();      break;
+         case 0x03: BTLD_Jump();    break;
+         case 0x04: BTLD_Update();  break;
+         default:   break;
+     }
+    
+}
 void LED(void)
 {
-  GPIO_TogglePin(GPIO_PORTA, PIN5);
+   GPIO_WritePin(GPIO_PORTA, PIN5,LED_Global);
 }
 
 void OS_IDLE_TASK(void) {}
