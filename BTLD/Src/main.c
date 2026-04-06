@@ -42,15 +42,22 @@ void CallBackFunctions(void);
 void systick_handler(void)
 {
   ms_ticks++;
+  if(ms_ticks % 1000 == 0)
+  {
+
+    UART_SendSyncBuffer(UART2, (uint8 *)".", 1);
+  }
+  
 }
 int main (void)
 {
   GPIO_PIN_CONFIG();
   APP_init();
-  UART_SendSyncBuffer(UART2, (uint8 *)"\nBTLD Session\n",15);
-  UART_SendSyncBuffer(UART2, (uint8 *)"BTLD will jump to application in 10 seconds if no data is received\n", 67);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\nBTLD Session\n", 14);
+  UART_SendSyncBuffer(UART2, (uint8 *)"BTLD will jump to application in 20 seconds if no data is received\n", 67);
+   UART_SendSyncBuffer(UART2, (uint8 *)"Waiting for data", 16);
   SysTick_voidInit();
-  NVIC_EnableInterrupt(UART1_IQ_NUM);
+  //NVIC_EnableInterrupt(UART1_IQ_NUM);
   NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
   FlashDrv_EraseSector(2);

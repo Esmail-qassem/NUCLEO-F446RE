@@ -7,7 +7,7 @@ uint8 UART_START = 0;
 static uint8 flush_done = 0;
 static uint8 verify_done = 0;
 extern uint32 ms_ticks;
-#define UART_TIMEOUT_MS 10000 // 10 seconds
+#define UART_TIMEOUT_MS 20000 // 20 seconds
 static uint32 counter = 0;
 uint32 Header = 0;
 uint8 Binary_receivingfinished = 0;

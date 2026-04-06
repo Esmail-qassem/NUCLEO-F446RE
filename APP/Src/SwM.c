@@ -84,14 +84,9 @@ void INTERNAL_TEMP_TASK(void)
 
   sint32 temp = (((sint32)760 - (sint32)voltage_mV) * 10) / 25 + 25;
 
-  UART_SendSyncBuffer(UART2, (uint8 *)"Internal RAW: ", 14);
-  UART_voidSendNumber(UART2, raw);
-  UART_SendSyncBuffer(UART2, (uint8 *)" | V: ", 6);
-  UART_voidSendNumber(UART2, voltage_mV);
-  UART_SendSyncBuffer(UART2, (uint8 *)"mV | Temp: ", 11);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Internal Temp: ", 15);
   UART_voidSendNumber(UART2, temp);
   UART_SendSyncBuffer(UART2, (uint8 *)" C\r\n", 4);
-  UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
 }
 
 void APP_init(void)
