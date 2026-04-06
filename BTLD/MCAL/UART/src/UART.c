@@ -124,7 +124,6 @@ void UART3_CALLBACK(void(*p2function)(uint8))
          uart3_funcPtr = p2function;
     }
 }
-extern uint32 ms_ticks;
 void USART2_IRQHandler(void)
 {   
     uint32 Add = Get_BASE_ADD(UART2);

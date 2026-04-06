@@ -1,6 +1,0 @@
-unusedVariable
-redundantAssignment
-padded
-missingInclude
-missingIncludeSystem
-unmatchedSuppression

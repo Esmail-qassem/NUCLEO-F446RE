@@ -47,13 +47,14 @@ int main (void)
 {
   GPIO_PIN_CONFIG();
   APP_init();
+  UART_SendSyncBuffer(UART2, (uint8 *)"\nBTLD Session\n",15);
+  UART_SendSyncBuffer(UART2, (uint8 *)"BTLD will jump to application in 10 seconds if no data is received\n", 67);
   SysTick_voidInit();
   NVIC_EnableInterrupt(UART1_IQ_NUM);
   NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
-  UART_SendSyncBuffer(UART2, (uint8 *)"\n BTLD \n",8);
-  CRC32_Init();
   FlashDrv_EraseSector(2);
+  CRC32_Init();
   CallBackFunctions();
 while(1) 
   {
@@ -97,5 +98,5 @@ RCC_EnableClock(RCC_APB1,APB1_USART2);
 void CallBackFunctions(void)
 {
   //UART2_CALLBACK(BootLoader_Handler);
-  UART1_CALLBACK(BootLoader_Handler);
+  UART2_CALLBACK(BootLoader_Handler);
 }
