@@ -84,7 +84,7 @@ $(Images)/application.elf: $(OBJ_FILES)
 $(OBJDIR)/%.o: ../%.c
 	@mkdir -p $(dir $@)
 	@printf  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)\n"
-	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -c $< -o $@
+	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -MF $(@:.o=.d) -c $< -o $@
 
 clean:
 	@rm -rf $(OBJDIR)/* $(Images)/*.elf $(Images)/*.map $(Images)/*.bin $(Images)/*.hex $(Images)/*.txt

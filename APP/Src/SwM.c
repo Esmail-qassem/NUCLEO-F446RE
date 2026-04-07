@@ -23,7 +23,7 @@ UART_Config_t Uart2_configuration = {
     UART_STOPBITS_1,
     UART_WORDLEN_8B,
     Interrupt};
-const uint8 FIRMWARE_VERSION[] = "1.0.0";
+const uint8 FIRMWARE_VERSION[] = "1.0.5";
 uint16 adc_value;
 uint32 voltage;
 uint8 LED_Global=0;

@@ -1,8 +1,8 @@
 import serial
 import time
 
-# PORT  = '/dev/ttyACM0'
-PORT  = 'COM5' 
+PORT  = '/dev/ttyACM0'
+# PORT  = 'COM5' 
 BAUD  = 115200
 INPUT = '../APP/Tools/APP_BTLD.bin'  # bin created by the other script
 

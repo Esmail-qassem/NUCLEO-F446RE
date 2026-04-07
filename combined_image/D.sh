@@ -1,0 +1,1 @@
+find ~/NUCLEO-F446RE -name "*.d" -delete
