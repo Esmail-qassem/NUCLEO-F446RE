@@ -12,13 +12,13 @@ extern void SystemInit(void);
 /*======================
  * Exception Handlers
  *======================*/
-void Reset_Handler                     (void);
+void Reset_Handler                     (void) ;
 void NMI_Handler                       (void) __attribute__ ((alias ("Default_Handler")));
-void HardFault_Handler                 (void) __attribute__ ((alias ("Default_Handler")));
-void MemManage_Handler                 (void) __attribute__ ((alias ("Default_Handler")));
+void HardFault_Handler                 (void) ;
+void MemManage_Handler                 (void) ;
 void BusFault_Handler                  (void) __attribute__ ((alias ("Default_Handler")));
 void UsageFault_Handler                (void) __attribute__ ((alias ("Default_Handler")));
-void SVC_Handler                       (void) __attribute__ ((alias ("Default_Handler")));
+void SVC_Handler                       (void) ;
 void DebugMon_Handler                  (void) __attribute__ ((alias ("Default_Handler")));
 void PendSV_Handler                    (void);
 void SysTick_Handler                   (void);

@@ -37,9 +37,9 @@ uint8 LED_Global=0;
 void Schedular(void)
 {
   RTOS_voidCreateTask(0, 5, LED);
-  RTOS_voidCreateTask(1, 1000, LifeCounter);
-  RTOS_voidCreateTask(2, 900, SW_VERSION);
-  RTOS_voidCreateTask(3, 1100, INTERNAL_TEMP_TASK);
+  RTOS_voidCreateTask(1, 10, LifeCounter);
+  RTOS_voidCreateTask(2, 10, SW_VERSION);
+  RTOS_voidCreateTask(3, 10, INTERNAL_TEMP_TASK);
   RTOS_voidStart();
 }
 

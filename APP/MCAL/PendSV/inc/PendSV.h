@@ -8,7 +8,6 @@
 #define PENDSV_PRIORITY 0xFF
 void PendSV_Init(void);
 void Trigger_PendSV(void);
-Status_t PendSV_CallBack(void (*Copy_pvCallBackFunc)(void));
 
 
 #endif

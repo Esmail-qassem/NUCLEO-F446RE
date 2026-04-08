@@ -1,57 +1,76 @@
 #ifndef RTOS_INTERFACE_H_
 #define RTOS_INTERFACE_H_
 
-#define TASK_NUMBER  4
-#define STACK_SIZE   128
+#include "STD_TYPES.h"
+
+/*==============================================================================
+ *  Configuration
+ *============================================================================*/
+
+#define TASK_NUMBER   4u
+#define TASK_STACK_SIZE    128u
+
+/*==============================================================================
+ *  Types
+ *============================================================================*/
 
 typedef enum
 {
-    READY ,
+    READY     = 0,
     SUSPENDED,
-    WAITING ,
+    WAITING,
     REMOVED
-}
-Task_States;
+} Task_States;
 
-typedef enum {
+typedef enum
+{
     TASK_OK,
     TASK_ERROR_INVALID_ID,
     TASK_ERROR_ALREADY_NULL
-} Task_status;
-
-typedef struct {
-    uint32 total_ticks;
-    uint32 idle_ticks;
-    uint8 cpu_load_percent;
-} cpu_load_type;
+} Task_Status;
 
 typedef struct
 {
-    uint32 *stack_pointer;
+    uint32 *stack_pointer;            /* MUST be first — assembly accesses it at offset 0 */
+    uint32  stack[TASK_STACK_SIZE];   /* task's private stack memory */
 } TCB_t;
 
+
 typedef struct
 {
-    uint16 periodicity;
-    uint16 remaining_ticks;
-    Task_States state;
-    void(*TaskFunc)(void);
-    TCB_t *TCB;
-}task_type;
+    uint16       periodicity;
+    uint16       remaining_ticks;
+    Task_States  state;
+    void       (*TaskFunc)(void);
+    TCB_t        TCB;
+} Task_t;
 
+/*==============================================================================
+ *  OS Control
+ *============================================================================*/
 
-
-void OS_IDLE_TASK(void);
-Task_status RTOS_voidCreateTask(uint8 Copy_priority,uint16 Copy_priodicity,void(*Copy_pvTaskFunc)(void));
-void RTOS_voidSchedular(void);
 void RTOS_voidStart(void);
-Task_status RTOS_voidDeleteTask(uint8 Copy_priority);
+
+/*==============================================================================
+ *  Task Management
+ *============================================================================*/
+
+Task_Status RTOS_voidCreateTask(uint8 Copy_priority, uint16 Copy_periodicity, void (*Copy_pvTaskFunc)(void));
+Task_Status RTOS_voidDeleteTask(uint8 Copy_priority);
+
+/*==============================================================================
+ *  Task State Control
+ *============================================================================*/
+
 void RTOS_voidSuspendTask(uint8 Copy_priority);
 void RTOS_voidResumeTask(uint8 Copy_priority);
 void RTOS_voidWaitEvent(uint8 Copy_priority);
+
+/*==============================================================================
+ *  Utilities
+ *============================================================================*/
+
+void  OS_IDLE_TASK(void);
 uint8 RTOS_u8GetCPULoad(void);
+
 #endif /* RTOS_INTERFACE_H_ */
-
-
-
-
