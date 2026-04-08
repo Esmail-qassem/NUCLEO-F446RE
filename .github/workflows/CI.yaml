@@ -33,7 +33,7 @@ jobs:
         run: find . -name "*.sh" -exec chmod +x {} \;
 
       - name: Build full image
-        run: ./combined_image/FULL_IMAGE.sh
+        run: ./combined_image/build.sh
 
       - name: Check binary size limits
         run: |
