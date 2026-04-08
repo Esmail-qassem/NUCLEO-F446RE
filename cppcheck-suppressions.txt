@@ -1,0 +1,34 @@
+# cppcheck suppression list
+# Format: [error-id]:[file]:[line]   or   [error-id]:[file]   or   [error-id]
+#
+# These are intentional embedded/bare-metal patterns that cppcheck cannot
+# understand without full MCU context (register maps, linker symbols, asm, etc.)
+
+# ── RTOS.c ────────────────────────────────────────────────────────────────────
+# RTOS_TaskEntry(uint8) is cast to void(*)(void) intentionally.
+# The priority argument is pre-loaded into R0 via the fake stack frame at
+# CreateTask() time — the cast is safe by design on Cortex-M ABI.
+invalidFunctionPointerCast:APP/RTOS/RTOS.c
+
+# PendSV / SVC handlers are naked asm functions — cppcheck cannot analyse
+# their register usage and may flag variables as unused or uninitialized.
+unusedVariable:APP/RTOS/RTOS.c
+uninitvar:APP/RTOS/RTOS.c
+
+# ── BM/Src/main.c ─────────────────────────────────────────────────────────────
+# Jump_toApplication and Jump_toBootLoader are set from a flash vector table
+# address immediately before the call inside the same if-branch.
+# cppcheck sees the NULL initialiser and flags the call as a null-pointer deref.
+nullPointer:BM/Src/main.c
+
+# ── Startup files ─────────────────────────────────────────────────────────────
+# Vector table entries are cast from function pointers to uint32* — required
+# by the bare-metal startup; not an error on ARM.
+invalidPointerCast:APP/Startup/startup_stm32f103.c
+invalidPointerCast:BTLD/Startup/startup_stm32f103.c
+invalidPointerCast:BM/Startup/startup_stm32f103.c
+
+# ── General embedded patterns ─────────────────────────────────────────────────
+# Volatile register-mapped addresses cast from integer literals — standard
+# bare-metal register access pattern, not a real error.
+performance:APP/RTOS/RTOS.c
