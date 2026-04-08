@@ -18,7 +18,7 @@ This project demonstrates a full embedded firmware architecture from scratch —
 - ✅ Wired OTA firmware update over UART at 115200 baud
 - ✅ **Wireless OTA** via ESP8266 + RPi4 server — no PC required!
 - ✅ Firmware version embedded in binary — auto-detected on upload
-- ✅ Custom bare-metal RTOS scheduler
+- ✅ Custom bare-metal preemptive RTOS with real context switching (PendSV + SVC)
 - ✅ Modular MCAL + HAL driver architecture
 - ✅ Makefile-based build system with custom linker scripts
 - ✅ Full Linux development workflow (build, flash, debug)
@@ -223,9 +223,9 @@ NUCLEO-F446RE/
 │   └── Tools/                  # Output: application.bin, application.elf
 │
 ├── combined_image/             # Combined image tools
-│   ├── FULL_IMAGE.sh           # Build BM + BTLD + APP
+│   ├── build.sh                # Build BM + BTLD + APP
 │   ├── FLASH.sh                # Flash combined image to board
-│   ├── clean_all.sh            # Clean all build outputs
+│   ├── D.sh                    # Clean all build outputs
 │   ├── full_image.hex          # Generated combined hex
 │   └── send_bin.py             # Generates header binary + sends over UART
 │
@@ -234,12 +234,98 @@ NUCLEO-F446RE/
 │
 ├── upload_firmware.sh          # Upload firmware to RPi4 server
 │
+├── state_machine.pdf           # RTOS task state machine diagram
+├── uml.pdf                     # RTOS architecture + UML sequence diagram
+│
 ├── .vscode/
 │   ├── launch.json             # Cortex-Debug configuration
 │   └── tasks.json              # VS Code build task
 │
 └── README.md
 ```
+
+---
+
+## ⚙️ Custom Preemptive RTOS
+
+The application runs on a custom bare-metal RTOS built from scratch on Cortex-M4 hardware primitives. It is **preemptive** — tasks are switched by the CPU itself using PendSV, not called as regular functions.
+
+### How It Works
+
+```
+SysTick (1ms)
+    │
+    └─► Scheduler()
+            │  counts down each task's remaining_ticks
+            │  when ticks == 0 → state = READY
+            └─► Trigger_PendSV()
+                    │
+                    └─► PendSV_Handler()   (lowest-priority ISR — fires after SysTick exits)
+                            │  STMDB  R4-R11  onto CurrentTask's PSP  (save context)
+                            │  LDMIA  R4-R11  from NextTask's PSP     (load context)
+                            └─► BX LR  →  CPU jumps to NextTask's PC  (context switched)
+```
+
+### Task States
+
+```
+CreateTask()
+    │
+    ▼
+SUSPENDED ──(ticks==0)──► READY ──(PendSV)──► [RUNNING]
+    ▲                                               │
+    │◄──────────── TaskFunc() returns ──────────────┘
+    │              (trampoline suspends task,
+    │               yields to Idle via PendSV)
+    │
+    ├── WaitEvent()  ──► WAITING ──(ResumeTask())──► SUSPENDED
+    └── DeleteTask() ──► REMOVED
+```
+
+### Key Design Decisions
+
+| Feature | Detail |
+|---------|--------|
+| **Context saved** | R4–R11 manually by PendSV; R0–R3, R12, LR, PC, xPSR by CPU hardware |
+| **Stack per task** | 128 words (512 bytes) private stack in RAM — tasks fully isolated |
+| **Initial stack frame** | Fake exception frame built at `CreateTask()` — SVC/PendSV can "return" into a task that never ran |
+| **Task trampoline** | `RTOS_TaskEntry()` wraps every user function — catches return, suspends task safely |
+| **First task launch** | `SVC #0` → SVC_Handler sets PSP, switches CONTROL to Thread/PSP, EXC_RETURNs into idle |
+| **Idle task** | Always runnable — `NOP` loop with its own stack; runs when all user tasks are suspended |
+| **Scheduler in ISR** | Runs directly inside SysTick ISR — no polling loop, no missed ticks |
+| **Priority = index** | `SysTask[0]` = highest priority (runs first when multiple tasks expire together) |
+
+### Stack Memory Layout
+
+```
+HIGH ADDRESS ──► stack[127]
+┌───────────┐
+│  xPSR     │  0x01000000 (Thumb bit)       ┐
+│  PC       │  → RTOS_TaskEntry             │  Hardware frame
+│  LR       │  0xFFFFFFFD (EXC_RETURN)      │  auto-saved/restored by CPU
+│  R12      │  0                            │  on exception entry/exit
+│  R3–R0    │  0, 0, 0, priority            ┘
+├───────────┤  ← CPU boundary
+│  R11–R4   │  0, 0, 0, 0, 0, 0, 0, 0      ← Software frame
+├───────────┤  ← stack_pointer after CreateTask()
+│  (free)   │  ← grows down as task calls functions
+LOW ADDRESS ──► stack[0]
+```
+
+### RTOS Files
+
+| File | Role |
+|------|------|
+| `APP/RTOS/RTOS.h` | Types (`TCB_t`, `Task_t`, states), public API |
+| `APP/RTOS/RTOS.c` | Kernel: scheduler, context switch, SVC/PendSV handlers, trampoline |
+| `APP/MCAL/PendSV/` | `PendSV_Init()` (sets lowest priority), `Trigger_PendSV()` (sets SCB_ICSR bit) |
+
+### Diagrams
+
+See the included PDFs at the root of this repo:
+
+- **[state_machine.pdf](state_machine.pdf)** — Full task state machine with all transitions and triggers
+- **[uml.pdf](uml.pdf)** — 2-page UML: system architecture (component diagram) + boot-to-tasks sequence diagram
 
 ---
 
