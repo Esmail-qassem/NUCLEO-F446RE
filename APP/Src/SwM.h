@@ -7,7 +7,11 @@ void GPIO_PIN_CONFIG(void);
 void APP_init(void);
 void ENABLE_NVIC_INTERRUPTS(void);
 void CallBackFunctions(void);
-void Schedular(void);
+void OS_5ms_Task(void);
+void OS_10ms_Task(void);
+void OS_20ms_Task(void);
+void OS_50ms_Task(void);
+void OS_100ms_Task(void);
 /**************************************************************/
 /**************************************************************/
 /*Function Prototypes*/

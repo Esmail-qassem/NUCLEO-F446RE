@@ -6,7 +6,8 @@
 #include "GP_Timer.h"
 #include "UART.h"
 #include "ADC.h"
-
+#include "RTC.h"
+#include "IWDG.h"
 /*Global Variables*/
 extern uint8 ESP_APPLICATION_FLAG;
 UART_Config_t Uart1_configuration = {
@@ -23,26 +24,73 @@ UART_Config_t Uart2_configuration = {
     UART_STOPBITS_1,
     UART_WORDLEN_8B,
     Interrupt};
+
+/* LSI ~32 kHz: 32000 / 100 / 320 = 1 Hz calendar tick.
+   Use RTC_CLK_LSE + prediv_a=127, prediv_s=255 if you have an LSE crystal. */
+RTC_Config_t RTC_config =
+{
+  RTC_CLK_LSI,
+  99,
+  319,
+  RTC_HOURFORMAT_24
+};
+
+RTC_Time_t Time =
+{
+  0,
+  0,
+  0,
+  RTC_AM
+};
 const uint8 FIRMWARE_VERSION[] = "1.0.5";
 uint16 adc_value;
 uint32 voltage;
 uint8 LED_Global=0;
+RTC_Time_t Get_Time;
+/*************************************************************************************************/
 /*MACROS*/
 #define CMD_GET_VERSION 0xA1
 #define VREF 5U              // Reference voltage in volts
 #define ADC_RESOLUTION 4096U // 12-bit ADC resolution (2^12 =
+/*************************************************************************************************/
 
 /*************************************************/
-
-void Schedular(void)
+void OS_5ms_Task(void)
 {
-  RTOS_voidCreateTask(0, 5, LED);
-  RTOS_voidCreateTask(1, 10, LifeCounter);
-  RTOS_voidCreateTask(2, 10, SW_VERSION);
-  RTOS_voidCreateTask(3, 10, INTERNAL_TEMP_TASK);
-  RTOS_voidStart();
+  
+
+}
+void OS_10ms_Task(void)
+{
+  LED();
+}
+void OS_20ms_Task(void)
+{
+
+}
+void OS_50ms_Task(void)
+{
+
+}
+void OS_100ms_Task(void)
+{
+  IWDG_Refresh();
 }
 
+void RUN_TIME (void)
+{
+   RTC_GetTime(&Get_Time);
+   UART_SendSyncBuffer(UART2, (uint8 *)"Hour: ", sizeof("Hour: ")-1);
+  UART_voidSendNumber(UART2, Get_Time.hours);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\t \t", 3);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Minuts: ", sizeof("Minuts: ")-1);
+  UART_voidSendNumber(UART2, Get_Time.minutes);
+  UART_SendSyncBuffer(UART2, (uint8 *)"\t", 1);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Seconds: ", sizeof("Seconds: ")-1);
+  UART_voidSendNumber(UART2, Get_Time.seconds);
+UART_SendSyncBuffer(UART2, (uint8 *)"\n", 1);
+
+}
 void duty_cycle_task(void)
 {
   static uint8 i = 0;
@@ -95,7 +143,14 @@ void APP_init(void)
   UART_Init(UART2, &Uart2_configuration, 16000000);
   ADC_Init();
   GP_Timer_PWM_Init(TIMER3);
+  RTC_Init(&RTC_config);
+  if (!RTC_IsInitialized()) {
+  RTC_SetTime(&Time);
+  }
+  IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(113, IWDG_PRE_32, 32000)); // 250-ms timeout
 }
+/*********************************************************************************************************/
+/****************************** GIO PIN CONFIGURATION*****************************************************/
 
 void GPIO_PIN_CONFIG(void)
 {
@@ -128,6 +183,8 @@ void GPIO_PIN_CONFIG(void)
   /* PC3 BOOTLOADER PIN */
   GPIO_InitPin(GPIO_PORTC, PIN3, GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
 }
+/*************************************************************************************************/
+/*************************************************************************************************/
 
 void ENABLE_NVIC_INTERRUPTS(void)
 {
@@ -141,13 +198,7 @@ void CallBackFunctions(void)
   UART2_CALLBACK(UART2_ISR);
 }
 
-void UART1_ISR(uint8 num)
-{
-  if (num == CMD_GET_VERSION)
-  {
-    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
-  }
-}
+
 void LED_ON (void)
 {
   LED_Global= 1;
@@ -167,17 +218,7 @@ void BTLD_Update (void)
 {
   
 }
-void UART2_ISR (uint8 num)
-{
-  switch (num) {
-         case 0x01: LED_ON();       break;
-         case 0x02: LED_OFF();      break;
-         case 0x03: BTLD_Jump();    break;
-         case 0x04: BTLD_Update();  break;
-         default:   break;
-     }
-    
-}
+
 void LED(void)
 {
    GPIO_WritePin(GPIO_PORTA, PIN5,LED_Global);
@@ -198,4 +239,31 @@ void SW_VERSION(void)
   UART_SendSyncBuffer(UART2, (uint8 *)"STM Application Version: ", 25);
   UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
   UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+}
+
+
+
+
+/*************************************************************************************************/
+/***************************************ISR*******************************************************/
+
+void UART2_ISR (uint8 num)
+{
+  switch (num) {
+         case 0x01: LED_ON();       break;
+         case 0x02: LED_OFF();      break;
+         case 0x03: BTLD_Jump();    break;
+         case 0x04: BTLD_Update();  break;
+         case 0x05: RUN_TIME();      break;
+         case 0xA1: SW_VERSION();    break;
+         default:   break;
+     }
+    
+}
+void UART1_ISR(uint8 num)
+{
+  if (num == CMD_GET_VERSION)
+  {
+    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
+  }
 }

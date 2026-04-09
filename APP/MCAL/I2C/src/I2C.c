@@ -1,334 +1,484 @@
 #include "I2C.h"
-/** I2C_Config_t cfg = {100000, 0x00, 1, 0};
-    I2C_Init(I2C1_PORT, &cfg);
-    I2C_MasterTransmit(I2C1_PORT, 0x27, &cmd, 1);
+
+/*
+ * Usage examples:
+ *
+ *   // Polling, 100 kHz, 7-bit addressing
+ *   I2C_Config_t cfg = {
+ *       .PCLK1_Hz        = 16000000,
+ *       .ClockSpeed      = 100000,
+ *       .DutyCycle       = I2C_DUTY_2,
+ *       .AddressingMode  = I2C_ADDR_7BIT,
+ *       .OwnAddress      = 0x00,
+ *       .Acknowledgement = 1,
+ *       .GeneralCallMode = 0,
+ *       .NoStretchMode   = 0,
+ *       .DualAddressMode = 0,
+ *       .TransferMode    = I2C_POLLING,
+ *   };
+ *   I2C_Init(I2C1_PORT, &cfg);
+ *   I2C_MasterTransmit(I2C1_PORT, 0x27, buf, 1, 0);
+ *
+ *   // Sensor register read (MPU-6050 accel X high byte)
+ *   uint8 val;
+ *   I2C_ReadRegister(I2C1_PORT, 0x68, 0x3B, &val);
  */
 
+/*------------------------------------------------------------------
+ *  Base address lookup table
+ *------------------------------------------------------------------*/
+static const uint32 I2C_BaseAddr[I2C_PORT_COUNT] = {
+    I2C1_BASE,
+    I2C2_BASE,
+    I2C3_BASE
+};
 
-/* Helper macro to get base address */
-static uint32 I2C_GetBase(I2C_Port_t port) {
-    switch(port)
-    {
-        case I2C1_PORT : return I2C1_BASE;break;
-        case I2C2_PORT : return I2C2_BASE;break;
-        case I2C3_PORT : return I2C3_BASE;break;
-        default : return 0; break;
-    }
+static uint32 I2C_GetBase(I2C_Port_t port)
+{
+    if ((uint8)port >= (uint8)I2C_PORT_COUNT) return 0U;
+    return I2C_BaseAddr[(uint8)port];
 }
 
+/*------------------------------------------------------------------
+ *  Per-port runtime handle (interrupt state machine)
+ *------------------------------------------------------------------*/
+typedef struct {
+    volatile I2C_State_t state;
+    uint8               *buffer;
+    uint16               size;
+    uint16               index;
+    uint16               address;    /* pre-shifted address with R/W bit */
+    I2C_Callback_t       tx_cb;
+    I2C_Callback_t       rx_cb;
+    I2C_Callback_t       err_cb;
+} I2C_Handle_t;
 
-void I2C_Init(I2C_Port_t port, I2C_Config_t *config)
+static I2C_Handle_t I2C_Handle[I2C_PORT_COUNT];
+
+/*------------------------------------------------------------------
+ *  Internal: disable EV/BUF/ERR interrupts
+ *------------------------------------------------------------------*/
+static void I2C_DisableInterrupts(uint32 base)
+{
+    I2C_CR2(base) &= ~(I2C_CR2_ITBUFEN | I2C_CR2_ITEVTEN | I2C_CR2_ITERREN);
+}
+
+/*------------------------------------------------------------------
+ *  I2C_Init
+ *------------------------------------------------------------------*/
+void I2C_Init(I2C_Port_t port, const I2C_Config_t *config)
 {
     uint32 base = I2C_GetBase(port);
+    if (base == 0U || config == NULL) return;
 
-    /*-----------------------------*
-     * 1. Disable I2C before config
-     *-----------------------------*/
-    CLEAR_BIT(I2C_CR1(base), 0);  // PE = 0
+    /* 1. Disable peripheral while configuring */
+    I2C_CR1(base) &= ~I2C_CR1_PE;
 
-    /*-----------------------------*
-     * 2. Peripheral input clock (PCLK1 = 36 MHz)
-     *-----------------------------*/
-    uint32 pclk1 = PCLK1;
-    uint32 freq_range = pclk1 / 1000000;
-    I2C_CR2(base) = (I2C_CR2(base) & ~0x3F) | (freq_range & 0x3F);
+    /* 2. Set FREQ bits (APB1 clock in MHz) */
+    uint32 freq_MHz = config->PCLK1_Hz / 1000000U;
+    I2C_CR2(base) = (I2C_CR2(base) & ~0x3FU) | (freq_MHz & 0x3FU);
 
-    /*-----------------------------*
-     * 3. Configure clock control
-     *-----------------------------*/
-    uint16 ccr_value = 0;
-
-    if (config->ClockSpeed <= 100000)   // Standard Mode (≤100 kHz)
-    {
-        CLEAR_BIT(I2C_CCR(base), 15);   // F/S = 0 → Standard mode
-        ccr_value = pclk1 / (config->ClockSpeed * 2);
-        if (ccr_value < 4) ccr_value = 4;
-        I2C_CCR(base) = ccr_value;
-
-        /* Rise time for Standard mode: TRISE = Freq_MHz + 1 */
-        I2C_TRISE(base) = freq_range + 1;
+    /* 3. Clock control register (CCR) and TRISE */
+    uint32 ccr = 0U;
+    if (config->ClockSpeed <= 100000U) {
+        /* Standard mode: CCR = PCLK1 / (2 * Fscl) */
+        uint32 val = config->PCLK1_Hz / (2U * config->ClockSpeed);
+        if (val < 4U) val = 4U;
+        ccr = val & 0x0FFFU;                 /* F/S=0, DUTY=0 */
+        /* TRISE = Tr_max(1000 ns) / Tpclk1 + 1 = freq_MHz + 1 */
+        I2C_TRISE(base) = freq_MHz + 1U;
+    } else {
+        /* Fast mode (up to 400 kHz) */
+        ccr |= I2C_CCR_FS;
+        uint32 val;
+        if (config->DutyCycle == I2C_DUTY_16_9) {
+            /* Tlow/Thigh = 16/9 → CCR = PCLK1 / (25 * Fscl) */
+            ccr |= I2C_CCR_DUTY;
+            val = config->PCLK1_Hz / (25U * config->ClockSpeed);
+        } else {
+            /* Tlow/Thigh = 2 → CCR = PCLK1 / (3 * Fscl) */
+            val = config->PCLK1_Hz / (3U * config->ClockSpeed);
+        }
+        if (val == 0U) val = 1U;
+        ccr |= (val & 0x0FFFU);
+        /* TRISE for FM: Tr_max = 300 ns → ceil(300 / (1/PCLK1 * 1e9)) + 1 */
+        I2C_TRISE(base) = ((freq_MHz * 300U) / 1000U) + 1U;
     }
-    else if(config->ClockSpeed <= 400000)                                // Fast Mode (400 kHz)
-    {
-        SET_BIT(I2C_CCR(base), 15);     // F/S = 1 → Fast mode
-        CLEAR_BIT(I2C_CCR(base), 14);   // DUTY = 0 (Tlow/Thigh = 2)
-        ccr_value = pclk1 / (3 * config->ClockSpeed);
-        if (ccr_value == 0) ccr_value = 1;
-        I2C_CCR(base) = (I2C_CCR(base) & ~0x0FFF) | (ccr_value & 0x0FFF);
+    I2C_CCR(base) = ccr;
 
-        /* Rise time for Fast mode: TRISE = (Freq_MHz * 300ns) + 1 */
-        I2C_TRISE(base) = (uint16)(((freq_range * 300) / 1000) + 1);
-    }
-    else
-    {
-        //do nothing
+    /* 4. Own address */
+    if (config->AddressingMode == I2C_ADDR_10BIT) {
+        /* Bit 15 = 1 for 10-bit mode */
+        I2C_OAR1(base) = (1U << 15) | (config->OwnAddress & 0x3FFU);
+    } else {
+        /* Bit 14 must be kept 1 (reserved, always write 1) */
+        I2C_OAR1(base) = (1U << 14) | ((config->OwnAddress & 0x7FU) << 1U);
     }
 
-    /*-----------------------------*
-     * 4. Program own address
-     *-----------------------------*/
-    I2C_OAR1(base) = (config->OwnAddress & 0x7F) << 1;
-    SET_BIT(I2C_OAR1(base), 14);  // Bit 14 must be kept 1
+    /* 5. Dual address */
+    if (config->DualAddressMode) {
+        I2C_OAR2(base) = ((config->OwnAddress2 & 0x7FU) << 1U) | 0x01U;
+    } else {
+        I2C_OAR2(base) = 0U;
+    }
 
-    /*-----------------------------*
-     * 5. Acknowledge enable/disable
-     *-----------------------------*/
-    if (config->Acknowledgement)
-        SET_BIT(I2C_CR1(base), 10);  // ACK = 1
-    else
-        CLEAR_BIT(I2C_CR1(base), 10); // ACK = 0
-
-    /*-----------------------------*
-     * 6. Enable I2C peripheral
-     *-----------------------------*/
-    SET_BIT(I2C_CR1(base), 0);  // PE = 1
+    /* 6. CR1 options */
+    uint32 cr1 = I2C_CR1_PE;
+    if (config->Acknowledgement)  cr1 |= I2C_CR1_ACK;
+    if (config->GeneralCallMode)  cr1 |= I2C_CR1_ENGC;
+    if (config->NoStretchMode)    cr1 |= I2C_CR1_NOSTRETCH;
+    I2C_CR1(base) = cr1;
 }
 
+/*------------------------------------------------------------------
+ *  I2C_DeInit
+ *------------------------------------------------------------------*/
 void I2C_DeInit(I2C_Port_t port)
 {
-     uint32 base = I2C_GetBase(port);
-    CLEAR_BIT(I2C_CR1(base), 0); // Disable
+    uint32 base = I2C_GetBase(port);
+    if (base == 0U) return;
+    I2C_CR1(base) &= ~I2C_CR1_PE;
+    I2C_DisableInterrupts(base);
+    I2C_Handle[port].state = I2C_IDLE;
 }
+
+/*------------------------------------------------------------------
+ *  I2C_Start
+ *------------------------------------------------------------------*/
 I2C_Status_t I2C_Start(I2C_Port_t port)
 {
-    uint32 base = I2C_GetBase(port);
+    uint32 base    = I2C_GetBase(port);
     uint32 timeout = I2C_TIMEOUT_MAX;
 
-    /* Generate START */
-    SET_BIT(I2C_CR1(base), 8); // START = 1
-
-    /* Wait for SB (start bit set) */
-    while (!(I2C_SR1(base) & (1 << 0))) {
-        if (--timeout == 0) return I2C_TIMEOUT;
+    I2C_CR1(base) |= I2C_CR1_START;
+    while (!(I2C_SR1(base) & I2C_SR1_SB)) {
+        if (--timeout == 0U) return I2C_TIMEOUT;
     }
     return I2C_OK;
 }
 
-I2C_Status_t I2C_SendAddress(I2C_Port_t port, uint8 address, uint8 direction)
+/*------------------------------------------------------------------
+ *  I2C_Stop
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_Stop(I2C_Port_t port)
 {
     uint32 base = I2C_GetBase(port);
+    I2C_CR1(base) |= I2C_CR1_STOP;
+    return I2C_OK;
+}
+
+/*------------------------------------------------------------------
+ *  I2C_SendAddress
+ *  address: raw 7-bit or 10-bit value (driver shifts and adds R/W)
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_SendAddress(I2C_Port_t port, uint16 address, uint8 direction)
+{
+    uint32 base    = I2C_GetBase(port);
     uint32 timeout = I2C_TIMEOUT_MAX;
 
-    /* Send address */
-    I2C_DR(base) = (address << 1) | (direction & 0x01);
+    I2C_DR(base) = ((uint32)address << 1U) | (direction & 0x01U);
 
-    /* Wait for ADDR flag */
-    while (!(I2C_SR1(base) & (1 << 1))) {
-        if (--timeout == 0) return I2C_TIMEOUT;
+    while (!(I2C_SR1(base) & I2C_SR1_ADDR)) {
+        if (I2C_SR1(base) & I2C_SR1_AF) {
+            I2C_CR1(base) |= I2C_CR1_STOP;
+            return I2C_ERROR;             /* NACK from slave */
+        }
+        if (--timeout == 0U) return I2C_TIMEOUT;
     }
 
     /* Clear ADDR by reading SR1 then SR2 */
     (void)I2C_SR1(base);
     (void)I2C_SR2(base);
-
     return I2C_OK;
 }
 
-/*-----------------------------------------------------------*/
+/*------------------------------------------------------------------
+ *  I2C_SendData
+ *------------------------------------------------------------------*/
 I2C_Status_t I2C_SendData(I2C_Port_t port, uint8 data)
 {
-    uint32 base = I2C_GetBase(port);
+    uint32 base    = I2C_GetBase(port);
     uint32 timeout = I2C_TIMEOUT_MAX;
 
-    /* Write data */
     I2C_DR(base) = data;
-
-    /* Wait for TXE */
-    while (!(I2C_SR1(base) & (1 << 7))) {
-        if (--timeout == 0) return I2C_TIMEOUT;
+    while (!(I2C_SR1(base) & I2C_SR1_TXE)) {
+        if (--timeout == 0U) return I2C_TIMEOUT;
     }
-
     return I2C_OK;
 }
 
-/*-----------------------------------------------------------*/
+/*------------------------------------------------------------------
+ *  I2C_ReceiveData
+ *  ack=1 → ACK the byte (more bytes to follow)
+ *  ack=0 → NACK the byte (last byte)
+ *------------------------------------------------------------------*/
 I2C_Status_t I2C_ReceiveData(I2C_Port_t port, uint8 *data, uint8 ack)
 {
-    uint32 base = I2C_GetBase(port);
+    uint32 base    = I2C_GetBase(port);
     uint32 timeout = I2C_TIMEOUT_MAX;
 
     if (ack)
-        SET_BIT(I2C_CR1(base), 10); // ACK = 1
+        I2C_CR1(base) |= I2C_CR1_ACK;
     else
-        CLEAR_BIT(I2C_CR1(base), 10);
+        I2C_CR1(base) &= ~I2C_CR1_ACK;
 
-    while (!(I2C_SR1(base) & (1 << 6))) { // RXNE
-        if (--timeout == 0) return I2C_TIMEOUT;
+    while (!(I2C_SR1(base) & I2C_SR1_RXNE)) {
+        if (--timeout == 0U) return I2C_TIMEOUT;
     }
-
     *data = (uint8)I2C_DR(base);
     return I2C_OK;
 }
 
-/*-----------------------------------------------------------*/
-I2C_Status_t I2C_Stop(I2C_Port_t port)
+/*------------------------------------------------------------------
+ *  I2C_MasterTransmit  (blocking)
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_MasterTransmit(I2C_Port_t port, uint16 slave_addr,
+                                  uint8 *data, uint16 size, uint8 repeated_start)
 {
-    uint32 base = I2C_GetBase(port);
-    SET_BIT(I2C_CR1(base), 9);  // STOP = 1
-    return I2C_OK;
-}
-
-/*-----------------------------------------------------------*/
-I2C_Status_t I2C_MasterTransmit(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size, uint8 repeated_start)
-{
-    uint32 base = I2C_GetBase(port);
+    uint32       base   = I2C_GetBase(port);
     I2C_Status_t status;
 
-    // Generate START condition
     status = I2C_Start(port);
     if (status != I2C_OK) return status;
 
-    // Send slave address with Write bit
     status = I2C_SendAddress(port, slave_addr, I2C_WRITE);
     if (status != I2C_OK) return status;
 
-    // Send all bytes
-    for (uint16 i = 0; i < size; i++) {
+    for (uint16 i = 0U; i < size; i++) {
         status = I2C_SendData(port, data[i]);
         if (status != I2C_OK) return status;
     }
 
-    // Wait for BTF (Byte Transfer Finished)
+    /* Wait for BTF (all bytes shifted out) */
     uint32 timeout = I2C_TIMEOUT_MAX;
-    while (!(I2C_SR1(base) & (1 << 2))) { // BTF
-        if (--timeout == 0) return I2C_TIMEOUT;
+    while (!(I2C_SR1(base) & I2C_SR1_BTF)) {
+        if (--timeout == 0U) return I2C_TIMEOUT;
     }
 
-    // Generate STOP only if repeated_start == 0
-    if (!repeated_start)
+    if (!repeated_start) {
         I2C_Stop(port);
-
+    }
     return I2C_OK;
 }
-/*-----------------------------------------------------------*/
 
-uint8 I2C_ReadStatus(uint32 base)
-{
-    return I2C_SR1(base);
-}
-
-/*-----------------------------------------------------------*/
-I2C_Status_t I2C_MasterReceive(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size, uint8 repeated_start)
+/*------------------------------------------------------------------
+ *  I2C_MasterReceive  (blocking)
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_MasterReceive(I2C_Port_t port, uint16 slave_addr,
+                                 uint8 *data, uint16 size, uint8 repeated_start)
 {
     I2C_Status_t status;
 
-    // Generate START condition
     status = I2C_Start(port);
     if (status != I2C_OK) return status;
 
-    // Send slave address with Read bit
     status = I2C_SendAddress(port, slave_addr, I2C_READ);
     if (status != I2C_OK) return status;
 
-    // Receive bytes
-    for (uint16 i = 0; i < size; i++) {
-        uint8 ack = (i < (size - 1)) ? 1 : 0;
+    for (uint16 i = 0U; i < size; i++) {
+        uint8 ack = (i < (size - 1U)) ? 1U : 0U;
         status = I2C_ReceiveData(port, &data[i], ack);
         if (status != I2C_OK) return status;
     }
 
-    // Generate STOP only if repeated_start == 0
-    if (!repeated_start)
+    if (!repeated_start) {
         I2C_Stop(port);
-
+    }
     return I2C_OK;
 }
 
-void static I2C_DisableInterrupts(uint32 base)
-{
+/*------------------------------------------------------------------
+ *  Register helpers — common sensor / EEPROM patterns
+ *------------------------------------------------------------------*/
 
-    CLEAR_BIT(I2C_CR2(base), 9);  // ITBUFEN
-    CLEAR_BIT(I2C_CR2(base), 10); // ITEVTEN
-    CLEAR_BIT(I2C_CR2(base), 8);  // ITERREN
+/* Write single register: START | addr+W | reg | value | STOP */
+I2C_Status_t I2C_WriteRegister(I2C_Port_t port, uint8 slave_addr,
+                                 uint8 reg, uint8 value)
+{
+    uint8 buf[2] = { reg, value };
+    return I2C_MasterTransmit(port, (uint16)slave_addr, buf, 2U, 0U);
 }
 
-static volatile I2C_State_t I2C1_State = I2C_IDLE;
+/* Read single register: START | addr+W | reg | Sr | addr+R | data | STOP */
+I2C_Status_t I2C_ReadRegister(I2C_Port_t port, uint8 slave_addr,
+                                uint8 reg, uint8 *value)
+{
+    I2C_Status_t status;
+    status = I2C_MasterTransmit(port, (uint16)slave_addr, &reg, 1U, 1U);
+    if (status != I2C_OK) return status;
+    return I2C_MasterReceive(port, (uint16)slave_addr, value, 1U, 0U);
+}
 
-static uint8 *I2C1_TxBuffer;
-static uint16 I2C1_TxSize;
-static uint16 I2C1_TxIndex;
-static uint8 I2C1_Address;
-void I2C_MasterTransmit_IT(I2C_Port_t port, uint8 slave_addr, uint8 *data, uint16 size)
+/* Burst read: START | addr+W | reg | Sr | addr+R | data[0..len-1] | STOP */
+I2C_Status_t I2C_ReadRegisters(I2C_Port_t port, uint8 slave_addr,
+                                 uint8 reg, uint8 *buf, uint16 len)
+{
+    I2C_Status_t status;
+    status = I2C_MasterTransmit(port, (uint16)slave_addr, &reg, 1U, 1U);
+    if (status != I2C_OK) return status;
+    return I2C_MasterReceive(port, (uint16)slave_addr, buf, len, 0U);
+}
+
+/*------------------------------------------------------------------
+ *  Callback registration
+ *------------------------------------------------------------------*/
+void I2C_RegisterTxCallback(I2C_Port_t port, I2C_Callback_t cb)
+{
+    if ((uint8)port < (uint8)I2C_PORT_COUNT) I2C_Handle[port].tx_cb = cb;
+}
+
+void I2C_RegisterRxCallback(I2C_Port_t port, I2C_Callback_t cb)
+{
+    if ((uint8)port < (uint8)I2C_PORT_COUNT) I2C_Handle[port].rx_cb = cb;
+}
+
+void I2C_RegisterErrorCallback(I2C_Port_t port, I2C_Callback_t cb)
+{
+    if ((uint8)port < (uint8)I2C_PORT_COUNT) I2C_Handle[port].err_cb = cb;
+}
+
+/*------------------------------------------------------------------
+ *  State query
+ *------------------------------------------------------------------*/
+I2C_State_t I2C_GetState(I2C_Port_t port)
+{
+    if ((uint8)port >= (uint8)I2C_PORT_COUNT) return I2C_IDLE;
+    return I2C_Handle[port].state;
+}
+
+uint8 I2C_ReadStatus(uint32 base)
+{
+    return (uint8)I2C_SR1(base);
+}
+
+/*------------------------------------------------------------------
+ *  Interrupt-driven transmit (non-blocking)
+ *  Caller must have enabled the corresponding NVIC line.
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_MasterTransmit_IT(I2C_Port_t port, uint16 slave_addr,
+                                     uint8 *data, uint16 size)
 {
     uint32 base = I2C_GetBase(port);
+    if (base == 0U || data == NULL || size == 0U) return I2C_ERROR;
+    if (I2C_Handle[port].state != I2C_IDLE)       return I2C_BUSY;
 
-    I2C1_State     = I2C_BUSY_TX;
-    I2C1_TxBuffer  = data;
-    I2C1_TxSize    = size;
-    I2C1_TxIndex   = 0;
-    I2C1_Address   = slave_addr << 1;  // write mode
+    I2C_Handle_t *h = &I2C_Handle[port];
+    h->state   = I2C_BUSY_TX;
+    h->buffer  = data;
+    h->size    = size;
+    h->index   = 0U;
+    h->address = ((uint16)slave_addr << 1U) | I2C_WRITE;
 
-    // Enable interrupts
-    SET_BIT(I2C_CR2(base), 9);  // ITBUFEN (TXE, RXNE)
-    SET_BIT(I2C_CR2(base), 10); // ITEVTEN (EV)
-    SET_BIT(I2C_CR2(base), 8);  // ITERREN (ERR)
-
-    // Start condition
-    SET_BIT(I2C_CR1(base), 8);
+    I2C_CR2(base) |= (I2C_CR2_ITBUFEN | I2C_CR2_ITEVTEN | I2C_CR2_ITERREN);
+    I2C_CR1(base) |= I2C_CR1_START;
+    return I2C_OK;
 }
 
-void I2C1_EV_IRQHandler(void)
+/*------------------------------------------------------------------
+ *  Interrupt-driven receive (non-blocking)
+ *------------------------------------------------------------------*/
+I2C_Status_t I2C_MasterReceive_IT(I2C_Port_t port, uint16 slave_addr,
+                                    uint8 *data, uint16 size)
 {
-    uint32 base = I2C1_BASE;
-    uint32 sr1 = I2C_SR1(base);
+    uint32 base = I2C_GetBase(port);
+    if (base == 0U || data == NULL || size == 0U) return I2C_ERROR;
+    if (I2C_Handle[port].state != I2C_IDLE)       return I2C_BUSY;
 
-    // 1) START condition sent (SB)
-    if (sr1 & (1<<0)) {
-        I2C_DR(base) = I2C1_Address;   // Send address
+    I2C_Handle_t *h = &I2C_Handle[port];
+    h->state   = I2C_BUSY_RX;
+    h->buffer  = data;
+    h->size    = size;
+    h->index   = 0U;
+    h->address = ((uint16)slave_addr << 1U) | I2C_READ;
+
+    I2C_CR1(base) |= I2C_CR1_ACK;   /* ACK bytes as they arrive */
+    I2C_CR2(base) |= (I2C_CR2_ITBUFEN | I2C_CR2_ITEVTEN | I2C_CR2_ITERREN);
+    I2C_CR1(base) |= I2C_CR1_START;
+    return I2C_OK;
+}
+
+/*------------------------------------------------------------------
+ *  Internal: shared EV IRQ body (called from all three port handlers)
+ *------------------------------------------------------------------*/
+static void I2C_EV_Handler(I2C_Port_t port)
+{
+    uint32        base = I2C_GetBase(port);
+    uint32        sr1  = I2C_SR1(base);
+    I2C_Handle_t *h   = &I2C_Handle[port];
+
+    /* SB: START sent → write address byte */
+    if (sr1 & I2C_SR1_SB) {
+        I2C_DR(base) = h->address;
         return;
     }
 
-    // 2) Address sent (ADDR)
-    if (sr1 & (1<<1)) {
+    /* ADDR: address phase done → clear by reading SR1 then SR2 */
+    if (sr1 & I2C_SR1_ADDR) {
         (void)I2C_SR1(base);
         (void)I2C_SR2(base);
         return;
     }
 
-    // 3) TXE: time to send next byte
-    if ((sr1 & (1<<7)) && (I2C1_State == I2C_BUSY_TX)) {
-        if (I2C1_TxIndex < I2C1_TxSize) {
-            I2C_DR(base) = I2C1_TxBuffer[I2C1_TxIndex++];
+    /* TXE: TX register empty → write next byte */
+    if ((sr1 & I2C_SR1_TXE) && (h->state == I2C_BUSY_TX)) {
+        if (h->index < h->size) {
+            I2C_DR(base) = h->buffer[h->index++];
         }
         return;
     }
 
-    // 4) BTF: last byte transferred → STOP
-    if ((sr1 & (1<<2)) && (I2C1_TxIndex >= I2C1_TxSize)) {
-        SET_BIT(I2C_CR1(base), 9);  // STOP
-        I2C1_State = I2C_IDLE;
+    /* BTF after last TX byte → STOP + notify */
+    if ((sr1 & I2C_SR1_BTF) && (h->state == I2C_BUSY_TX)
+                              && (h->index >= h->size)) {
+        I2C_CR1(base) |= I2C_CR1_STOP;
+        I2C_DisableInterrupts(base);
+        h->state = I2C_IDLE;
+        if (h->tx_cb) h->tx_cb(port);
         return;
     }
+
+    /* RXNE: RX register has data */
+    if ((sr1 & I2C_SR1_RXNE) && (h->state == I2C_BUSY_RX)) {
+        if (h->index < h->size) {
+            /* Send NACK + STOP before reading the last byte */
+            if (h->index == h->size - 1U) {
+                I2C_CR1(base) &= ~I2C_CR1_ACK;
+                I2C_CR1(base) |=  I2C_CR1_STOP;
+            }
+            h->buffer[h->index++] = (uint8)I2C_DR(base);
+
+            if (h->index >= h->size) {
+                I2C_DisableInterrupts(base);
+                h->state = I2C_IDLE;
+                if (h->rx_cb) h->rx_cb(port);
+            }
+        }
+        return;
+    }
+
     I2C_DisableInterrupts(base);
-}   
-void I2C1_ER_IRQHandler(void)
+}
+
+/*------------------------------------------------------------------
+ *  Internal: shared ER IRQ body
+ *------------------------------------------------------------------*/
+static void I2C_ER_Handler(I2C_Port_t port)
 {
-    uint32 base = I2C1_BASE;
-
-    // Clear all errors
-    I2C_SR1(base) = 0;
-
-    I2C1_State = I2C_IDLE;
-I2C_DisableInterrupts(base);
+    uint32 base = I2C_GetBase(port);
+    I2C_SR1(base) = 0U;              /* clear all error flags */
+    I2C_Handle[port].state = I2C_IDLE;
+    I2C_DisableInterrupts(base);
+    if (I2C_Handle[port].err_cb) I2C_Handle[port].err_cb(port);
 }
 
-void I2C2_EV_IRQHandler(void)
-{     
+/*------------------------------------------------------------------
+ *  IRQ handlers — all three ports delegate to shared bodies
+ *------------------------------------------------------------------*/
+void I2C1_EV_IRQHandler(void) { I2C_EV_Handler(I2C1_PORT); }
+void I2C1_ER_IRQHandler(void) { I2C_ER_Handler(I2C1_PORT); }
 
+void I2C2_EV_IRQHandler(void) { I2C_EV_Handler(I2C2_PORT); }
+void I2C2_ER_IRQHandler(void) { I2C_ER_Handler(I2C2_PORT); }
 
-}
-void I2C2_ER_IRQHandler(void)
-{     
-
-
-}
-void I2C3_EV_IRQHandler(void)
-{     
-
-
-}
-void I2C3_ER_IRQHandler(void)
-{     
-
-
-}
+void I2C3_EV_IRQHandler(void) { I2C_EV_Handler(I2C3_PORT); }
+void I2C3_ER_IRQHandler(void) { I2C_ER_Handler(I2C3_PORT); }
