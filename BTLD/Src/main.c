@@ -31,7 +31,7 @@ UART_Config_t Uart2_configuration={
   UART_PARITY_NONE,
   UART_STOPBITS_1,
   UART_WORDLEN_8B,
-  Interrupt
+  Polling
 };
 /**************************************************************/
 /*           function prototype              */
@@ -57,8 +57,8 @@ int main (void)
   UART_SendSyncBuffer(UART2, (uint8 *)"BTLD will jump to application in 20 seconds if no data is received\n", 67);
    UART_SendSyncBuffer(UART2, (uint8 *)"Waiting for data", 16);
   SysTick_voidInit();
-  //NVIC_EnableInterrupt(UART1_IQ_NUM);
-  NVIC_EnableInterrupt(UART2_IQ_NUM);
+  NVIC_EnableInterrupt(UART1_IQ_NUM);
+  //NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
   FlashDrv_EraseSector(2);
   CRC32_Init();
@@ -104,6 +104,6 @@ RCC_EnableClock(RCC_APB1,APB1_USART2);
 
 void CallBackFunctions(void)
 {
+  UART1_CALLBACK(BootLoader_Handler);
   //UART2_CALLBACK(BootLoader_Handler);
-  UART2_CALLBACK(BootLoader_Handler);
 }

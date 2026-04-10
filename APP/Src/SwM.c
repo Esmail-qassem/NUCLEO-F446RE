@@ -57,7 +57,6 @@ RTC_Time_t Get_Time;
 /*************************************************/
 void OS_5ms_Task(void)
 {
-  
 
 }
 void OS_10ms_Task(void)
@@ -66,15 +65,39 @@ void OS_10ms_Task(void)
 }
 void OS_20ms_Task(void)
 {
-
+  /* nothing */
 }
 void OS_50ms_Task(void)
 {
-
+  /* nothing */
 }
 void OS_100ms_Task(void)
 {
   IWDG_Refresh();
+}
+
+/* Called from main scheduler loop — slow periodic output to UART2 */
+void OS_1000ms_Task(void)
+{
+  static uint8 tick = 0;
+  tick++;
+
+  LifeCounter();          /* every 1 s — life counter + version */
+
+  if (tick % 5 == 0)     /* every 5 s — internal temperature */
+  {
+    INTERNAL_TEMP_TASK();
+  }
+
+  if (tick % 10 == 0)    /* every 10 s — RTC time */
+  {
+    RUN_TIME();
+  }
+
+  if (tick == 1)          /* once on first tick — firmware version */
+  {
+    SW_VERSION();
+  }
 }
 
 void RUN_TIME (void)
@@ -147,7 +170,7 @@ void APP_init(void)
   if (!RTC_IsInitialized()) {
   RTC_SetTime(&Time);
   }
-  IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(113, IWDG_PRE_32, 32000)); // 250-ms timeout
+  IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(120, IWDG_PRE_32, 32000)); // 250-ms timeout
 }
 /*********************************************************************************************************/
 /****************************** GIO PIN CONFIGURATION*****************************************************/
@@ -216,7 +239,10 @@ void BTLD_Jump (void)
 }
 void BTLD_Update (void)
 {
-  
+  /* Signal the ESP8266 to perform an immediate OTA poll.
+     ESP loop() reads this byte and forces lastPollTime = 0. */
+  uint8 trigger = 0x04;
+  UART_SendSyncBuffer(UART1, &trigger, 1);
 }
 
 void LED(void)
@@ -262,8 +288,21 @@ void UART2_ISR (uint8 num)
 }
 void UART1_ISR(uint8 num)
 {
-  if (num == CMD_GET_VERSION)
+  /* UART1 = ESP8266 link — mirrors UART2_ISR so WiFi and Wire paths
+     behave identically.  0x04 (BTLD_Update) is intentionally absent:
+     ESP handles it internally (triggers OTA) without forwarding here. */
+  switch (num)
   {
-    UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
+    case 0x01: LED_ON();    break;
+    case 0x02: LED_OFF();   break;
+    case 0x03: BTLD_Jump(); break;
+    case 0x05: RUN_TIME();  break;
+    case 0xA1:
+      /* Reply to ESP on UART1 (OTA version check) */
+      UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
+      /* Also echo full string to UART2 so the server dashboard updates */
+      SW_VERSION();
+      break;
+    default: break;
   }
 }

@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUCLEO-F446RE ECU System Documentation</title>
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #1a1a2e;
+    background: #f5f6fa;
+  }
+
+  /* ── Page wrapper ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 18mm 18mm 20mm 18mm;
+    position: relative;
+  }
+
+  /* ── Print rules ── */
+  @media print {
+    body { background: #fff; font-size: 10pt; }
+    .page { margin: 0; padding: 15mm 15mm 18mm 15mm; width: 100%; box-shadow: none; }
+    .no-print { display: none; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    table { page-break-inside: avoid; }
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 270mm;
+    text-align: center;
+    page-break-after: always;
+  }
+
+  .cover-header {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2a4a 60%, #16213e 100%);
+    color: #ffffff;
+    width: 100%;
+    padding: 36px 24px 32px 24px;
+    border-radius: 6px;
+    margin-bottom: 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  }
+
+  .cover-header .logo-line {
+    font-size: 11pt;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #7ecfff;
+    margin-bottom: 10px;
+  }
+
+  .cover-header h1 {
+    font-size: 26pt;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    margin-bottom: 6px;
+  }
+
+  .cover-header .subtitle {
+    font-size: 13pt;
+    color: #a8d4f5;
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .cover-header .badge {
+    display: inline-block;
+    background: #0a84ff;
+    color: #fff;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 16px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin: 4px 4px;
+  }
+
+  .cover-header .badge.green { background: #28a745; }
+  .cover-header .badge.orange { background: #e67e22; }
+
+  .cover-meta {
+    width: 100%;
+    border: 1.5px solid #dde3ed;
+    border-radius: 6px;
+    padding: 20px 28px;
+    text-align: left;
+    background: #f8faff;
+  }
+
+  .cover-meta table { width: 100%; border-collapse: collapse; }
+  .cover-meta td { padding: 5px 10px; font-size: 10.5pt; }
+  .cover-meta td:first-child { font-weight: 700; color: #555; width: 38%; }
+  .cover-meta td:last-child { color: #1a1a2e; }
+
+  /* ── TOC ── */
+  .toc-page { page-break-after: always; }
+
+  .toc-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #0d1b2a;
+    border-bottom: 3px solid #0a84ff;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+  }
+
+  .toc-list { list-style: none; }
+  .toc-list li {
+    display: flex;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px dotted #cdd5e0;
+  }
+  .toc-list li:last-child { border-bottom: none; }
+
+  .toc-num {
+    font-weight: 800;
+    color: #0a84ff;
+    min-width: 36px;
+    font-size: 10.5pt;
+  }
+
+  .toc-label {
+    flex: 1;
+    font-size: 10.5pt;
+    color: #1a1a2e;
+  }
+
+  .toc-page-num {
+    font-size: 10pt;
+    color: #888;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .toc-sub { padding-left: 36px; }
+  .toc-sub .toc-num { color: #4a90d9; font-weight: 600; font-size: 10pt; }
+  .toc-sub .toc-label { font-size: 10pt; color: #444; }
+
+  /* ── Section headings ── */
+  .section { margin-bottom: 28px; }
+
+  .section-heading {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #0d1b2a;
+    border-bottom: 3px solid #0a84ff;
+    padding-bottom: 5px;
+    margin-bottom: 14px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-num {
+    background: #0a84ff;
+    color: #fff;
+    font-size: 10pt;
+    font-weight: 800;
+    border-radius: 4px;
+    padding: 1px 9px;
+    flex-shrink: 0;
+  }
+
+  .subsection-heading {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1b2a4a;
+    border-left: 4px solid #0a84ff;
+    padding-left: 10px;
+    margin: 18px 0 10px 0;
+  }
+
+  /* ── Page break ── */
+  .page-break { page-break-before: always; padding-top: 0; }
+
+  /* ── Paragraphs ── */
+  p { margin-bottom: 9px; color: #2c3e50; }
+
+  /* ── ASCII / pre blocks ── */
+  .ascii-block {
+    background: #0d1b2a;
+    color: #d4eaff;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 8.2pt;
+    line-height: 1.45;
+    padding: 16px 18px;
+    border-radius: 6px;
+    border: 1px solid #1b3a5c;
+    overflow-x: auto;
+    margin: 10px 0 18px 0;
+    white-space: pre;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  }
+
+  .flowchart-block {
+    background: #f0f4ff;
+    color: #0d1b2a;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    padding: 16px 18px;
+    border-radius: 6px;
+    border: 1.5px solid #b0c4e8;
+    overflow-x: auto;
+    margin: 10px 0 18px 0;
+    white-space: pre;
+  }
+
+  /* ── Tables ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 18px 0;
+    font-size: 9.5pt;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+
+  .data-table thead tr {
+    background: linear-gradient(90deg, #0d1b2a 0%, #1b3a5c 100%);
+    color: #ffffff;
+  }
+
+  .data-table thead th {
+    padding: 9px 11px;
+    text-align: left;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .data-table tbody tr:nth-child(odd)  { background: #f8faff; }
+  .data-table tbody tr:nth-child(even) { background: #edf2fb; }
+  .data-table tbody tr:hover { background: #dceeff; }
+
+  .data-table tbody td {
+    padding: 7px 11px;
+    border-bottom: 1px solid #dde3ed;
+    vertical-align: top;
+  }
+
+  .data-table tbody tr:last-child td { border-bottom: none; }
+
+  /* monospace cells */
+  .mono { font-family: 'Courier New', monospace; font-size: 9pt; }
+
+  /* ── Info boxes ── */
+  .info-box {
+    background: #e8f4fd;
+    border-left: 4px solid #0a84ff;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    margin: 10px 0 16px 0;
+    font-size: 10pt;
+  }
+
+  .warn-box {
+    background: #fff8e1;
+    border-left: 4px solid #f39c12;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    margin: 10px 0 16px 0;
+    font-size: 10pt;
+  }
+
+  /* ── Numbered steps ── */
+  .steps-list { list-style: none; counter-reset: step-counter; margin: 10px 0 18px 24px; }
+  .steps-list li {
+    counter-increment: step-counter;
+    position: relative;
+    padding: 7px 10px 7px 44px;
+    margin-bottom: 6px;
+    background: #f8faff;
+    border-radius: 5px;
+    border: 1px solid #dde3ed;
+    font-size: 10pt;
+  }
+  .steps-list li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0a84ff;
+    color: #fff;
+    font-weight: 800;
+    font-size: 8.5pt;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 22px;
+    text-align: center;
+  }
+
+  /* ── Inline code ── */
+  code {
+    background: #edf2fb;
+    color: #1a6fba;
+    font-family: 'Courier New', monospace;
+    font-size: 9pt;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── Check / cross ── */
+  .yes { color: #28a745; font-weight: 700; }
+  .no  { color: #999;    font-weight: 400; }
+  .partial { color: #e67e22; font-weight: 700; }
+
+  /* ── Footer ── */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14mm;
+    background: #0d1b2a;
+    color: #a8d4f5;
+    font-size: 8.5pt;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18mm;
+    z-index: 100;
+  }
+
+  @media print {
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  .footer-left  { font-weight: 700; letter-spacing: 0.5px; }
+  .footer-right { color: #7ecfff; }
+
+  /* ── Two-col grid ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  .card {
+    background: #f8faff;
+    border: 1.5px solid #dde3ed;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+
+  .card h4 { font-size: 10pt; font-weight: 700; color: #0d1b2a; margin-bottom: 6px; }
+  .card p, .card li { font-size: 9.5pt; color: #444; }
+  .card ul { padding-left: 18px; }
+  .card ul li { margin-bottom: 3px; }
+
+  /* spacer */
+  .spacer { height: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ COVER PAGE ═══════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+
+    <div class="cover-header">
+      <div class="logo-line">Embedded Systems Engineering</div>
+      <h1>NUCLEO-F446RE ECU</h1>
+      <div class="subtitle">System Architecture &amp; Technical Reference Manual</div>
+      <div style="margin-top:18px;">
+        <span class="badge">STM32F446RE</span>
+        <span class="badge green">ESP8266 WiFi</span>
+        <span class="badge orange">OTA Updates</span>
+        <span class="badge">Flask 5000</span>
+        <span class="badge green">RTOS</span>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <table>
+        <tr>
+          <td>Project</td>
+          <td>NUCLEO-F446RE Embedded ECU with Dual-Channel Control</td>
+        </tr>
+        <tr>
+          <td>Target Hardware</td>
+          <td>STM32F446RET6 — NUCLEO-F446RE Development Board</td>
+        </tr>
+        <tr>
+          <td>Wireless Module</td>
+          <td>ESP8266 (NodeMCU / bare module) — UART1 bridge + OTA agent</td>
+        </tr>
+        <tr>
+          <td>Host Software</td>
+          <td>Python Flask + SocketIO server — port 5000</td>
+        </tr>
+        <tr>
+          <td>Document Type</td>
+          <td>Full System Architecture &amp; API Reference</td>
+        </tr>
+        <tr>
+          <td>Date</td>
+          <td>April 10, 2026</td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>Released</td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin-top:32px;font-size:9pt;color:#888;text-align:center;">
+      This document covers system architecture, command protocol, OTA firmware update flow,<br>
+      hardware pin mapping, RTOS task schedule, and web dashboard API reference.
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ TABLE OF CONTENTS ═══════════════════════════════════ -->
+<div class="page toc-page">
+  <div class="toc-title">Table of Contents</div>
+  <ul class="toc-list">
+    <li>
+      <span class="toc-num">1</span>
+      <span class="toc-label">System Overview</span>
+      <span class="toc-page-num">3</span>
+    </li>
+    <li>
+      <span class="toc-num">2</span>
+      <span class="toc-label">Full System Architecture</span>
+      <span class="toc-page-num">3</span>
+    </li>
+    <li>
+      <span class="toc-num">3</span>
+      <span class="toc-label">Command Byte Protocol</span>
+      <span class="toc-page-num">4</span>
+    </li>
+    <li class="toc-sub">
+      <span class="toc-num">3.1</span>
+      <span class="toc-label">Command Byte Reference Table</span>
+      <span class="toc-page-num">4</span>
+    </li>
+    <li>
+      <span class="toc-num">4</span>
+      <span class="toc-label">ESP8266 State Machine</span>
+      <span class="toc-page-num">5</span>
+    </li>
+    <li class="toc-sub">
+      <span class="toc-num">4.1</span>
+      <span class="toc-label">State Diagram</span>
+      <span class="toc-page-num">5</span>
+    </li>
+    <li class="toc-sub">
+      <span class="toc-num">4.2</span>
+      <span class="toc-label">OTA Sub-State Detail</span>
+      <span class="toc-page-num">5</span>
+    </li>
+    <li>
+      <span class="toc-num">5</span>
+      <span class="toc-label">ECU Command State Machine</span>
+      <span class="toc-page-num">6</span>
+    </li>
+    <li>
+      <span class="toc-num">6</span>
+      <span class="toc-label">Web Dashboard API Reference</span>
+      <span class="toc-page-num">7</span>
+    </li>
+    <li>
+      <span class="toc-num">7</span>
+      <span class="toc-label">Hardware Pin Map</span>
+      <span class="toc-page-num">8</span>
+    </li>
+    <li>
+      <span class="toc-num">8</span>
+      <span class="toc-label">OTA Firmware Update Flow</span>
+      <span class="toc-page-num">8</span>
+    </li>
+    <li>
+      <span class="toc-num">9</span>
+      <span class="toc-label">RTOS Task Schedule</span>
+      <span class="toc-page-num">9</span>
+    </li>
+  </ul>
+
+  <div class="spacer"></div>
+
+  <div class="info-box">
+    <strong>Document Scope:</strong> This manual provides a complete technical reference for the NUCLEO-F446RE
+    embedded ECU system including all firmware interfaces, hardware connections, OTA update protocol,
+    and web dashboard API endpoints. It is intended for firmware engineers, systems integrators,
+    and QA personnel working with this platform.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 3 — OVERVIEW + ARCH ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <!-- Section 1: System Overview -->
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">1</span>System Overview</h2>
+
+    <p>
+      The NUCLEO-F446RE ECU is an embedded control unit built around the <strong>STM32F446RET6</strong>
+      microcontroller (ARM Cortex-M4, 180 MHz, 512 KB Flash, 128 KB SRAM). It exposes two independent
+      command channels — a wired USB/UART channel and a wireless WiFi channel — both controlled from a
+      centralized web dashboard running on a host PC.
+    </p>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>Wire Channel (UART2)</h4>
+        <ul>
+          <li>Physical: PA2/PA3 via ST-LINK USB bridge</li>
+          <li>Host: COM5 at 115200 baud, 8-N-1</li>
+          <li>Direct byte commands from Flask server</li>
+          <li>Response bytes returned over same UART</li>
+          <li>Supports: LED, BTLD, RUN_TIME, VERSION</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>WiFi Channel (ESP8266 → UART1)</h4>
+        <ul>
+          <li>Physical: PA9/PA10 (UART1) ↔ ESP8266</li>
+          <li>ESP hosts HTTP server on port 80</li>
+          <li>Flask POSTs to <code>http://{esp_ip}/cmd</code></li>
+          <li>ESP forwards bytes to STM32 over UART1</li>
+          <li>ESP also acts as autonomous OTA agent</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>Web Dashboard</h4>
+        <ul>
+          <li>Python Flask + SocketIO, port 5000</li>
+          <li>Real-time push via WebSocket events</li>
+          <li>Drag-and-drop firmware upload (.bin)</li>
+          <li>COM port selector and baud config</li>
+          <li>Channel selector: Wire / WiFi / Both</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Key Features</h4>
+        <ul>
+          <li>OTA firmware update via ESP8266 downloader</li>
+          <li>Hardware bootloader trigger (PC3 pin)</li>
+          <li>IWDG watchdog with RTOS-refreshed pet</li>
+          <li>RTC runtime reporting over UART2</li>
+          <li>ADC: LDR (PA0) and internal temperature</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Architecture Diagram -->
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">2</span>Full System Architecture</h2>
+
+    <p>The diagram below shows the complete data-flow and control path between the web browser,
+    the Flask server, the STM32F446RE MCU, and the ESP8266 wireless module.</p>
+
+<pre class="ascii-block">
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                          WEB BROWSER                                    │
+  │  [LED ON] [LED OFF] [BTLD Jump] [Trigger Update]  channel: [Both ▼]    │
+  └───────────────────────────┬─────────────────────────────────────────────┘
+                              │  HTTP REST + WebSocket (SocketIO)
+  ┌───────────────────────────▼─────────────────────────────────────────────┐
+  │                    FLASK SERVER  192.168.1.2:5000                       │
+  │                                                                         │
+  │  POST /api/command  {cmd, channel:"wire"|"wifi"|"both"}                 │
+  │   [Wire] ──► write byte to COM5/UART2                                   │
+  │   [WiFi] ──► POST http://{esp_ip}/cmd  (threaded, 2s timeout)           │
+  │                                                                         │
+  │  POST /api/esp_register  ◄── ESP registers its IP on boot               │
+  │  GET  /version           ◄── ESP OTA polls for server firmware version  │
+  │  GET  /firmware          ◄── ESP downloads binary for flashing          │
+  │  POST /status            ◄── ESP reports flash result                   │
+  └──────────┬──────────────────────────────────────┬───────────────────────┘
+             │                                      │
+             │  UART2 / USB COM5                    │  WiFi HTTP  port 80
+             │  PA2(TX) / PA3(RX)  115200 8N1       │
+             │                                      │
+  ┌──────────▼──────────────────────┐    ┌──────────▼──────────────────────┐
+  │         STM32F446RE             │    │          ESP8266                 │
+  │  ─────────────────────────────  │    │  ─────────────────────────────   │
+  │  UART2_ISR  (Wire commands)     │    │  HTTP Server  /cmd endpoint:     │
+  │    0x01 ──► LED_ON  (PA5 HIGH)  │    │    0x04 ──► trigger OTA now      │
+  │    0x02 ──► LED_OFF (PA5 LOW)   │    │    0x03 ──► fwd + reset + OTA    │
+  │    0x03 ──► BTLD_Jump (PC3=LOW) │    │    other ──► write byte to UART1 │
+  │    0x04 ──► BTLD_Update         │    │                                  │
+  │             └──► write 0x04     │    │  OTA Poller  (every 30 seconds): │
+  │                   to UART1      │    │    send 0xA1 ──► get STM32 ver   │
+  │    0x05 ──► RUN_TIME            │◄───│    GET /version ──► compare      │
+  │    0xA1 ──► SW_VERSION          │───►│    match && !force ──► idle      │
+  │  ─────────────────────────────  │    │    mismatch || force:            │
+  │  UART1_ISR  (WiFi commands)     │    │      ──► DOWNLOAD_FIRMWARE       │
+  │    0x01 ──► LED_ON              │    │      ──► FLASH_STM32 (NRST low)  │
+  │    0x02 ──► LED_OFF             │    │      ──► VERIFY (0xA1 again)     │
+  │    0x03 ──► BTLD_Jump           │    │      ──► NOTIFY POST /status     │
+  │    0x05 ──► RUN_TIME            │    │                                  │
+  │    0xA1 ──► SW_VERSION ──►UART1 │    │  NRST pin D1: hardware reset     │
+  │  ─────────────────────────────  │    │  Registers IP every 2 minutes    │
+  │  RTOS + IWDG + RTC              │    │                                  │
+  └─────────────────────────────────┘    └──────────────────────────────────┘
+</pre>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 4 — COMMANDS ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">3</span>Command Byte Protocol</h2>
+
+    <p>
+      All control messages are single-byte commands transmitted over UART. The STM32 firmware decodes
+      each byte in the ISR (interrupt service routine) for the respective UART peripheral. The ESP8266
+      intercepts certain bytes (particularly <code>0x04</code>) before forwarding others to the MCU.
+    </p>
+
+    <div class="info-box">
+      <strong>Protocol Detail:</strong> All UARTs are configured at <strong>115200 baud, 8-N-1</strong>
+      (8 data bits, no parity, 1 stop bit). Commands are single bytes with no framing or checksum;
+      responses are variable-length strings terminated with <code>\r\n</code>, except for version
+      queries which are null-terminated strings.
+    </div>
+
+    <h3 class="subsection-heading">3.1 Command Byte Reference Table</h3>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Byte</th>
+          <th>Command Name</th>
+          <th>Wire (UART2)</th>
+          <th>WiFi (UART1)</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">0x01</td>
+          <td><code>led_on</code></td>
+          <td class="yes">&#10003; Supported</td>
+          <td class="yes">&#10003; Supported</td>
+          <td>Drive PA5 HIGH — turns on on-board LD2 LED</td>
+        </tr>
+        <tr>
+          <td class="mono">0x02</td>
+          <td><code>led_off</code></td>
+          <td class="yes">&#10003; Supported</td>
+          <td class="yes">&#10003; Supported</td>
+          <td>Drive PA5 LOW — turns off on-board LD2 LED</td>
+        </tr>
+        <tr>
+          <td class="mono">0x03</td>
+          <td><code>btld_jump</code></td>
+          <td class="yes">&#10003; Supported</td>
+          <td class="yes">&#10003; Supported</td>
+          <td>Configure PC3 as output and drive LOW — asserts bootloader select signal</td>
+        </tr>
+        <tr>
+          <td class="mono">0x04</td>
+          <td><code>btld_update</code></td>
+          <td class="yes">&#10003; UART2 → STM32</td>
+          <td class="partial">&#9654; ESP handles directly</td>
+          <td>
+            <strong>Wire path:</strong> STM32 writes 0x04 to UART1 → signals ESP to start OTA.<br>
+            <strong>WiFi path:</strong> ESP intercepts in /cmd handler and triggers OTA immediately
+            without forwarding to MCU.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">0x05</td>
+          <td><code>run_time</code></td>
+          <td class="yes">&#10003; Supported</td>
+          <td class="yes">&#10003; Supported</td>
+          <td>Read current RTC value and transmit formatted time string over UART2</td>
+        </tr>
+        <tr>
+          <td class="mono">0xA1</td>
+          <td><code>get_version</code></td>
+          <td class="yes">&#10003; Supported</td>
+          <td class="yes">&#10003; Supported</td>
+          <td>
+            Reply with the <code>FIRMWARE_VERSION</code> string constant over the receiving UART.
+            WiFi path: response is also forwarded to UART1 so ESP can read the version during OTA.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warn-box">
+      <strong>Note on 0x04 asymmetry:</strong> When the <em>wire channel</em> sends 0x04, the STM32
+      receives it on UART2 and then <em>re-emits</em> 0x04 on UART1 toward the ESP. The ESP's
+      UART1 listener then interprets it as an OTA trigger. When the <em>WiFi channel</em> sends 0x04,
+      the Flask server POSTs it to the ESP's HTTP <code>/cmd</code> endpoint, and the ESP handles
+      it directly — the STM32 is not involved in this path.
+    </div>
+
+    <h3 class="subsection-heading">Response Format</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>Response Example</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>0x01 / 0x02</code></td>
+          <td class="mono">(no response)</td>
+          <td>State change only; no ACK byte</td>
+        </tr>
+        <tr>
+          <td><code>0x03</code></td>
+          <td class="mono">(no response)</td>
+          <td>PC3 asserted; system may reset</td>
+        </tr>
+        <tr>
+          <td><code>0x04</code></td>
+          <td class="mono">(no response to host)</td>
+          <td>STM32 → ESP OTA trigger forwarded internally</td>
+        </tr>
+        <tr>
+          <td><code>0x05</code></td>
+          <td class="mono">RTC: 14:32:07\r\n</td>
+          <td>HH:MM:SS format</td>
+        </tr>
+        <tr>
+          <td><code>0xA1</code></td>
+          <td class="mono">FW:v1.2.3\0</td>
+          <td>Null-terminated version string</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 5 — ESP STATE MACHINE ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">4</span>ESP8266 State Machine</h2>
+
+    <p>
+      The ESP8266 firmware implements a cooperative multi-task state machine within the Arduino
+      <code>loop()</code> function. Three always-running handlers operate concurrently: an HTTP server,
+      a UART1 listener, and a periodic registrar. OTA operations suspend normal operation temporarily.
+    </p>
+
+    <h3 class="subsection-heading">4.1 Top-Level State Diagram</h3>
+
+<pre class="flowchart-block">
+  ┌──────────────────────────────────────────────────────────────────────────────────┐
+  │                          ESP8266 FIRMWARE STATE MACHINE                          │
+  └──────────────────────────────────────────────────────────────────────────────────┘
+
+         Power On / Reset
+               │
+               ▼
+      ┌─────────────────┐
+      │      INIT        │  Serial.begin(115200), GPIO config,
+      │                  │  WiFi.mode(STATION), load saved config
+      └────────┬─────────┘
+               │
+               ▼
+      ┌─────────────────┐       timeout / wrong SSID
+      │  WIFI_CONNECT    │ ─────────────────────────────► (retry loop, LED blink)
+      │                  │
+      │  WiFi.begin()    │
+      │  wait for        │
+      │  WL_CONNECTED    │
+      └────────┬─────────┘
+               │ connected
+               ▼
+      ┌─────────────────────────────────────────────────────────────────────────┐
+      │                              RUNNING                                    │
+      │                                                                         │
+      │   Every loop() tick:                                                    │
+      │   ┌──────────────────────┐   ┌───────────────────────┐                 │
+      │   │  HTTP_SERVER_HANDLER │   │   UART1_RX_LISTENER   │                 │
+      │   │  server.handleClient │   │   if byte == 0x04     │                 │
+      │   │  (/cmd, /ota routes) │   │     → trigger OTA now │                 │
+      │   └──────────────────────┘   └───────────────────────┘                 │
+      │                                                                         │
+      │   ┌────────────────────────────────────────────────────────────────┐   │
+      │   │  PERIODIC_REGISTRAR  (every 2 minutes)                         │   │
+      │   │  POST http://server:5000/api/esp_register  {ip: WiFi.localIP()} │   │
+      │   └────────────────────────────────────────────────────────────────┘   │
+      │                                                                         │
+      │   ┌────────────────────────────────────────────────────────────────┐   │
+      │   │  OTA_POLL  (every 30 s  OR  forced by 0x04 byte / /cmd 0x04)  │   │
+      │   │   ──► GET_STM32_VERSION  ──► GET_SERVER_VERSION ──► compare   │   │
+      │   │         match && !force ──────────────────────────► idle       │   │
+      │   │         mismatch || force ──► DOWNLOAD ──► FLASH ──► VERIFY   │   │
+      │   └────────────────────────────────────────────────────────────────┘   │
+      └─────────────────────────────────────────────────────────────────────────┘
+</pre>
+
+    <h3 class="subsection-heading">4.2 OTA Sub-State Detail</h3>
+
+<pre class="flowchart-block">
+  OTA_POLL triggered
+        │
+        ▼
+  ┌─────────────────────┐
+  │  GET_STM32_VERSION  │  Write 0xA1 to UART1 → read response string (timeout 1s)
+  └──────────┬──────────┘
+             │  stm32_ver = "FW:v1.2.3"
+             ▼
+  ┌─────────────────────┐
+  │  GET_SERVER_VERSION │  HTTP GET http://server:5000/version → server_ver
+  └──────────┬──────────┘
+             │
+             ├── stm32_ver == server_ver && !forced ──► idle (no update needed)
+             │
+             ▼  (mismatch OR forced)
+  ┌─────────────────────┐
+  │  DOWNLOAD_FIRMWARE  │  HTTP GET /firmware → buffer in RAM
+  │                     │  Serial.end() during download to avoid UART conflicts
+  └──────────┬──────────┘
+             │  download OK
+             ▼
+  ┌─────────────────────┐
+  │    FLASH_STM32      │  Serial.begin(115200)
+  │                     │  Pulse NRST pin D1 LOW for 100 ms → STM32 enters BTLD
+  │                     │  Send 0x55 sync byte → send raw firmware bytes over UART1
+  │                     │  STM32 bootloader writes to flash, then soft-resets
+  └──────────┬──────────┘
+             │  flash complete
+             ▼
+  ┌─────────────────────┐
+  │       VERIFY        │  Wait 2 s → send 0xA1 → read version → compare
+  └──────────┬──────────┘
+             │
+             ├── version matches ──► result = "success"
+             └── version mismatch ─► result = "failed"
+                       │
+                       ▼
+             ┌─────────────────────┐
+             │       NOTIFY        │  POST http://server:5000/status
+             │                     │  body: {version, status}
+             │                     │  Server emits flash_result via SocketIO
+             │                     │  Browser shows toast notification
+             └─────────────────────┘
+</pre>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 6 — ECU STATE MACHINE ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">5</span>ECU Command State Machine</h2>
+
+    <p>
+      The STM32 firmware processes commands via UART interrupt service routines. Each received byte
+      passes through a simple decode-and-dispatch state machine. Both UART1 and UART2 share the same
+      command set (with UART2 having exclusive access to 0x04) and are handled symmetrically in
+      separate ISRs.
+    </p>
+
+<pre class="flowchart-block">
+  ┌──────────────────────────────────────────────────────────────────────────────────────┐
+  │                         ECU UART COMMAND STATE MACHINE                               │
+  └──────────────────────────────────────────────────────────────────────────────────────┘
+
+                  ┌──────────────────────────────────┐
+                  │               IDLE               │◄────────────────────────────┐
+                  │  Waiting for byte on UART1/UART2 │                             │
+                  └──────────────────┬───────────────┘                             │
+                                     │ byte received in ISR                        │
+                                     ▼                                             │
+                  ┌──────────────────────────────────┐                             │
+                  │           DECODE_CMD             │                             │
+                  │  switch(received_byte)           │                             │
+                  └───────────┬──────────────────────┘                             │
+                              │                                                    │
+          ┌───────────────────┼────────────────────────────────────┐               │
+          │                   │                                    │               │
+          ▼                   ▼                                    ▼               │
+  ┌───────────────┐  ┌────────────────┐                  ┌────────────────┐        │
+  │  0x01         │  │  0x02          │                  │  0x03          │        │
+  │  LED_ON       │  │  LED_OFF       │                  │  BTLD_JUMP     │        │
+  │  PA5 = HIGH   │  │  PA5 = LOW     │                  │  PC3 → OUTPUT  │        │
+  └──────┬────────┘  └───────┬────────┘                  │  PC3 = LOW     │        │
+         │                   │                           └───────┬────────┘        │
+         └──────────┬────────┘                                   │                 │
+                    │                                            │                 │
+                    └─────────────────────────────────────────────┘                 │
+                                          │                                         │
+          ┌───────────────────────────────┼──────────────────────────┐              │
+          │                               │                          │              │
+          ▼                               ▼                          ▼              │
+  ┌───────────────────────┐    ┌────────────────────┐    ┌─────────────────────┐   │
+  │  0x04  (UART2 only)   │    │  0x05              │    │  0xA1               │   │
+  │  BTLD_UPDATE          │    │  RUN_TIME          │    │  SW_VERSION         │   │
+  │  write 0x04 to UART1  │    │  read RTC value    │    │  send FIRMWARE_VER  │   │
+  │  (ESP receives it,    │    │  format HH:MM:SS   │    │  string over the    │   │
+  │   triggers OTA)       │    │  send over UART2   │    │  receiving UART     │   │
+  └──────────┬────────────┘    └────────┬───────────┘    └──────────┬──────────┘   │
+             │                          │                            │              │
+             └──────────────────────────┴────────────────────────────┘              │
+                                          │                                         │
+                                          ▼                          default byte   │
+                               ┌────────────────────┐  (unrecognized) ────────────►│
+                               │     action done     │                              │
+                               └──────────┬──────────┘                             │
+                                          │                                         │
+                                          └─────────────────────────────────────────┘
+                                                           return to IDLE
+</pre>
+
+    <div class="info-box">
+      <strong>UART1 vs UART2 ISR Symmetry:</strong> Both ISRs call the same
+      <code>process_command(uint8_t byte, UART_HandleTypeDef *huart)</code> function with the receiving
+      UART handle as context. The only asymmetry is that UART2 accepts 0x04 (BTLD_UPDATE) while UART1
+      ignores it (since 0x04 arriving on UART1 comes <em>from</em> the ESP and would be circular).
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 7 — WEB API ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">6</span>Web Dashboard API Reference</h2>
+
+    <p>
+      The Flask server exposes a REST API consumed both by the web browser front-end (via
+      <code>fetch()</code> / SocketIO) and by the ESP8266 module (via its HTTP client). All JSON
+      endpoints accept and return <code>Content-Type: application/json</code>.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Method</th>
+          <th>Request Body</th>
+          <th>Response</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">/</td>
+          <td class="mono">GET</td>
+          <td class="no">—</td>
+          <td class="mono">HTML</td>
+          <td>Serves the dashboard HTML page (<code>index.html</code>)</td>
+        </tr>
+        <tr>
+          <td class="mono">/upload</td>
+          <td class="mono">POST</td>
+          <td class="mono">multipart:<br>firmware (.bin)<br>version (string)</td>
+          <td class="mono">{ok, version, size}</td>
+          <td>
+            Upload a new firmware binary. Saved to <code>uploads/firmware.bin</code>.
+            Version string saved to <code>uploads/version.txt</code>.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/api/command</td>
+          <td class="mono">POST</td>
+          <td class="mono">{cmd: string,<br>channel: "wire"|<br>"wifi"|"both"}</td>
+          <td class="mono">{ok, wire, wifi, byte}</td>
+          <td>
+            Translates command name to byte, sends over selected channel(s).
+            <code>wire</code> / <code>wifi</code> fields in response indicate per-channel success.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/api/ports</td>
+          <td class="mono">GET</td>
+          <td class="no">—</td>
+          <td class="mono">[{port, desc}]</td>
+          <td>Lists available COM ports using <code>serial.tools.list_ports</code></td>
+        </tr>
+        <tr>
+          <td class="mono">/api/connect</td>
+          <td class="mono">POST</td>
+          <td class="mono">{port, baud}</td>
+          <td class="mono">{ok}</td>
+          <td>Opens the specified serial port at the given baud rate</td>
+        </tr>
+        <tr>
+          <td class="mono">/api/disconnect</td>
+          <td class="mono">POST</td>
+          <td class="no">—</td>
+          <td class="mono">{ok}</td>
+          <td>Closes the currently open serial port</td>
+        </tr>
+        <tr>
+          <td class="mono">/api/state</td>
+          <td class="mono">GET</td>
+          <td class="no">—</td>
+          <td class="mono">state JSON</td>
+          <td>
+            Returns full server state: connected port, baud, ESP IP, last uploaded firmware
+            version and size, LED state
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/api/esp_register</td>
+          <td class="mono">POST</td>
+          <td class="mono">{ip: string}</td>
+          <td class="mono">ok</td>
+          <td>
+            Called by ESP8266 every 2 minutes to register (or update) its current IP address.
+            Server stores IP for use in WiFi command routing.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/version</td>
+          <td class="mono">GET</td>
+          <td class="no">—</td>
+          <td class="mono">version string<br>(plain text)</td>
+          <td>
+            Returns content of <code>uploads/version.txt</code>. Polled by ESP every 30 s
+            during OTA check.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/firmware</td>
+          <td class="mono">GET</td>
+          <td class="no">—</td>
+          <td class="mono">binary (.bin)</td>
+          <td>
+            Returns raw firmware binary from <code>uploads/firmware.bin</code>.
+            Downloaded by ESP when OTA update is required.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">/status</td>
+          <td class="mono">POST</td>
+          <td class="mono">{version, status}</td>
+          <td class="mono">ok</td>
+          <td>
+            ESP reports flash result. Server broadcasts <code>flash_result</code> event via
+            SocketIO; browser displays toast notification with outcome.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection-heading">SocketIO Events</h3>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Event Name</th>
+          <th>Direction</th>
+          <th>Payload</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">connect</td>
+          <td>Client → Server</td>
+          <td class="no">—</td>
+          <td>Browser establishes WebSocket connection; server sends current state</td>
+        </tr>
+        <tr>
+          <td class="mono">flash_result</td>
+          <td>Server → Client</td>
+          <td class="mono">{status, version}</td>
+          <td>Pushed after ESP reports OTA outcome; triggers toast in browser UI</td>
+        </tr>
+        <tr>
+          <td class="mono">state_update</td>
+          <td>Server → Client</td>
+          <td class="mono">state JSON</td>
+          <td>Pushed on any state change (port connect/disconnect, ESP register, upload)</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 8 — PINS + OTA FLOW ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">7</span>Hardware Pin Map</h2>
+
+    <p>
+      The table below lists all signal connections for the NUCLEO-F446RE board in this design.
+      GPIO pins not listed here are available for future expansion.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>MCU Pin</th>
+          <th>GPIO Mode</th>
+          <th>Direction</th>
+          <th>Connected To</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>UART1 TX</strong></td>
+          <td class="mono">PA9</td>
+          <td class="mono">AF7</td>
+          <td>OUT</td>
+          <td>ESP8266 RX pin</td>
+          <td>115200 baud — commands/responses to ESP</td>
+        </tr>
+        <tr>
+          <td><strong>UART1 RX</strong></td>
+          <td class="mono">PA10</td>
+          <td class="mono">AF7</td>
+          <td>IN</td>
+          <td>ESP8266 TX pin</td>
+          <td>115200 baud — commands from ESP</td>
+        </tr>
+        <tr>
+          <td><strong>UART2 TX</strong></td>
+          <td class="mono">PA2</td>
+          <td class="mono">AF7</td>
+          <td>OUT</td>
+          <td>ST-LINK USB bridge</td>
+          <td>Virtual COM port to host PC (COM5)</td>
+        </tr>
+        <tr>
+          <td><strong>UART2 RX</strong></td>
+          <td class="mono">PA3</td>
+          <td class="mono">AF7</td>
+          <td>IN</td>
+          <td>ST-LINK USB bridge</td>
+          <td>Wire channel commands from Flask server</td>
+        </tr>
+        <tr>
+          <td><strong>LED (LD2)</strong></td>
+          <td class="mono">PA5</td>
+          <td class="mono">GPIO_OUT</td>
+          <td>OUT</td>
+          <td>On-board green LED</td>
+          <td>HIGH = ON, LOW = OFF; set by 0x01/0x02 commands</td>
+        </tr>
+        <tr>
+          <td><strong>BTLD_SEL</strong></td>
+          <td class="mono">PC3</td>
+          <td class="mono">GPIO_OUT</td>
+          <td>OUT (when triggered)</td>
+          <td>Bootloader select signal</td>
+          <td>Normally INPUT/PULL-UP; driven LOW by 0x03 command to enter bootloader</td>
+        </tr>
+        <tr>
+          <td><strong>ESP_RESET</strong></td>
+          <td class="mono">D1 (ESP)</td>
+          <td class="mono">GPIO_OUT</td>
+          <td>OUT</td>
+          <td>STM32 NRST pin</td>
+          <td>ESP drives this LOW for 100 ms to hardware-reset STM32 into bootloader for OTA</td>
+        </tr>
+        <tr>
+          <td><strong>ADC LDR</strong></td>
+          <td class="mono">PA0</td>
+          <td class="mono">ADC_IN0</td>
+          <td>IN</td>
+          <td>Light-dependent resistor</td>
+          <td>Analog ambient light sensor; 12-bit ADC result</td>
+        </tr>
+        <tr>
+          <td><strong>ADC TEMP</strong></td>
+          <td class="mono">CH16</td>
+          <td class="mono">ADC1_IN16</td>
+          <td>IN</td>
+          <td>Internal temperature sensor</td>
+          <td>STM32 internal die temperature; requires TSVREFE bit set in ADC_CCR</td>
+        </tr>
+        <tr>
+          <td><strong>PWM Output</strong></td>
+          <td class="mono">PC7</td>
+          <td class="mono">AF2 (TIM3)</td>
+          <td>OUT</td>
+          <td>External peripheral / test point</td>
+          <td>Timer 3 Channel 2 PWM output; configurable duty cycle and frequency</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Section 8: OTA Firmware Update Flow -->
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">8</span>OTA Firmware Update Flow</h2>
+
+    <p>
+      The OTA (Over-The-Air) update mechanism allows the STM32 firmware to be updated wirelessly
+      without physical access to the board. The process is fully automated once a new firmware binary
+      is uploaded to the server.
+    </p>
+
+    <ol class="steps-list">
+      <li>
+        <strong>Upload:</strong> User drags and drops a <code>.bin</code> firmware file onto the web
+        dashboard. The browser POSTs it to <code>/upload</code> with the version string.
+      </li>
+      <li>
+        <strong>Server stores:</strong> Flask saves the binary to <code>uploads/firmware.bin</code>
+        and writes the version string to <code>uploads/version.txt</code>. Responds with
+        <code>{ok, version, size}</code>.
+      </li>
+      <li>
+        <strong>ESP polls version:</strong> Every 30 seconds the ESP issues HTTP GET to
+        <code>/version</code>. Alternatively, if the user clicks "Trigger Update" or sends command
+        0x04, the poll is forced immediately.
+      </li>
+      <li>
+        <strong>Query STM32 version:</strong> ESP sends <code>0xA1</code> byte over UART1.
+        STM32 responds with its compiled-in <code>FIRMWARE_VERSION</code> string. ESP reads
+        the response with a 1-second timeout.
+      </li>
+      <li>
+        <strong>Version comparison:</strong> If server version equals STM32 version (and not
+        forced), no update is needed and the ESP returns to idle. If versions differ, or the
+        update was force-triggered, OTA proceeds.
+      </li>
+      <li>
+        <strong>Download:</strong> ESP calls <code>Serial.end()</code> to pause UART, then
+        issues HTTP GET to <code>/firmware</code>, buffering the binary in RAM.
+        <code>Serial.begin(115200)</code> resumes after download.
+      </li>
+      <li>
+        <strong>Reset into bootloader:</strong> ESP pulses the <strong>NRST pin (D1)</strong>
+        LOW for 100 ms → STM32 hardware-resets. The BTLD_SEL line (PC3) must be asserted LOW
+        before reset so the STM32 ROM bootloader starts instead of the application.
+      </li>
+      <li>
+        <strong>Flash transfer:</strong> ESP sends the <code>0x55</code> UART bootloader sync byte,
+        then streams raw firmware bytes over UART1 at 115200 baud. The STM32 ROM bootloader
+        receives these, erases flash pages, and programs new firmware.
+      </li>
+      <li>
+        <strong>Verify:</strong> ESP waits 2 seconds for STM32 to soft-reset into the new
+        application, then sends <code>0xA1</code> again and compares the version reply to the
+        expected new version.
+      </li>
+      <li>
+        <strong>Notify:</strong> ESP POSTs result to <code>/status</code> with
+        <code>{version, status: "success"|"failed"}</code>. Flask emits a <code>flash_result</code>
+        SocketIO event. The dashboard displays a toast notification with the outcome.
+      </li>
+    </ol>
+
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 9 — RTOS ═══════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section">
+    <h2 class="section-heading"><span class="section-num">9</span>RTOS Task Schedule</h2>
+
+    <p>
+      The STM32 firmware runs a lightweight cooperative/preemptive RTOS scheduler. Tasks are
+      registered with fixed periods and dispatched by the OS tick timer. The watchdog refresh
+      task is critical — if it misses its deadline, the IWDG fires a hardware reset.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Task Name</th>
+          <th>Period</th>
+          <th>Priority</th>
+          <th>Function Called</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">OS_5ms_Task</td>
+          <td class="mono">5 ms</td>
+          <td>High</td>
+          <td class="mono">(reserved)</td>
+          <td>Reserved for future high-frequency control tasks (e.g., PID loop, ADC sampling)</td>
+        </tr>
+        <tr>
+          <td class="mono">OS_10ms_Task</td>
+          <td class="mono">10 ms</td>
+          <td>High</td>
+          <td class="mono">LED()</td>
+          <td>
+            Applies the <code>LED_Global</code> variable to PA5 output.
+            This decouples ISR command processing from GPIO state updates.
+          </td>
+        </tr>
+        <tr>
+          <td class="mono">OS_20ms_Task</td>
+          <td class="mono">20 ms</td>
+          <td>Medium</td>
+          <td class="mono">(reserved)</td>
+          <td>Reserved for future periodic tasks (e.g., sensor reads, PWM updates)</td>
+        </tr>
+        <tr>
+          <td class="mono">OS_50ms_Task</td>
+          <td class="mono">50 ms</td>
+          <td>Medium</td>
+          <td class="mono">(reserved)</td>
+          <td>Reserved for future lower-frequency tasks (e.g., UART telemetry, display update)</td>
+        </tr>
+        <tr>
+          <td class="mono">OS_100ms_Task</td>
+          <td class="mono">100 ms</td>
+          <td>Low</td>
+          <td class="mono">IWDG_Refresh()</td>
+          <td>
+            Writes the IWDG key register (<code>KR = 0xAAAA</code>) to reset the watchdog counter.
+            IWDG is configured with a timeout greater than 100 ms so any missed refresh causes reset.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>Watchdog Configuration:</strong> The IWDG (Independent Watchdog) uses the LSI oscillator
+      (~32 kHz) with a prescaler of /256 and a reload value that gives a timeout of approximately
+      800 ms. Since the RTOS refreshes every 100 ms, the system has ~8x margin before a reset.
+      If any task blocks or the scheduler stalls, the watchdog fires within 800 ms.
+    </div>
+
+    <h3 class="subsection-heading">RTOS Tick Architecture</h3>
+
+<pre class="flowchart-block">
+  SysTick_Handler (every 1 ms)
+        │
+        ├── OS_tick_counter++
+        │
+        ├── if (tick % 5   == 0) ──► schedule OS_5ms_Task
+        ├── if (tick % 10  == 0) ──► schedule OS_10ms_Task  →  LED()
+        ├── if (tick % 20  == 0) ──► schedule OS_20ms_Task
+        ├── if (tick % 50  == 0) ──► schedule OS_50ms_Task
+        └── if (tick % 100 == 0) ──► schedule OS_100ms_Task →  IWDG_Refresh()
+
+  Main Loop
+        │
+        └── OS_Dispatch() ──► run any pending tasks in priority order
+                          ──► UART ISRs can preempt (NVIC priority &lt; SysTick)
+</pre>
+
+    <div class="spacer"></div>
+
+    <h3 class="subsection-heading">System Timing Summary</h3>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>STM32F446RE Clocks</h4>
+        <ul>
+          <li>SYSCLK: 180 MHz (PLL from HSE/HSI)</li>
+          <li>AHB: 180 MHz</li>
+          <li>APB1: 45 MHz (UART2, TIM3)</li>
+          <li>APB2: 90 MHz (UART1)</li>
+          <li>LSI: ~32 kHz (IWDG, RTC)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Communication Timing</h4>
+        <ul>
+          <li>UART1/2 baud: 115200 bps</li>
+          <li>Byte transfer time: ~87 µs</li>
+          <li>ESP OTA poll: every 30 s</li>
+          <li>ESP IP register: every 2 min</li>
+          <li>ESP /cmd HTTP timeout: 2 s</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="spacer"></div>
+
+    <div style="text-align:center; color:#888; font-size:9pt; border-top: 1px solid #dde3ed; padding-top:16px;">
+      <strong>End of Document</strong><br>
+      NUCLEO-F446RE ECU System Documentation — April 10, 2026<br>
+      All rights reserved. For internal engineering use.
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
+<div class="footer">
+  <span class="footer-left">NUCLEO-F446RE ECU System Documentation</span>
+  <span class="footer-right">April 10, 2026 &nbsp;|&nbsp; Confidential — Engineering Reference</span>
+</div>
+
+</body>
+</html>

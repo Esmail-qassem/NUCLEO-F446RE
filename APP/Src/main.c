@@ -14,11 +14,12 @@ RCC_Config_t RCC_Configuration =
 
 void Schedular(void)
 {
-  RTOS_voidCreateTask(0, 5, OS_5ms_Task);
-  RTOS_voidCreateTask(1, 10, OS_10ms_Task);
-  RTOS_voidCreateTask(2, 20, OS_20ms_Task);
-  RTOS_voidCreateTask(3, 50, OS_50ms_Task);
-  RTOS_voidCreateTask(4, 100, OS_100ms_Task);
+  RTOS_voidCreateTask(0, 5,    OS_5ms_Task);
+  RTOS_voidCreateTask(1, 10,   OS_10ms_Task);
+  RTOS_voidCreateTask(2, 20,   OS_20ms_Task);
+  RTOS_voidCreateTask(3, 50,   OS_50ms_Task);
+  RTOS_voidCreateTask(4, 100,  OS_100ms_Task);
+  RTOS_voidCreateTask(5, 1000, OS_1000ms_Task);
   RTOS_voidStart();
 }
 
