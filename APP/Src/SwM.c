@@ -8,6 +8,7 @@
 #include "ADC.h"
 #include "RTC.h"
 #include "IWDG.h"
+#include "LOW_POWER.h"
 /*Global Variables*/
 extern uint8 ESP_APPLICATION_FLAG;
 UART_Config_t Uart1_configuration = {
@@ -42,7 +43,7 @@ RTC_Time_t Time =
   0,
   RTC_AM
 };
-const uint8 FIRMWARE_VERSION[] = "1.0.1";
+const uint8 FIRMWARE_VERSION[] = "1.0.2";
 uint16 adc_value;
 uint32 voltage;
 uint8 LED_Global=0;
@@ -278,7 +279,10 @@ void LED(void)
    GPIO_WritePin(GPIO_PORTA, PIN5,LED_Global);
 }
 
-void OS_IDLE_TASK(void) {}
+void OS_IDLE_TASK(void)
+{
+  { __asm("NOP"); }
+}
 void LifeCounter(void)
 {
   static uint32 counter = 0;

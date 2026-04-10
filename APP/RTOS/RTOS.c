@@ -53,7 +53,7 @@ static void RTOS_voidIdleTask(void)
 {
     while (1)
     {
-        __asm volatile ("NOP");
+        OS_IDLE_TASK();
     }
 }
 

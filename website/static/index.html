@@ -10,9 +10,14 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     HEADER
-═══════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════ ALERT BANNER ═══════════════════════════════ -->
+<div id="alert-banner" class="alert-banner" style="display:none">
+  <span id="alert-icon">⚠</span>
+  <span id="alert-msg">–</span>
+  <button class="btn btn-ghost alert-close" onclick="dismissAlert()">✕</button>
+</div>
+
+<!-- ═══════════════════════════════ HEADER ═════════════════════════════════════ -->
 <header>
   <div class="header-left">
     <span class="chip-icon">⚙</span>
@@ -58,12 +63,18 @@
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     MAIN GRID
-═══════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════ TAB NAV ════════════════════════════════════ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="tab-main">Control</button>
+  <button class="tab-btn" data-tab="tab-history">Firmware History</button>
+  <button class="tab-btn" data-tab="tab-metrics">Metrics</button>
+</nav>
+
+<!-- ═══════════════════════════════ TAB: MAIN ══════════════════════════════════ -->
+<div id="tab-main" class="tab-content active">
 <main class="grid">
 
-  <!-- ── Control Panel ─────────────────────────────────────────── -->
+  <!-- ── Control Panel ── -->
   <section class="card" id="card-control">
     <h2>Control</h2>
 
@@ -78,7 +89,6 @@
       </div>
     </div>
 
-    <!-- Channel selector -->
     <div class="channel-row">
       <span class="ver-label">Channel</span>
       <div class="channel-btns">
@@ -91,53 +101,26 @@
     <div class="divider"></div>
 
     <div class="btn-group">
-      <button class="btn btn-success  cmd-btn" data-cmd="led_on">
-        💡 LED ON
-      </button>
-      <button class="btn btn-danger   cmd-btn" data-cmd="led_off">
-        🌑 LED OFF
-      </button>
+      <button class="btn btn-success  cmd-btn" data-cmd="led_on">💡 LED ON</button>
+      <button class="btn btn-danger   cmd-btn" data-cmd="led_off">🌑 LED OFF</button>
     </div>
-
     <div class="divider"></div>
-
     <div class="btn-group">
-      <button class="btn btn-warning  cmd-btn" data-cmd="btld_jump"
-              title="Jump to bootloader — ESP will flash new firmware">
-        ⚡ Jump to Bootloader
-      </button>
-      <button class="btn btn-secondary cmd-btn" data-cmd="btld_update"
-              title="Signal ESP to do OTA check now">
-        🔄 Trigger Update
-      </button>
+      <button class="btn btn-warning  cmd-btn" data-cmd="btld_jump">⚡ Jump to Bootloader</button>
+      <button class="btn btn-secondary cmd-btn" data-cmd="btld_update">🔄 Trigger Update</button>
     </div>
-
     <div class="divider"></div>
-
     <div class="btn-group">
-      <button class="btn btn-info cmd-btn" data-cmd="get_version"
-              title="Request firmware version from ECU (0xA1)">
-        🏷 Get Version
-      </button>
-      <button class="btn btn-info cmd-btn" data-cmd="run_time"
-              title="Request RTC time from ECU (0x05)">
-        🕐 Get RTC Time
-      </button>
+      <button class="btn btn-info cmd-btn" data-cmd="get_version">🏷 Get Version</button>
+      <button class="btn btn-info cmd-btn" data-cmd="run_time">🕐 Get RTC Time</button>
     </div>
-
     <div class="divider"></div>
-
     <div class="btn-group">
       <button class="btn btn-danger cmd-btn" data-cmd="sys_reset"
-              onclick="return confirm('Reset the ECU now?')"
-              title="Software reset via SCB AIRCR SYSRESETREQ (0x06)">
-        ⟳ System Reset
-      </button>
+              onclick="return confirm('Reset the ECU now?')">⟳ System Reset</button>
     </div>
-
     <div class="divider"></div>
 
-    <!-- Raw byte sender -->
     <div class="raw-row">
       <span class="ver-label">Send raw byte</span>
       <div class="raw-input-group">
@@ -148,9 +131,25 @@
     </div>
 
     <div id="cmd-feedback" class="feedback"></div>
+
+    <!-- Alert thresholds config -->
+    <div class="divider"></div>
+    <h2>Alert Thresholds</h2>
+    <div class="alert-cfg-row">
+      <div class="input-labeled">
+        <label for="inp-temp-thresh">Temp limit (°C)</label>
+        <input id="inp-temp-thresh" type="number" value="55" min="0" max="120"/>
+      </div>
+      <div class="input-labeled">
+        <label for="inp-life-stall">Life stall (s)</label>
+        <input id="inp-life-stall" type="number" value="60" min="10" max="600"/>
+      </div>
+      <button class="btn btn-secondary" id="btn-save-alerts">Save</button>
+    </div>
+    <div id="alert-cfg-feedback" class="feedback"></div>
   </section>
 
-  <!-- ── Firmware Upload ────────────────────────────────────────── -->
+  <!-- ── Firmware Upload ── -->
   <section class="card" id="card-firmware">
     <h2>Firmware Update</h2>
 
@@ -187,11 +186,11 @@
     <div class="ota-hint">
       <span class="hint-icon">ℹ</span>
       After upload, press <strong>Jump to Bootloader</strong> on the left
-      <em>or</em> wait up to 30 s for ESP8266 auto-OTA to flash the ECU.
+      <em>or</em> wait up to 30 s for ESP8266 auto-OTA.
     </div>
   </section>
 
-  <!-- ── Terminal ───────────────────────────────────────────────── -->
+  <!-- ── Terminal ── -->
   <section class="card" id="card-terminal">
     <div class="term-header">
       <h2>Live Terminal  <span class="muted" id="term-port">(COM5 · 115200)</span></h2>
@@ -203,15 +202,73 @@
       </div>
     </div>
     <pre id="terminal"></pre>
-
-    <!-- Flash notification overlay -->
     <div id="flash-toast" class="flash-toast" style="display:none"></div>
   </section>
 
 </main>
+</div>
 
-<!-- SocketIO client — served locally, no internet required -->
+<!-- ═══════════════════════════════ TAB: HISTORY ═══════════════════════════════ -->
+<div id="tab-history" class="tab-content">
+  <div class="tab-inner">
+    <div class="card">
+      <h2>Firmware History</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:12px">
+        Each uploaded binary is stored. Click <strong>Rollback</strong> to restore a previous version as the active OTA binary.
+      </p>
+      <div class="table-wrap">
+        <table id="tbl-history">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Version</th>
+              <th>Uploaded</th>
+              <th>Size</th>
+              <th>Flash result</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-history">
+            <tr><td colspan="6" class="muted" style="text-align:center">No history yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ TAB: METRICS ═══════════════════════════════ -->
+<div id="tab-metrics" class="tab-content">
+  <div class="tab-inner">
+    <div class="card">
+      <div class="metrics-header">
+        <h2>Metrics</h2>
+        <div class="metrics-controls">
+          <select id="sel-hours">
+            <option value="1">Last 1 h</option>
+            <option value="6">Last 6 h</option>
+            <option value="24" selected>Last 24 h</option>
+            <option value="168">Last 7 d</option>
+          </select>
+          <button class="btn btn-secondary" id="btn-refresh-metrics">Refresh</button>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-box">
+          <div class="chart-title">Internal Temperature (°C)</div>
+          <canvas id="chart-temp" height="180"></canvas>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">Life Counter</div>
+          <canvas id="chart-life" height="180"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="/static/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

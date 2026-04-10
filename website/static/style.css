@@ -485,6 +485,180 @@ main.grid {
 }
 
 /* ───────────────────────────────────────────────────────────────
+   Alert banner
+─────────────────────────────────────────────────────────────── */
+.alert-banner {
+  display      : flex;
+  align-items  : center;
+  gap          : 10px;
+  padding      : 10px 20px;
+  font-size    : 13px;
+  font-family  : var(--font-mono);
+  position     : sticky;
+  top          : 0;
+  z-index      : 100;
+  border-bottom: 2px solid transparent;
+}
+
+.alert-banner.alert-high_temp   { background: rgba(218,54,51,.15); border-color: var(--red);    color: var(--red-h); }
+.alert-banner.alert-life_stall  { background: rgba(158,106,3,.15); border-color: var(--yellow); color: var(--yellow-h); }
+.alert-banner.alert-esp_offline { background: rgba(31,111,235,.15);border-color: var(--blue);   color: var(--blue-h); }
+
+.alert-banner span:first-child { font-size: 18px; flex-shrink: 0; }
+.alert-banner .alert-close { margin-left: auto; padding: 2px 8px; min-height: unset; }
+
+/* ───────────────────────────────────────────────────────────────
+   Tab navigation
+─────────────────────────────────────────────────────────────── */
+.tab-nav {
+  display      : flex;
+  gap          : 0;
+  background   : var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding      : 0 16px;
+}
+
+.tab-btn {
+  padding      : 10px 20px;
+  background   : transparent;
+  border       : none;
+  border-bottom: 2px solid transparent;
+  color        : var(--text-muted);
+  cursor       : pointer;
+  font-size    : 13px;
+  font-weight  : 600;
+  margin-bottom: -1px;
+  transition   : color 0.15s, border-color 0.15s;
+  min-height   : unset;
+}
+
+.tab-btn:hover  { color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--blue); }
+
+/* ───────────────────────────────────────────────────────────────
+   Tab content
+─────────────────────────────────────────────────────────────── */
+.tab-content         { display: none; }
+.tab-content.active  { display: block; }
+
+.tab-inner {
+  padding: 16px;
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Alert config row
+─────────────────────────────────────────────────────────────── */
+.alert-cfg-row {
+  display    : flex;
+  gap        : 8px;
+  align-items: flex-end;
+  flex-wrap  : wrap;
+}
+
+.alert-cfg-row .input-labeled { flex: 1; min-width: 100px; }
+.alert-cfg-row .btn { align-self: flex-end; }
+
+/* ───────────────────────────────────────────────────────────────
+   Firmware history table
+─────────────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width          : 100%;
+  border-collapse: collapse;
+  font-size      : 13px;
+}
+
+thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  text-align    : left;
+  color         : var(--text-muted);
+  font-size     : 11px;
+  font-weight   : 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding       : 8px 12px;
+}
+
+td {
+  padding      : 10px 12px;
+  border-bottom: 1px solid var(--surface2);
+  vertical-align: middle;
+}
+
+tbody tr:hover { background: var(--surface2); }
+
+.ver-tag {
+  font-family  : var(--font-mono);
+  font-size    : 13px;
+  color        : var(--term-green);
+  font-weight  : 600;
+}
+
+.badge {
+  display      : inline-block;
+  padding      : 2px 8px;
+  border-radius: 10px;
+  font-size    : 11px;
+  font-weight  : 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-ok      { background: rgba(63,185,80,.15);  color: var(--term-green); border: 1px solid rgba(63,185,80,.3); }
+.badge-err     { background: rgba(248,81,73,.15);  color: var(--red-h);      border: 1px solid rgba(248,81,73,.3); }
+.badge-pending { background: rgba(158,106,3,.15);  color: var(--yellow-h);   border: 1px solid rgba(158,106,3,.3); }
+
+.btn-sm { padding: 4px 10px; font-size: 12px; min-height: unset; }
+
+/* ───────────────────────────────────────────────────────────────
+   Metrics charts
+─────────────────────────────────────────────────────────────── */
+.metrics-header {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  margin-bottom  : 16px;
+  padding-bottom : 10px;
+  border-bottom  : 1px solid var(--border);
+}
+
+.metrics-header h2 { margin-bottom: 0; padding-bottom: 0; border: none; }
+
+.metrics-controls {
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+}
+
+.charts-grid {
+  display              : grid;
+  grid-template-columns: 1fr 1fr;
+  gap                  : 16px;
+}
+
+.chart-box {
+  background   : var(--surface2);
+  border       : 1px solid var(--border);
+  border-radius: var(--radius);
+  padding      : 12px;
+}
+
+.chart-title {
+  font-size    : 11px;
+  color        : var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  font-weight  : 600;
+}
+
+/* ───────────────────────────────────────────────────────────────
    Responsive — Tablet (≤900px)
 ─────────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -606,4 +780,15 @@ main.grid {
 
   /* Feedback text */
   .feedback { font-size: 11px; }
+
+  /* Charts stack vertically */
+  .charts-grid { grid-template-columns: 1fr; }
+
+  /* Tab nav scroll */
+  .tab-nav { padding: 0 8px; overflow-x: auto; }
+  .tab-btn { padding: 8px 14px; font-size: 12px; white-space: nowrap; }
+
+  /* Alert cfg */
+  .alert-cfg-row { flex-direction: column; }
+  .alert-cfg-row .btn { width: 100%; }
 }

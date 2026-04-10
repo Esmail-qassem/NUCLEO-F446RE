@@ -5,49 +5,52 @@
 // ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-const dotConn    = $("dot-conn");
-const dotEsp     = $("dot-esp");
-const lblConn    = $("lbl-conn");
-const lblEsp     = $("lbl-esp");
-const lblRtc     = $("lbl-rtc");
-const lblTemp    = $("lbl-temp");
-const lblLife    = $("lbl-life");
-const lblEcuVer  = $("lbl-ecu-ver");
-const lblSrvVer  = $("lbl-srv-ver");
-const termPort   = $("term-port");
-const terminal   = $("terminal");
-const selPort    = $("sel-port");
-const selBaud    = $("sel-baud");
-const btnConnect = $("btn-connect");
-const cmdBtns    = document.querySelectorAll(".cmd-btn");
-const chBtns     = document.querySelectorAll(".ch-btn");
+const dotConn      = $("dot-conn");
+const dotEsp       = $("dot-esp");
+const lblConn      = $("lbl-conn");
+const lblEsp       = $("lbl-esp");
+const lblRtc       = $("lbl-rtc");
+const lblTemp      = $("lbl-temp");
+const lblLife      = $("lbl-life");
+const lblEcuVer    = $("lbl-ecu-ver");
+const lblSrvVer    = $("lbl-srv-ver");
+const termPort     = $("term-port");
+const terminal     = $("terminal");
+const selPort      = $("sel-port");
+const selBaud      = $("sel-baud");
+const btnConnect   = $("btn-connect");
+const cmdBtns      = document.querySelectorAll(".cmd-btn");
+const chBtns       = document.querySelectorAll(".ch-btn");
 const cmdFeedback  = $("cmd-feedback");
-const inpRaw     = $("inp-raw");
-const btnRaw     = $("btn-raw");
-const dropZone   = $("drop-zone");
-const dropInner  = $("drop-inner");
-const inpFile    = $("inp-file");
-const fileInfo   = $("file-info");
-const fiName     = $("fi-name");
-const fiSize     = $("fi-size");
+const inpRaw       = $("inp-raw");
+const btnRaw       = $("btn-raw");
+const dropZone     = $("drop-zone");
+const inpFile      = $("inp-file");
+const fileInfo     = $("file-info");
+const fiName       = $("fi-name");
+const fiSize       = $("fi-size");
 const btnClearFile = $("btn-clear-file");
-const inpVersion = $("inp-version");
-const btnUpload  = $("btn-upload");
+const inpVersion   = $("inp-version");
+const btnUpload    = $("btn-upload");
 const progressWrap = $("upload-progress");
 const progressBar  = $("progress-bar");
 const uploadFeedback = $("upload-feedback");
-const chkScroll  = $("chk-scroll");
+const chkScroll    = $("chk-scroll");
 const btnClearTerm = $("btn-clear-term");
-const flashToast = $("flash-toast");
+const flashToast   = $("flash-toast");
+const alertBanner  = $("alert-banner");
+const alertMsg     = $("alert-msg");
+const alertIcon    = $("alert-icon");
+const tbodyHistory = $("tbody-history");
 
 // ──────────────────────────────────────────────────────────────────
 //  State
 // ──────────────────────────────────────────────────────────────────
-let isConnected    = false;
-let espIp          = null;
-let selectedFile   = null;
-let toastTimer     = null;
-let activeChannel  = "both";   // "wire" | "wifi" | "both"
+let isConnected  = false;
+let espIp        = null;
+let selectedFile = null;
+let toastTimer   = null;
+let activeChannel = "both";
 const MAX_TERM_LEN = 50_000;
 
 // ──────────────────────────────────────────────────────────────────
@@ -57,35 +60,41 @@ const socket = io({ transports: ["websocket", "polling"] });
 
 socket.on("connect",    () => console.log("[ws] connected"));
 socket.on("disconnect", () => applyState({ connected: false }));
-socket.on("state", applyState);
-socket.on("terminal", ({ data }) => appendTerminal(data));
+socket.on("state",      applyState);
+socket.on("terminal",   ({ data }) => appendTerminal(data));
+socket.on("firmware_history", renderHistory);
 
 socket.on("flash_result", ({ version, status }) => {
   const ok  = status === "ok";
-  const msg = ok
-    ? `✅  Flash OK  —  v${version}`
-    : `❌  Flash FAILED  —  v${version}`;
+  const msg = ok ? `✅  Flash OK — v${version}` : `❌  Flash FAILED — v${version}`;
   showToast(msg, ok ? "ok" : "err");
   appendTerminal(`\n[OTA] ${msg}\n`);
 });
 
+socket.on("alert", ({ kind, message, ts }) => {
+  const icons = { HIGH_TEMP: "🌡", LIFE_STALL: "💀", ESP_OFFLINE: "📡" };
+  alertIcon.textContent = icons[kind] || "⚠";
+  alertMsg.textContent  = `[${ts}] ${message}`;
+  alertBanner.className = `alert-banner alert-${kind.toLowerCase()}`;
+  alertBanner.style.display = "flex";
+  // Browser notification (if permitted)
+  if (Notification.permission === "granted") {
+    new Notification("ECU Alert", { body: message, icon: "" });
+  }
+});
+
 // ──────────────────────────────────────────────────────────────────
-//  Apply state from server
+//  Apply state
 // ──────────────────────────────────────────────────────────────────
 function applyState(s) {
   if (s.connected !== undefined) {
     isConnected = s.connected;
-    dotConn.className  = "dot" + (isConnected ? " online" : "");
-    lblConn.textContent = isConnected
-      ? `${s.serial_port} · ${s.baud}`
-      : "Disconnected";
+    dotConn.className      = "dot" + (isConnected ? " online" : "");
+    lblConn.textContent    = isConnected ? `${s.serial_port} · ${s.baud}` : "Disconnected";
     btnConnect.textContent = isConnected ? "Disconnect" : "Connect";
-    termPort.textContent   = isConnected
-      ? `(${s.serial_port} · ${s.baud})`
-      : "(not connected)";
+    termPort.textContent   = isConnected ? `(${s.serial_port} · ${s.baud})` : "(not connected)";
   }
 
-  // ESP WiFi status
   if ("esp_ip" in s) {
     espIp = s.esp_ip;
     const up = !!espIp;
@@ -95,12 +104,12 @@ function applyState(s) {
 
   updateCmdAvailability();
 
-  if (s.rtc_time)      lblRtc.textContent  = s.rtc_time;
-  if (s.temperature)   lblTemp.textContent = s.temperature;
-  if (s.life_counter)  lblLife.textContent = s.life_counter;
+  if (s.rtc_time)      lblRtc.textContent    = s.rtc_time;
+  if (s.temperature)   lblTemp.textContent   = s.temperature;
+  if (s.life_counter)  lblLife.textContent   = s.life_counter;
   if (s.ecu_version)   lblEcuVer.textContent = s.ecu_version;
   if (s.server_version) {
-    lblSrvVer.textContent = s.server_version;
+    lblSrvVer.textContent  = s.server_version;
     inpVersion.placeholder = nextPatch(s.server_version);
   }
 
@@ -112,9 +121,7 @@ function applyState(s) {
 }
 
 function updateCmdAvailability() {
-  const wireOk = isConnected;
-  const wifiOk = !!espIp;
-
+  const wireOk = isConnected, wifiOk = !!espIp;
   cmdBtns.forEach(b => {
     switch (activeChannel) {
       case "wire": b.disabled = !wireOk; break;
@@ -133,6 +140,48 @@ function nextPatch(ver) {
 }
 
 // ──────────────────────────────────────────────────────────────────
+//  Alert banner
+// ──────────────────────────────────────────────────────────────────
+function dismissAlert() {
+  alertBanner.style.display = "none";
+}
+
+// Request browser notification permission on load
+if ("Notification" in window && Notification.permission === "default") {
+  Notification.requestPermission();
+}
+
+// ──────────────────────────────────────────────────────────────────
+//  Alert config form
+// ──────────────────────────────────────────────────────────────────
+$("btn-save-alerts").addEventListener("click", async () => {
+  const payload = {
+    temp_threshold: parseInt($("inp-temp-thresh").value),
+    life_stall_s  : parseInt($("inp-life-stall").value),
+  };
+  try {
+    const res = await fetch("/api/alert_config", {
+      method : "POST",
+      headers: { "Content-Type": "application/json" },
+      body   : JSON.stringify(payload),
+    });
+    if (res.ok) setFeedback($("alert-cfg-feedback"), "✅ Alert config saved", "ok");
+    else        setFeedback($("alert-cfg-feedback"), "Save failed", "err");
+  } catch {
+    setFeedback($("alert-cfg-feedback"), "Network error", "err");
+  }
+});
+
+// Load current alert config
+(async () => {
+  try {
+    const cfg = await (await fetch("/api/alert_config")).json();
+    $("inp-temp-thresh").value = cfg.temp_threshold ?? 55;
+    $("inp-life-stall").value  = cfg.life_stall_s   ?? 60;
+  } catch {}
+})();
+
+// ──────────────────────────────────────────────────────────────────
 //  Channel selector
 // ──────────────────────────────────────────────────────────────────
 chBtns.forEach(btn => {
@@ -145,30 +194,40 @@ chBtns.forEach(btn => {
 });
 
 // ──────────────────────────────────────────────────────────────────
+//  Tab navigation
+// ──────────────────────────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    $(btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab === "tab-metrics") loadMetrics();
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────
 //  Terminal
 // ──────────────────────────────────────────────────────────────────
 function appendTerminal(text) {
   terminal.textContent += text;
-  if (terminal.textContent.length > MAX_TERM_LEN) {
+  if (terminal.textContent.length > MAX_TERM_LEN)
     terminal.textContent = terminal.textContent.slice(-MAX_TERM_LEN / 2);
-  }
   if (chkScroll.checked) terminal.scrollTop = terminal.scrollHeight;
 }
 
 btnClearTerm.addEventListener("click", () => { terminal.textContent = ""; });
 
 // ──────────────────────────────────────────────────────────────────
-//  Connect / disconnect
+//  Connect / Disconnect
 // ──────────────────────────────────────────────────────────────────
 async function loadPorts() {
   try {
-    const res   = await fetch("/api/ports");
-    const ports = await res.json();
+    const ports = await (await fetch("/api/ports")).json();
     selPort.innerHTML = "";
     ports.forEach(({ port, desc }) => {
       const opt = document.createElement("option");
-      opt.value       = port;
-      opt.textContent = `${port}  –  ${desc}`;
+      opt.value = port; opt.textContent = `${port}  –  ${desc}`;
       selPort.appendChild(opt);
     });
     if (!ports.length) {
@@ -196,7 +255,7 @@ btnConnect.addEventListener("click", async () => {
 });
 
 // ──────────────────────────────────────────────────────────────────
-//  Control commands
+//  Commands
 // ──────────────────────────────────────────────────────────────────
 cmdBtns.forEach(btn => {
   btn.addEventListener("click", async () => {
@@ -214,7 +273,7 @@ cmdBtns.forEach(btn => {
       } else {
         setFeedback(cmdFeedback, data.error, "err");
       }
-    } catch (e) {
+    } catch {
       setFeedback(cmdFeedback, "Request failed", "err");
     }
   });
@@ -227,7 +286,6 @@ function channelLabel(wire, wifi) {
   return "[no channel]";
 }
 
-// Raw byte sender
 inpRaw.addEventListener("keydown", e => { if (e.key === "Enter") btnRaw.click(); });
 btnRaw.addEventListener("click", () => {
   const hex = inpRaw.value.trim();
@@ -241,47 +299,33 @@ btnRaw.addEventListener("click", () => {
 //  Firmware upload
 // ──────────────────────────────────────────────────────────────────
 dropZone.addEventListener("click", () => inpFile.click());
-
-dropZone.addEventListener("dragover", e => {
-  e.preventDefault();
-  dropZone.classList.add("drag-over");
-});
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
 dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
 dropZone.addEventListener("drop", e => {
-  e.preventDefault();
-  dropZone.classList.remove("drag-over");
-  const file = e.dataTransfer.files[0];
-  if (file) selectFile(file);
+  e.preventDefault(); dropZone.classList.remove("drag-over");
+  if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
 });
-inpFile.addEventListener("change", () => {
-  if (inpFile.files[0]) selectFile(inpFile.files[0]);
-});
+inpFile.addEventListener("change", () => { if (inpFile.files[0]) selectFile(inpFile.files[0]); });
 
 function selectFile(file) {
-  selectedFile            = file;
-  fiName.textContent      = file.name;
-  fiSize.textContent      = formatBytes(file.size);
-  fileInfo.style.display  = "flex";
-  dropZone.style.display  = "none";
+  selectedFile = file;
+  fiName.textContent = file.name;
+  fiSize.textContent = formatBytes(file.size);
+  fileInfo.style.display = "flex";
+  dropZone.style.display = "none";
   const m = file.name.match(/(\d+\.\d+\.\d+)/);
   if (m && !inpVersion.value) inpVersion.value = m[1];
 }
 
 btnClearFile.addEventListener("click", () => {
-  selectedFile           = null;
-  inpFile.value          = "";
-  fileInfo.style.display = "none";
-  dropZone.style.display = "block";
+  selectedFile = null; inpFile.value = "";
+  fileInfo.style.display = "none"; dropZone.style.display = "block";
 });
 
 btnUpload.addEventListener("click", async () => {
-  if (!selectedFile) {
-    setFeedback(uploadFeedback, "Select a .bin file first", "err"); return;
-  }
+  if (!selectedFile) { setFeedback(uploadFeedback, "Select a .bin file first", "err"); return; }
   const version = inpVersion.value.trim();
-  if (!version) {
-    setFeedback(uploadFeedback, "Enter a version tag (e.g. 1.0.6)", "err"); return;
-  }
+  if (!version) { setFeedback(uploadFeedback, "Enter a version tag (e.g. 1.0.6)", "err"); return; }
 
   const form = new FormData();
   form.append("firmware", selectedFile);
@@ -289,46 +333,137 @@ btnUpload.addEventListener("click", async () => {
 
   btnUpload.disabled = true;
   progressWrap.style.display = "block";
-  progressBar.style.width    = "0%";
+  progressBar.style.width = "0%";
   setFeedback(uploadFeedback, "Uploading…", "");
 
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/upload");
-
-    xhr.upload.onprogress = e => {
-      if (e.lengthComputable)
-        progressBar.style.width = `${(e.loaded / e.total * 100).toFixed(0)}%`;
-    };
-
-    xhr.onload = () => {
-      btnUpload.disabled = false;
-      progressBar.style.width = "100%";
-      try {
-        const data = JSON.parse(xhr.responseText);
-        if (data.ok) {
-          setFeedback(uploadFeedback,
-            `✅  v${data.version} uploaded  (${formatBytes(data.size)})`, "ok");
-          setTimeout(() => { progressWrap.style.display = "none"; }, 1200);
-        } else {
-          setFeedback(uploadFeedback, data.error || "Upload failed", "err");
-        }
-      } catch {
-        setFeedback(uploadFeedback, "Unexpected server response", "err");
-      }
-    };
-
-    xhr.onerror = () => {
-      btnUpload.disabled = false;
-      setFeedback(uploadFeedback, "Network error", "err");
-    };
-
-    xhr.send(form);
-  } catch (e) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/upload");
+  xhr.upload.onprogress = e => {
+    if (e.lengthComputable)
+      progressBar.style.width = `${(e.loaded / e.total * 100).toFixed(0)}%`;
+  };
+  xhr.onload = () => {
     btnUpload.disabled = false;
-    setFeedback(uploadFeedback, `Error: ${e.message}`, "err");
-  }
+    progressBar.style.width = "100%";
+    try {
+      const data = JSON.parse(xhr.responseText);
+      if (data.ok) {
+        setFeedback(uploadFeedback, `✅  v${data.version} uploaded  (${formatBytes(data.size)})`, "ok");
+        setTimeout(() => { progressWrap.style.display = "none"; }, 1200);
+      } else {
+        setFeedback(uploadFeedback, data.error || "Upload failed", "err");
+      }
+    } catch { setFeedback(uploadFeedback, "Server error", "err"); }
+  };
+  xhr.onerror = () => { btnUpload.disabled = false; setFeedback(uploadFeedback, "Network error", "err"); };
+  xhr.send(form);
 });
+
+// ──────────────────────────────────────────────────────────────────
+//  Firmware History
+// ──────────────────────────────────────────────────────────────────
+function renderHistory(rows) {
+  if (!rows || !rows.length) {
+    tbodyHistory.innerHTML = `<tr><td colspan="6" class="muted" style="text-align:center">No history yet</td></tr>`;
+    return;
+  }
+  tbodyHistory.innerHTML = rows.map(r => {
+    const result = r.flash_result || "pending";
+    const badge  = result === "ok"      ? "badge-ok"
+                 : result === "failed"  ? "badge-err"
+                 : "badge-pending";
+    const canRollback = result !== "pending";
+    return `<tr>
+      <td class="muted">#${r.id}</td>
+      <td><span class="ver-tag">v${r.version}</span></td>
+      <td class="muted">${r.uploaded_at}</td>
+      <td class="muted">${r.size ? formatBytes(r.size) : "–"}</td>
+      <td><span class="badge ${badge}">${result}</span></td>
+      <td>${canRollback
+        ? `<button class="btn btn-secondary btn-sm"
+             onclick="doRollback('${r.version}')">Rollback</button>`
+        : "–"}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function doRollback(version) {
+  if (!confirm(`Restore v${version} as active OTA firmware?`)) return;
+  try {
+    const res  = await fetch(`/api/rollback/${version}`, { method: "POST" });
+    const data = await res.json();
+    if (data.ok) showToast(`✅ Rolled back to v${version}`, "ok");
+    else         showToast(`❌ Rollback failed: ${data.error}`, "err");
+  } catch {
+    showToast("Rollback request failed", "err");
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+//  Metrics charts
+// ──────────────────────────────────────────────────────────────────
+let chartTemp = null;
+let chartLife = null;
+
+const CHART_OPTS = {
+  responsive: true,
+  animation : false,
+  plugins   : { legend: { display: false } },
+  scales    : {
+    x: {
+      ticks: { color: "#8b949e", maxTicksLimit: 8, maxRotation: 0 },
+      grid : { color: "#21262d" },
+    },
+    y: {
+      ticks: { color: "#8b949e" },
+      grid : { color: "#21262d" },
+    },
+  },
+};
+
+function buildCharts() {
+  const ctxT = $("chart-temp").getContext("2d");
+  const ctxL = $("chart-life").getContext("2d");
+
+  chartTemp = new Chart(ctxT, {
+    type: "line",
+    data: { labels: [], datasets: [{ data: [], borderColor: "#f85149", backgroundColor: "rgba(248,81,73,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] },
+    options: { ...CHART_OPTS, scales: { ...CHART_OPTS.scales, y: { ...CHART_OPTS.scales.y, title: { display: true, text: "°C", color: "#8b949e" } } } },
+  });
+
+  chartLife = new Chart(ctxL, {
+    type: "line",
+    data: { labels: [], datasets: [{ data: [], borderColor: "#3fb950", backgroundColor: "rgba(63,185,80,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] },
+    options: { ...CHART_OPTS },
+  });
+}
+
+async function loadMetrics() {
+  const hours = $("sel-hours").value;
+  try {
+    const rows = await (await fetch(`/api/metrics?hours=${hours}`)).json();
+
+    const labels = rows.map(r => {
+      const d = new Date(r.ts);
+      return `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+    });
+    const temps  = rows.map(r => r.temperature);
+    const lifes  = rows.map(r => r.life_counter);
+
+    chartTemp.data.labels                  = labels;
+    chartTemp.data.datasets[0].data        = temps;
+    chartTemp.update();
+
+    chartLife.data.labels                  = labels;
+    chartLife.data.datasets[0].data        = lifes;
+    chartLife.update();
+  } catch (e) {
+    console.error("Metrics load failed", e);
+  }
+}
+
+$("btn-refresh-metrics").addEventListener("click", loadMetrics);
+$("sel-hours").addEventListener("change", loadMetrics);
 
 // ──────────────────────────────────────────────────────────────────
 //  Toast
@@ -350,8 +485,8 @@ function setFeedback(el, msg, cls) {
 }
 
 function formatBytes(n) {
-  if (n < 1024)         return `${n} B`;
-  if (n < 1024 * 1024)  return `${(n / 1024).toFixed(1)} KB`;
+  if (n < 1024)        return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / 1024 / 1024).toFixed(2)} MB`;
 }
 
@@ -366,5 +501,12 @@ function formatBytes(n) {
   try {
     const s = await (await fetch("/api/state")).json();
     applyState(s);
-  } catch { /* server not ready yet */ }
+  } catch {}
+
+  buildCharts();
+
+  try {
+    const rows = await (await fetch("/api/firmware_history")).json();
+    renderHistory(rows);
+  } catch {}
 })();
