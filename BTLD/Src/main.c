@@ -61,6 +61,7 @@ int main (void)
   //NVIC_EnableInterrupt(UART2_IQ_NUM);
   SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS,&systick_handler);
   FlashDrv_EraseSector(2);
+  FlashDrv_EraseSector(3);
   CRC32_Init();
   CallBackFunctions();
 while(1) 

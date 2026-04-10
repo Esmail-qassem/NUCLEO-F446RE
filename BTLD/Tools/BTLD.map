@@ -94,7 +94,7 @@ Linker script and memory map
                 0x08004000                Vector_Table
                 0x08004178                . = ALIGN (0x4)
 
-.text           0x08004178     0x1ebc
+.text           0x08004178     0x1ec0
                 0x08004178                . = ALIGN (0x4)
  *(.text)
  .text          0x08004178        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -405,64 +405,64 @@ Linker script and memory map
  .text.systick_handler
                 0x08005ea0       0x44 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
                 0x08005ea0                systick_handler
- .text.main     0x08005ee4       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .text.main     0x08005ee4       0x68 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
                 0x08005ee4                main
  .text.APP_init
-                0x08005f48       0x28 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005f48                APP_init
+                0x08005f4c       0x28 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005f4c                APP_init
  .text.GPIO_PIN_CONFIG
-                0x08005f70       0x84 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005f70                GPIO_PIN_CONFIG
+                0x08005f74       0x84 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005f74                GPIO_PIN_CONFIG
  .text.SystemInit
-                0x08005ff4       0x2c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08005ff4                SystemInit
+                0x08005ff8       0x2c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08005ff8                SystemInit
  .text.CallBackFunctions
-                0x08006020       0x14 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x08006020                CallBackFunctions
-                0x08006034                . = ALIGN (0x4)
-                0x08006034                _etext = .
+                0x08006024       0x14 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x08006024                CallBackFunctions
+                0x08006038                . = ALIGN (0x4)
+                0x08006038                _etext = .
 
-.glue_7         0x08006034        0x0
- .glue_7        0x08006034        0x0 linker stubs
+.glue_7         0x08006038        0x0
+ .glue_7        0x08006038        0x0 linker stubs
 
-.glue_7t        0x08006034        0x0
- .glue_7t       0x08006034        0x0 linker stubs
+.glue_7t        0x08006038        0x0
+ .glue_7t       0x08006038        0x0 linker stubs
 
-.vfp11_veneer   0x08006034        0x0
- .vfp11_veneer  0x08006034        0x0 linker stubs
+.vfp11_veneer   0x08006038        0x0
+ .vfp11_veneer  0x08006038        0x0 linker stubs
 
-.v4_bx          0x08006034        0x0
- .v4_bx         0x08006034        0x0 linker stubs
+.v4_bx          0x08006038        0x0
+ .v4_bx         0x08006038        0x0 linker stubs
 
-.iplt           0x08006034        0x0
- .iplt          0x08006034        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x08006038        0x0
+ .iplt          0x08006038        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x08006034      0x198
-                0x08006034                . = ALIGN (0x4)
+.rodata         0x08006038      0x198
+                0x08006038                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x08006034        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x0800603a        0x2 
- .rodata        0x0800603c       0x47 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08006083        0x1 
- .rodata        0x08006084       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .rodata        0x08006038        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x0800603e        0x2 
+ .rodata        0x08006040       0x47 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x08006087        0x1 
+ .rodata        0x08006088       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  *(.rodata*)
- *fill*         0x080060ed        0x3 
+ *fill*         0x080060f1        0x3 
  .rodata.asciiToHex
-                0x080060f0       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
- *fill*         0x08006159        0x3 
+                0x080060f4       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
+ *fill*         0x0800615d        0x3 
  .rodata.MSP_Value
-                0x0800615c        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
-                0x0800615c                MSP_Value
+                0x08006160        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
+                0x08006160                MSP_Value
  .rodata.asciiToHex
-                0x08006160       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
-                0x080061cc                . = ALIGN (0x4)
- *fill*         0x080061c9        0x3 
-                0x080061cc                _sidata = LOADADDR (.data)
+                0x08006164       0x69 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+                0x080061d0                . = ALIGN (0x4)
+ *fill*         0x080061cd        0x3 
+                0x080061d0                _sidata = LOADADDR (.data)
 
-.rel.dyn        0x080061cc        0x0
- .rel.iplt      0x080061cc        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x080061d0        0x0
+ .rel.iplt      0x080061d0        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x1c load address 0x080061cc
+.data           0x20000000       0x1c load address 0x080061d0
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdata = .
  *(.data)
@@ -488,10 +488,10 @@ Linker script and memory map
                 0x2000001c                . = ALIGN (0x4)
                 0x2000001c                _edata = .
 
-.igot.plt       0x2000001c        0x0 load address 0x080061e8
+.igot.plt       0x2000001c        0x0 load address 0x080061ec
  .igot.plt      0x2000001c        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x2000001c      0x44c load address 0x080061e8
+.bss            0x2000001c      0x44c load address 0x080061ec
                 0x2000001c                _sbss = .
  *(.bss)
  .bss           0x2000001c        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -564,7 +564,7 @@ Linker script and memory map
                 0x20000468                _ebss = .
 
 ._user_heap_stack
-                0x20000468     0x1200 load address 0x080061e8
+                0x20000468     0x1200 load address 0x080061ec
                 0x20000468                . = ALIGN (0x8)
                 0x20000668                . = (. + _Min_Heap_Size)
  *fill*         0x20000468      0x200 
@@ -663,7 +663,7 @@ LOAD linker stubs
  .debug_macro   0x00001196       0x9a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
  .debug_macro   0x00001230       0x76 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
-.debug_line     0x00000000     0x1863
+.debug_line     0x00000000     0x1864
  .debug_line    0x00000000      0x2c0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -672,7 +672,7 @@ LOAD linker stubs
  .debug_line    0x00000c9e      0x597 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/FLASH/src/FLASH.o
  .debug_line    0x00001235      0x34d C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Parse/Parse.o
  .debug_line    0x00001582       0xe1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00001663      0x200 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
+ .debug_line    0x00001663      0x201 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/Src/main.o
 
 .debug_str      0x00000000     0x54c9
  .debug_str     0x00000000     0x34ab C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BTLD/Build/Object/MCAL/RCC/src/RCC_program.o

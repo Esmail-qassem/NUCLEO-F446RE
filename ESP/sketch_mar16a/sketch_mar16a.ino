@@ -2,44 +2,73 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <WiFiClient.h>
+#include <WiFiUdp.h>
 
 /*===========================================================================
                         CONFIGURATION
 ===========================================================================*/
-#define WIFI_SSID           "ZzZz"
-#define WIFI_PASSWORD       "Esmail_122001"
-#define SERVER_IP           "192.168.1.2"
-#define SERVER_PORT         5000
-#define POLL_INTERVAL_MS    30000
-#define RESET_PIN           D1
-#define STM32_BAUD          115200
+#define WIFI_SSID        "ZzZz"
+#define WIFI_PASSWORD    "Esmail_122001"
+#define SERVER_IP        "192.168.1.2"
+#define SERVER_PORT      5000
+#define TELEMETRY_PORT   5001          /* UDP — fire-and-forget, no handshake */
+#define POLL_INTERVAL_MS 30000
+#define RESET_PIN        D1
+#define STM32_BAUD       115200
 
-/* Command bytes — must match COMMANDS dict in server.py and ISRs in SwM.c */
-#define CMD_LED_ON          0x01
-#define CMD_LED_OFF         0x02
-#define CMD_BTLD_JUMP       0x03
-#define CMD_TRIGGER_OTA     0x04
-#define CMD_RUN_TIME        0x05
-#define CMD_GET_VERSION     0xA1
+#define CMD_LED_ON      0x01
+#define CMD_LED_OFF     0x02
+#define CMD_BTLD_JUMP   0x03
+#define CMD_TRIGGER_OTA 0x04
+#define CMD_RUN_TIME    0x05
+#define CMD_GET_VERSION 0xA1
 
 /*===========================================================================
                         GLOBALS
 ===========================================================================*/
-ESP8266WebServer cmdServer(80);   /* HTTP server for dashboard commands */
+ESP8266WebServer cmdServer(80);
+WiFiUDP          udp;
 
-String   currentVersion = "0.0.0";
+String   currentVersion = "";
 uint32_t lastPollTime   = 0;
+uint32_t lastRegTime    = 0;
 bool     flashing       = false;
-bool     otaTrigger     = false;   /* set true → force OTA on next poll */
-bool     forceOTA       = false;   /* set true → bypass version match   */
+bool     otaTrigger     = false;
+bool     forceOTA       = false;
+
+/* Serial line accumulator — non-blocking */
+String   rxBuf = "";
 
 /*===========================================================================
-                        DEBUG  (suppressed while flashing)
+                        UDP TELEMETRY  — ~0 ms, no TCP handshake
 ===========================================================================*/
-void dbg(const String& msg)
+void sendTelemetry(const String& line)
 {
-    if (!flashing)
-        Serial.println("[ESP] " + msg);
+    udp.beginPacket(SERVER_IP, TELEMETRY_PORT);
+    udp.write((const uint8_t*)line.c_str(), line.length());
+    udp.endPacket();
+}
+
+/*===========================================================================
+                        HTTP HELPERS
+===========================================================================*/
+static String serverUrl(const char* path)
+{
+    return "http://" SERVER_IP ":" + String(SERVER_PORT) + path;
+}
+
+static int httpPost(const String& url, const String& body,
+                    const char* ct = "application/x-www-form-urlencoded",
+                    int timeout = 2000)
+{
+    WiFiClient  client;
+    HTTPClient  http;
+    http.begin(client, url);
+    http.addHeader("Content-Type", ct);
+    http.setTimeout(timeout);
+    int code = http.POST(body);
+    http.end();
+    return code;
 }
 
 /*===========================================================================
@@ -47,334 +76,218 @@ void dbg(const String& msg)
 ===========================================================================*/
 void connectWiFi()
 {
-    dbg("Connecting to WiFi...");
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-    int attempts = 0;
+    uint32_t t = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
-        delay(500);
-        if (++attempts > 40)
-        {
-            dbg("WiFi failed! Restarting...");
-            ESP.restart();
-        }
+        if (millis() - t > 15000) { ESP.restart(); }
+        delay(250);
+        yield();
     }
-    dbg("WiFi OK  IP: " + WiFi.localIP().toString());
-    delay(1000);   /* let the IP stack settle before any HTTP call */
 }
 
 /*===========================================================================
-                        REGISTER WITH FLASK SERVER
-                        Server stores our IP → can push commands to us
+                        REGISTER WITH SERVER
 ===========================================================================*/
-bool registerWithServer()
+void registerWithServer()
 {
-    /* Retry up to 5 times — -1 (connection refused) happens when the
-       network stack isn't fully ready or the server is momentarily busy. */
-    for (int attempt = 1; attempt <= 5; attempt++)
+    String body = "ip=" + WiFi.localIP().toString();
+    for (int i = 0; i < 3; i++)
     {
-        WiFiClient client;
-        HTTPClient http;
-
-        String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT)
-                     + "/api/esp_register";
-        http.begin(client, url);
-        http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        http.setTimeout(3000);
-
-        String body = "ip=" + WiFi.localIP().toString();
-        int    code = http.POST(body);
-        http.end();
-
-        dbg("Register attempt " + String(attempt) + "/5 → " + String(code));
-
-        if (code == 200)
-        {
-            dbg("Registered OK  (" + WiFi.localIP().toString() + ")");
-            return true;
-        }
-        if (attempt < 5) delay(3000);
+        if (httpPost(serverUrl("/api/esp_register"), body) == 200) return;
+        if (i < 2) delay(1500);
     }
-    dbg("Registration failed — will retry in loop");
-    return false;
 }
 
 /*===========================================================================
-                        HTTP SERVER  — /cmd
-                        Called by the Flask server to forward commands
+                        HTTP /cmd  — commands from dashboard
 ===========================================================================*/
 void handleCmd()
 {
     if (!cmdServer.hasArg("byte"))
     {
-        cmdServer.send(400, "text/plain", "missing param: byte");
+        cmdServer.send(400, "text/plain", "missing byte");
         return;
     }
-
     uint8_t b = (uint8_t)strtol(cmdServer.arg("byte").c_str(), NULL, 16);
 
     if (b == CMD_TRIGGER_OTA)
     {
-        /* "Trigger Update" via WiFi → force OTA poll immediately */
         otaTrigger = true;
         cmdServer.send(200, "text/plain", "ota_trigger");
-        dbg("OTA trigger via HTTP");
         return;
     }
-
     if (b == CMD_BTLD_JUMP)
     {
-        /* Forward PC3=LOW to STM32, then force OTA (which does reset+flash) */
-        if (!flashing)
-            Serial.write((uint8_t)CMD_BTLD_JUMP);
-        forceOTA   = true;
-        otaTrigger = true;
+        if (!flashing) Serial.write((uint8_t)CMD_BTLD_JUMP);
+        forceOTA = otaTrigger = true;
         cmdServer.send(200, "text/plain", "btld_jump+ota");
-        dbg("BTLD_Jump + force OTA via HTTP");
         return;
     }
 
-    /* All other commands → forward byte to STM32 UART1 */
-    if (!flashing)
-        Serial.write(b);
-
+    if (!flashing) Serial.write(b);
     cmdServer.send(200, "text/plain", "ok");
-    dbg("Forwarded 0x" + String(b, HEX) + " to STM32");
 }
 
-/*===========================================================================
-                        HTTP SERVER  — /health
-                        Dashboard can check ESP is alive and get its version
-===========================================================================*/
 void handleHealth()
 {
     String body = "{\"ip\":\"" + WiFi.localIP().toString()
-                + "\",\"rssi\":" + String(WiFi.RSSI())
-                + ",\"stm_ver\":\"" + currentVersion + "\"}";
+                + "\",\"rssi\":"        + String(WiFi.RSSI())
+                + ",\"stm_ver\":\""     + currentVersion + "\"}";
     cmdServer.send(200, "application/json", body);
 }
 
 /*===========================================================================
-                        GET STM32 VERSION  (0xA1 → UART1)
+                        GET STM32 VERSION
+        Sends 0xA1, waits for "VER:x.x.x\n", forwards all other lines
+        as telemetry so BTLD/APP output appears in the dashboard terminal.
 ===========================================================================*/
 String getSTM32Version()
 {
-    String   version = "";
-    uint32_t start   = millis();
-
-    while (Serial.available()) Serial.read();   /* flush RX */
+    while (Serial.available()) Serial.read();   /* flush stale bytes */
     Serial.write((uint8_t)CMD_GET_VERSION);
 
-    while (millis() - start < 1500)
+    String   line = "";
+    uint32_t end  = millis() + 3000;
+
+    while (millis() < end)
     {
-        if (Serial.available())
+        while (Serial.available())
         {
-            char c = Serial.read();
-            if (c == '\n' || c == '\r' || c == '\0') break;
-            if ((c >= '0' && c <= '9') || c == '.')
-                version += c;
+            char c = (char)Serial.read();
+            if (c == '\n')
+            {
+                line.trim();
+                if (line.startsWith("VER:"))
+                {
+                    String ver = line.substring(4);
+                    ver.trim();
+                    sendTelemetry(line);   /* update dashboard version pill */
+                    return ver;
+                }
+                if (line.length() > 0) sendTelemetry(line);
+                line = "";
+            }
+            else if (c != '\r' && line.length() < 128)
+            {
+                line += c;
+            }
         }
+        yield();
     }
-    version.trim();
-    dbg("STM32 ver: [" + version + "]");
-    return version;
+    return "";   /* timeout — STM not ready */
 }
 
 /*===========================================================================
-                        GET SERVER VERSION  (GET /version)
-===========================================================================*/
-String getServerVersion()
-{
-    WiFiClient client;
-    HTTPClient http;
-    String     version = "";
-
-    String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + "/version";
-    http.begin(client, url);
-
-    int code = http.GET();
-    if (code == HTTP_CODE_OK)
-    {
-        version = http.getString();
-        version.trim();
-        dbg("Server ver: " + version);
-    }
-    else
-    {
-        dbg("GET /version failed → " + String(code));
-    }
-    http.end();
-    return version;
-}
-
-/*===========================================================================
-                        STM32 HARDWARE RESET  (NRST pulse)
+                        OTA FLOW
 ===========================================================================*/
 void triggerSTM32Reset()
 {
     pinMode(RESET_PIN, OUTPUT);
     digitalWrite(RESET_PIN, LOW);
-    delay(100);
+    delay(50);
     pinMode(RESET_PIN, INPUT_PULLUP);
-    delay(1500);   /* bootloader init time */
+    delay(800);   /* bootloader needs ~500 ms to init */
 }
 
-/*===========================================================================
-                        DOWNLOAD FIRMWARE TO RAM
-===========================================================================*/
-uint8_t* downloadFirmware(int& totalBytes)
+String getServerVersion()
 {
-    Serial.end();   /* silence UART during heavy WiFi transfer */
+    WiFiClient client;
+    HTTPClient http;
+    http.begin(client, serverUrl("/version"));
+    http.setTimeout(3000);
+    String ver = "";
+    if (http.GET() == HTTP_CODE_OK) { ver = http.getString(); ver.trim(); }
+    http.end();
+    return ver;
+}
+
+uint8_t* downloadFirmware(int& outSize)
+{
+    Serial.end();   /* pause UART during heavy WiFi transfer */
 
     WiFiClient client;
     HTTPClient http;
-
-    String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + "/firmware";
-    http.begin(client, url);
+    http.begin(client, serverUrl("/firmware"));
     http.setTimeout(15000);
 
     int code = http.GET();
     if (code != HTTP_CODE_OK)
     {
         http.end();
-        Serial.begin(STM32_BAUD); delay(200);
+        Serial.begin(STM32_BAUD);
         return NULL;
     }
 
-    totalBytes = http.getSize();
-    if (totalBytes <= 0)
-    {
-        http.end();
-        Serial.begin(STM32_BAUD); delay(200);
-        return NULL;
-    }
+    outSize = http.getSize();
+    if (outSize <= 0) { http.end(); Serial.begin(STM32_BAUD); return NULL; }
 
-    uint8_t* buf = (uint8_t*)malloc(totalBytes);
-    if (!buf)
-    {
-        http.end();
-        Serial.begin(STM32_BAUD); delay(200);
-        return NULL;
-    }
+    uint8_t* buf = (uint8_t*)malloc(outSize);
+    if (!buf)      { http.end(); Serial.begin(STM32_BAUD); return NULL; }
 
-    WiFiClient* stream    = http.getStreamPtr();
-    int         totalRead = 0;
-    uint32_t    deadline  = millis() + 15000;
+    WiFiClient* stream   = http.getStreamPtr();
+    int         received = 0;
+    uint32_t    deadline = millis() + 20000;
 
-    while (totalRead < totalBytes && millis() < deadline)
+    while (received < outSize && millis() < deadline)
     {
         int avail = stream->available();
         if (avail > 0)
         {
-            int chunk  = min(avail, 128);
-            totalRead += stream->readBytes(buf + totalRead, chunk);
-            deadline   = millis() + 5000;
+            int n     = min(avail, 256);
+            received += stream->readBytes(buf + received, n);
         }
         yield();
     }
 
     http.end();
-    Serial.begin(STM32_BAUD); delay(500);
+    Serial.begin(STM32_BAUD);
+    delay(200);
 
-    if (totalRead != totalBytes)
-    {
-        free(buf);
-        dbg("Download incomplete: " + String(totalRead) + "/" + String(totalBytes));
-        return NULL;
-    }
-    dbg("Downloaded " + String(totalBytes) + " bytes");
+    if (received != outSize) { free(buf); return NULL; }
     return buf;
 }
 
-/*===========================================================================
-                        FLASH STM32
-                        flashing == true: NO Serial.println!
-===========================================================================*/
-bool flashSTM32(uint8_t* buf, int totalBytes)
+bool flashSTM32(uint8_t* buf, int len)
 {
     triggerSTM32Reset();
+    Serial.write((uint8_t)0x55);   /* bootloader sync byte */
+    Serial.write(buf, len);
     Serial.flush();
-    delay(2000);
-    Serial.write((uint8_t)0x55);          /* bootloader sync byte */
-    Serial.write(buf, totalBytes);
-    Serial.flush();
-
-    delay(2000);   /* BTLD writes flash + soft resets */
+    delay(1500);   /* BTLD: CRC verify + remaining flash writes + reset chain */
     return true;
 }
 
-/*===========================================================================
-                        NOTIFY SERVER  (POST /status)
-===========================================================================*/
-void notifyServer(const String& version, bool success)
+void notifyServer(const String& ver, bool ok)
 {
-    WiFiClient client;
-    HTTPClient http;
-
-    String url = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + "/status";
-    http.begin(client, url);
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    String body = "version=" + version + "&status=" + (success ? "ok" : "failed");
-    int    code = http.POST(body);
-    dbg("POST /status → " + String(code));
-    http.end();
+    String body = "version=" + ver + "&status=" + (ok ? "ok" : "failed");
+    httpPost(serverUrl("/status"), body);
 }
 
-/*===========================================================================
-                        FULL OTA FLOW
-===========================================================================*/
 void checkAndFlash(bool force)
 {
-    /* Step 1: STM32 current version */
     currentVersion = getSTM32Version();
-    if (currentVersion == "")
-    {
-        dbg("STM32 not responding — skip OTA");
-        return;
-    }
+    if (currentVersion.isEmpty()) return;
 
-    /* Step 2: server version */
-    String serverVersion = getServerVersion();
-    if (serverVersion == "")
-    {
-        dbg("Server unreachable — skip OTA");
-        return;
-    }
+    String serverVer = getServerVersion();
+    if (serverVer.isEmpty()) return;
 
-    if (!force && serverVersion == currentVersion)
-    {
-        dbg("Up to date: v" + currentVersion);
-        return;
-    }
+    if (!force && serverVer == currentVersion) return;
 
-    dbg("Flashing: " + currentVersion + " → " + serverVersion);
-
-    /* Step 3: download */
     int      totalBytes = 0;
     uint8_t* buf        = downloadFirmware(totalBytes);
-    if (!buf)
-    {
-        dbg("Download failed!");
-        notifyServer(serverVersion, false);
-        return;
-    }
+    if (!buf) { notifyServer(serverVer, false); return; }
 
-    /* Step 4: flash */
-    flashing     = true;
-    bool success = flashSTM32(buf, totalBytes);
+    flashing = true;
+    flashSTM32(buf, totalBytes);
     free(buf);
-    flashing     = false;
+    flashing = false;
 
-    /* Step 5: verify */
-    delay(1000);
+    /* Wait for reset chain: BTLD → BM → APP → RTOS ready */
+    delay(3000);
     currentVersion = getSTM32Version();
-    bool verified  = (currentVersion == serverVersion);
-    dbg("Post-flash ver: " + currentVersion + (verified ? " ✓" : " ✗ MISMATCH"));
-
-    /* Step 6: report */
-    notifyServer(serverVersion, verified);
+    bool ok = (currentVersion == serverVer);
+    notifyServer(serverVer, ok);
 }
 
 /*===========================================================================
@@ -382,21 +295,17 @@ void checkAndFlash(bool force)
 ===========================================================================*/
 void setup()
 {
-    pinMode(RESET_PIN, INPUT_PULLUP);   /* keep NRST HIGH during ESP boot */
-    delay(2000);                        /* let ESP boot garbage settle     */
-
+    pinMode(RESET_PIN, INPUT_PULLUP);
     Serial.begin(STM32_BAUD);
-    dbg("ESP OTA + Control node starting...");
+    delay(300);
 
     connectWiFi();
+    udp.begin(TELEMETRY_PORT);
     registerWithServer();
 
-    /* Start HTTP command server */
     cmdServer.on("/cmd",    HTTP_POST, handleCmd);
     cmdServer.on("/health", HTTP_GET,  handleHealth);
     cmdServer.begin();
-    dbg("CMD server listening on port 80");
-    dbg("Polling every " + String(POLL_INTERVAL_MS / 1000) + "s");
 }
 
 /*===========================================================================
@@ -407,44 +316,53 @@ void loop()
     /* WiFi watchdog */
     if (WiFi.status() != WL_CONNECTED)
     {
-        dbg("WiFi lost — reconnecting...");
         connectWiFi();
         registerWithServer();
     }
 
-    /* Serve incoming HTTP commands from dashboard */
+    /* Always serve HTTP commands first — keep latency low */
     cmdServer.handleClient();
 
-    /* Re-register with server every 2 min so it keeps our IP
-       (handles server restarts and first-boot timing failures) */
-    static uint32_t lastRegTime = 0;
-    if (!flashing && millis() - lastRegTime >= 120000UL)
+    /* Re-register every 2 min */
+    if (millis() - lastRegTime >= 120000UL)
     {
         lastRegTime = millis();
         registerWithServer();
     }
 
-    /* Check for OTA trigger byte from STM32 on UART1 */
-    while (!flashing && Serial.available())
+    /* Non-blocking serial read — assemble complete lines, forward via UDP */
+    if (!flashing)
     {
-        uint8_t b = (uint8_t)Serial.read();
-        if (b == CMD_TRIGGER_OTA)
+        while (Serial.available())
         {
-            dbg("OTA trigger byte from STM32");
-            otaTrigger = true;
+            uint8_t b = Serial.read();
+
+            if (b == CMD_TRIGGER_OTA)
+            {
+                otaTrigger = true;
+                rxBuf      = "";
+                continue;
+            }
+            if (b == '\n')
+            {
+                rxBuf.trim();
+                if (rxBuf.length() > 0) sendTelemetry(rxBuf);
+                rxBuf = "";
+            }
+            else if (b != '\r' && (b >= 0x20 || b == '\t') && rxBuf.length() < 256)
+            {
+                rxBuf += (char)b;
+            }
         }
     }
 
-    /* Periodic OTA poll (or immediate if triggered) */
-    bool doNow = otaTrigger || (millis() - lastPollTime >= POLL_INTERVAL_MS);
-    if (doNow)
+    /* OTA check — only when triggered or poll interval elapsed */
+    if (!flashing && (otaTrigger || millis() - lastPollTime >= POLL_INTERVAL_MS))
     {
         bool force  = forceOTA;
         otaTrigger  = false;
         forceOTA    = false;
         lastPollTime = millis();
-
-        dbg("--- OTA check (force=" + String(force) + ") ---");
         checkAndFlash(force);
     }
 }

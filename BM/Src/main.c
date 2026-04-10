@@ -40,12 +40,14 @@ GPIO_PIN_CONFIG();
  SwReset = GET_BIT(RCC_CSR, SFT_RSTF);
  PowerReset = GET_BIT(RCC_CSR,POR_RSTF);
  PinReset = GET_BIT(RCC_CSR,PIN_RSTF);
+ uint8 IwdgReset = GET_BIT(RCC_CSR, IWDG_RSTF);
+
  /*REMOVE THE FLAG*/
  SET_BIT(RCC_CSR,RMVF);
 while(1) 
 {
 UART_SendSyncBuffer(UART2, (uint8 *)"\n BM \n",7);
-if(PowerReset || SwReset)
+if(PowerReset || SwReset || IwdgReset)
 {
   VTOR=0x08008000;
   Jump_toApplication = (void (*)(void)) *((volatile uint32*)0x08008004);

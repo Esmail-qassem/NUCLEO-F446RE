@@ -20,6 +20,7 @@ Web UI endpoints:
 """
 
 import re
+import socket
 import threading
 import time
 import urllib.request
@@ -30,6 +31,8 @@ import serial
 import serial.tools.list_ports
 from flask import Flask, request, jsonify, send_file
 from flask_socketio import SocketIO, emit
+
+TELEMETRY_UDP_PORT = 5001
 
 # ──────────────────────────────────────────────────────────────────
 #  Paths
@@ -99,7 +102,7 @@ def _parse_line(raw: str):
     if m:
         state["temperature"] = m.group(1) + " °C"
 
-    m = re.search(r"STM Application Version:\s*([\d.]+)", line)
+    m = re.search(r"(?:STM Application Version:|VER:)\s*([\d.]+)", line)
     if m:
         state["ecu_version"] = m.group(1)
 
@@ -137,6 +140,26 @@ def _rx_worker():
             time.sleep(1)
         except Exception:
             time.sleep(0.05)
+
+
+def _udp_worker():
+    """Receive telemetry UDP packets from ESP8266 (no TCP overhead)."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(("0.0.0.0", TELEMETRY_UDP_PORT))
+    sock.settimeout(1.0)
+    while True:
+        try:
+            data, _ = sock.recvfrom(512)
+            line = data.decode("utf-8", errors="replace").strip()
+            if line:
+                _parse_line(line)
+                socketio.emit("state", state)
+                socketio.emit("terminal", {"data": "[WiFi] " + line + "\r\n"})
+        except socket.timeout:
+            continue
+        except Exception:
+            continue
 
 
 def _open_serial(port: str, baud: int) -> bool:
@@ -234,6 +257,17 @@ def route_status():
     socketio.emit("state", state)
     socketio.emit("flash_result", {"version": ver, "status": result})
     print(f"[flash] v{ver} → {result}")
+    return "ok"
+
+
+@app.route("/api/telemetry", methods=["POST"])
+def route_telemetry():
+    """ESP forwards raw STM32 telemetry lines here (wireless path)."""
+    line = request.data.decode("utf-8", errors="replace").strip()
+    if line:
+        _parse_line(line)
+        socketio.emit("state", state)
+        socketio.emit("terminal", {"data": "[WiFi] " + line + "\r\n"})
     return "ok"
 
 
@@ -398,6 +432,9 @@ if __name__ == "__main__":
     if public_url:
         print(f"  PUBLIC URL    →  {public_url}")
     print("=" * 60)
+
+    threading.Thread(target=_udp_worker, daemon=True).start()
+    print(f"  UDP telemetry  →  port {TELEMETRY_UDP_PORT}")
 
     _open_serial(state["serial_port"], state["baud"])
 

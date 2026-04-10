@@ -42,7 +42,7 @@ RTC_Time_t Time =
   0,
   RTC_AM
 };
-const uint8 FIRMWARE_VERSION[] = "1.0.5";
+const uint8 FIRMWARE_VERSION[] = "1.0.1";
 uint16 adc_value;
 uint32 voltage;
 uint8 LED_Global=0;
@@ -106,7 +106,7 @@ void OS_1000ms_Task(void)
 void RUN_TIME (void)
 {
    RTC_GetTime(&Get_Time);
-   UART_SendSyncBuffer(UART2, (uint8 *)"Hour: ", sizeof("Hour: ")-1);
+  UART_SendSyncBuffer(UART2, (uint8 *)"Hour: ", sizeof("Hour: ")-1);
   UART_voidSendNumber(UART2, Get_Time.hours);
   UART_SendSyncBuffer(UART2, (uint8 *)"\t \t", 3);
   UART_SendSyncBuffer(UART2, (uint8 *)"Minuts: ", sizeof("Minuts: ")-1);
@@ -114,8 +114,17 @@ void RUN_TIME (void)
   UART_SendSyncBuffer(UART2, (uint8 *)"\t", 1);
   UART_SendSyncBuffer(UART2, (uint8 *)"Seconds: ", sizeof("Seconds: ")-1);
   UART_voidSendNumber(UART2, Get_Time.seconds);
-UART_SendSyncBuffer(UART2, (uint8 *)"\n", 1);
-
+  UART_SendSyncBuffer(UART2, (uint8 *)"\n", 1);
+  /* Duplicate to UART1 for wireless telemetry */
+  UART_SendSyncBuffer(UART1, (uint8 *)"Hour: ", sizeof("Hour: ")-1);
+  UART_voidSendNumber(UART1, Get_Time.hours);
+  UART_SendSyncBuffer(UART1, (uint8 *)"\t \t", 3);
+  UART_SendSyncBuffer(UART1, (uint8 *)"Minuts: ", sizeof("Minuts: ")-1);
+  UART_voidSendNumber(UART1, Get_Time.minutes);
+  UART_SendSyncBuffer(UART1, (uint8 *)"\t", 1);
+  UART_SendSyncBuffer(UART1, (uint8 *)"Seconds: ", sizeof("Seconds: ")-1);
+  UART_voidSendNumber(UART1, Get_Time.seconds);
+  UART_SendSyncBuffer(UART1, (uint8 *)"\n", 1);
 }
 void duty_cycle_task(void)
 {
@@ -161,6 +170,10 @@ void INTERNAL_TEMP_TASK(void)
   UART_SendSyncBuffer(UART2, (uint8 *)"Internal Temp: ", 15);
   UART_voidSendNumber(UART2, temp);
   UART_SendSyncBuffer(UART2, (uint8 *)" C\r\n", 4);
+  /* Duplicate to UART1 for wireless telemetry */
+  UART_SendSyncBuffer(UART1, (uint8 *)"Internal Temp: ", 15);
+  UART_voidSendNumber(UART1, temp);
+  UART_SendSyncBuffer(UART1, (uint8 *)" C\r\n", 4);
 }
 
 void APP_init(void)
@@ -173,7 +186,7 @@ void APP_init(void)
   if (!RTC_IsInitialized()) {
   RTC_SetTime(&Time);
   }
-  IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(120, IWDG_PRE_32, 32000)); // 250-ms timeout
+  IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000)); // 250-ms timeout
 }
 /*********************************************************************************************************/
 /****************************** GIO PIN CONFIGURATION*****************************************************/
@@ -272,6 +285,10 @@ void LifeCounter(void)
   UART_SendSyncBuffer(UART2, (uint8 *)"Life counter: ", 14);
   UART_voidSendNumber(UART2, counter);
   UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+  /* Duplicate to UART1 for wireless telemetry */
+  UART_SendSyncBuffer(UART1, (uint8 *)"Life counter: ", 14);
+  UART_voidSendNumber(UART1, counter);
+  UART_SendSyncBuffer(UART1, (uint8 *)"\r\n", 2);
   counter++;
 }
 void SW_VERSION(void)
@@ -314,8 +331,11 @@ void UART1_ISR(uint8 num)
     case 0x05: RUN_TIME();  break;
     case 0x06: SYS_Reset(); break;
     case 0xA1:
-      /* Reply to ESP on UART1 (OTA version check) */
+      /* Reply to ESP on UART1 with "VER:X.X.X\n" — prefixed so ESP can
+         extract it unambiguously even when telemetry is flowing on UART1 */
+      UART_SendSyncBuffer(UART1, (uint8 *)"VER:", 4);
       UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);
+      UART_SendSyncBuffer(UART1, (uint8 *)"\n", 1);
       /* Also echo full string to UART2 so the server dashboard updates */
       SW_VERSION();
       break;
