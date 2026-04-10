@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>ECU Dashboard — NUCLEO-F446RE</title>
   <link rel="stylesheet" href="/static/style.css"/>
 </head>
@@ -125,6 +127,16 @@
 
     <div class="divider"></div>
 
+    <div class="btn-group">
+      <button class="btn btn-danger cmd-btn" data-cmd="sys_reset"
+              onclick="return confirm('Reset the ECU now?')"
+              title="Software reset via SCB AIRCR SYSRESETREQ (0x06)">
+        ⟳ System Reset
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
     <!-- Raw byte sender -->
     <div class="raw-row">
       <span class="ver-label">Send raw byte</span>
@@ -198,8 +210,8 @@
 
 </main>
 
-<!-- SocketIO client -->
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<!-- SocketIO client — served locally, no internet required -->
+<script src="/static/socket.io.min.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

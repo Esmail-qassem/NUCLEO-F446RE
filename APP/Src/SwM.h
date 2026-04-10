@@ -17,6 +17,7 @@ void OS_1000ms_Task(void);
 /**************************************************************/
 /*Function Prototypes*/
 void LED(void);
+void SYS_Reset(void);
 void LifeCounter(void);
 void SW_VERSION(void);
 void LDR_TASK(void);

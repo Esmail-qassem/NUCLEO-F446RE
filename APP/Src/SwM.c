@@ -52,6 +52,9 @@ RTC_Time_t Get_Time;
 #define CMD_GET_VERSION 0xA1
 #define VREF 5U              // Reference voltage in volts
 #define ADC_RESOLUTION 4096U // 12-bit ADC resolution (2^12 =
+#define CMD_RESET       0x06
+
+#define SCB_AIRCR  (*((volatile uint32*)0xE000ED0Cu))
 /*************************************************************************************************/
 
 /*************************************************/
@@ -222,6 +225,18 @@ void CallBackFunctions(void)
 }
 
 
+void SYS_Reset(void)
+{
+  /* Cortex-M4 SYSRESETREQ — resets CPU + peripherals, cleaner than NRST */
+  UART_SendSyncBuffer(UART2, (uint8 *)"Resetting...\r\n", 14);
+  /* Small delay so UART flushes before reset */
+  volatile uint32 i;
+  for (i = 0; i < 100000u; i++) { __asm("NOP"); }
+  SCB_AIRCR = (0x5FAu << 16u) | (1u << 2u);
+  /* Never returns */
+  while(1){}
+}
+
 void LED_ON (void)
 {
   LED_Global= 1;
@@ -280,11 +295,11 @@ void UART2_ISR (uint8 num)
          case 0x02: LED_OFF();      break;
          case 0x03: BTLD_Jump();    break;
          case 0x04: BTLD_Update();  break;
-         case 0x05: RUN_TIME();      break;
-         case 0xA1: SW_VERSION();    break;
+         case 0x05: RUN_TIME();     break;
+         case 0x06: SYS_Reset();    break;
+         case 0xA1: SW_VERSION();   break;
          default:   break;
      }
-    
 }
 void UART1_ISR(uint8 num)
 {
@@ -297,6 +312,7 @@ void UART1_ISR(uint8 num)
     case 0x02: LED_OFF();   break;
     case 0x03: BTLD_Jump(); break;
     case 0x05: RUN_TIME();  break;
+    case 0x06: SYS_Reset(); break;
     case 0xA1:
       /* Reply to ESP on UART1 (OTA version check) */
       UART_SendSyncBuffer(UART1, (uint8 *)FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION) - 1U);

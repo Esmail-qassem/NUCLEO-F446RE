@@ -281,6 +281,7 @@ COMMANDS = {
     "btld_jump"  : 0x03,
     "btld_update": 0x04,
     "run_time"   : 0x05,
+    "sys_reset"  : 0x06,
     "get_version": 0xA1,
 }
 

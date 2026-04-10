@@ -3,6 +3,7 @@
 #include "SwM.h"
 #include "RTC.h"
 #include "GPIO_interface.h"
+#include "CRC.h"
 RCC_Config_t RCC_Configuration =
     {
         RCC_CLK_HSI,
@@ -42,7 +43,8 @@ void SystemInit(void)
   RCC_EnableClock(RCC_APB1, APB1_USART2);
   RCC_EnableClock(RCC_APB2, APB2_USART1);
   RCC_EnableClock(RCC_APB2, APB2_ADC1);
-  RCC_EnableClock(RCC_APB1,APB1_PWR );
-  RCC_EnableClock(RCC_APB1,APB1_WWDG);
+  RCC_EnableClock(RCC_APB1, APB1_PWR);
+  RCC_EnableClock(RCC_APB1, APB1_WWDG);
+  RCC_EnableClock(RCC_AHB1, AHB1_CRC);
 
 }

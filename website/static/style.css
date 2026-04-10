@@ -24,16 +24,15 @@
   --font-mono : "Cascadia Code", "Fira Code", "Consolas", monospace;
 }
 
-html, body { height: 100%; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
 
 body {
   background : var(--bg);
   color      : var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size  : 14px;
-  display    : flex;
-  flex-direction: column;
-  min-height : 100vh;
+  min-height : 100%;
+  /* Do NOT use height:100% or flex on body — iOS Safari clips overflow */
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -147,6 +146,9 @@ select:focus, input:focus {
 
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
+/* iOS: minimum 44px tap target, no callout on long press */
+.btn { min-height: 44px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+select, input { min-height: 44px; -webkit-tap-highlight-color: transparent; }
 
 .btn-primary   { background: var(--blue);   color: #fff; }
 .btn-primary:hover:not(:disabled) { background: var(--blue-h); }
@@ -175,11 +177,9 @@ select:focus, input:focus {
 main.grid {
   display             : grid;
   grid-template-columns: 320px 1fr;
-  grid-template-rows  : auto 1fr;
+  grid-template-rows  : auto auto;
   gap                 : 16px;
   padding             : 16px;
-  flex                : 1;
-  min-height          : 0;
 }
 
 /* Control  → row 1 col 1 */
@@ -187,7 +187,7 @@ main.grid {
 /* Firmware  → row 2 col 1 */
 #card-firmware  { grid-column: 1; grid-row: 2; }
 /* Terminal  → col 2, both rows */
-#card-terminal  { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: column; }
+#card-terminal  { grid-column: 2; grid-row: 1 / 3; }
 
 /* ───────────────────────────────────────────────────────────────
    Cards
@@ -197,7 +197,7 @@ main.grid {
   border       : 1px solid var(--border);
   border-radius: var(--radius);
   padding      : 18px;
-  overflow     : hidden;
+  overflow     : visible;   /* was hidden — clipped buttons on iOS */
 }
 
 .card h2 {
@@ -445,19 +445,18 @@ main.grid {
 }
 
 #terminal {
-  flex       : 1;
-  background : var(--term-bg);
-  border     : 1px solid var(--border);
+  background   : var(--term-bg);
+  border       : 1px solid var(--border);
   border-radius: var(--radius);
-  padding    : 12px;
-  font-family: var(--font-mono);
-  font-size  : 12px;
-  color      : var(--term-green);
-  overflow-y : auto;
-  white-space: pre-wrap;
-  word-break : break-all;
-  line-height: 1.5;
-  min-height : 200px;
+  padding      : 12px;
+  font-family  : var(--font-mono);
+  font-size    : 12px;
+  color        : var(--term-green);
+  overflow-y   : auto;
+  white-space  : pre-wrap;
+  word-break   : break-all;
+  line-height  : 1.5;
+  height       : 500px;   /* fixed height — safe on all browsers including iOS */
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -486,15 +485,125 @@ main.grid {
 }
 
 /* ───────────────────────────────────────────────────────────────
-   Responsive
+   Responsive — Tablet (≤900px)
 ─────────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   main.grid {
     grid-template-columns: 1fr;
     grid-template-rows   : auto;
+    padding              : 10px;
+    gap                  : 10px;
   }
   #card-control, #card-firmware, #card-terminal {
     grid-column: 1;
     grid-row   : auto;
   }
+  #card-terminal {
+    min-height: 300px;
+  }
+  #terminal {
+    min-height: 220px;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Responsive — Mobile (≤600px)
+─────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Header — stack vertically */
+  header {
+    padding        : 10px 12px;
+    gap            : 8px;
+    flex-direction : column;
+    align-items    : flex-start;
+  }
+
+  .header-left { width: 100%; }
+
+  h1   { font-size: 16px; }
+  .sub { font-size: 10px; }
+
+  /* Pills — wrap tightly, smaller */
+  .status-pills {
+    justify-content: flex-start;
+    gap            : 6px;
+    width          : 100%;
+  }
+
+  .pill {
+    padding  : 3px 8px;
+    font-size: 11px;
+    gap      : 4px;
+  }
+
+  .pill-label { font-size: 9px; }
+
+  /* Port selector row — stack */
+  .header-right {
+    flex-wrap: wrap;
+    width    : 100%;
+    gap      : 6px;
+  }
+
+  .header-right select { flex: 1; min-width: 0; }
+  .header-right .btn   { width: 100%; }
+
+  /* Main grid — single column, tight padding */
+  main.grid {
+    padding: 8px;
+    gap    : 8px;
+  }
+
+  /* Cards */
+  .card { padding: 14px 12px; }
+
+  /* Version row — stack vertically */
+  .version-row { flex-direction: column; gap: 8px; }
+
+  /* Channel selector */
+  .channel-row { flex-wrap: wrap; gap: 6px; }
+
+  .channel-btns { flex-wrap: wrap; }
+
+  .ch-btn { padding: 6px 12px; font-size: 13px; flex: 1; text-align: center; }
+
+  /* Buttons — always full-width on mobile */
+  .btn-group { flex-direction: column; gap: 8px; }
+  .btn-group .btn { width: 100%; padding: 10px; font-size: 14px; }
+
+  /* Raw byte row — stack */
+  .raw-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .raw-input-group { width: 100%; }
+  .raw-input-group input { flex: 1; width: auto; }
+  .raw-row .btn { width: 100%; padding: 10px; }
+
+  /* Upload row — stack */
+  .upload-row { flex-direction: column; gap: 8px; }
+  .upload-row .btn { width: 100%; padding: 10px; }
+
+  /* Drop zone — smaller */
+  .drop-zone { padding: 16px; }
+
+  /* Terminal */
+  #terminal {
+    font-size : 11px;
+    min-height: 200px;
+    max-height: 300px;
+  }
+
+  .term-header { flex-wrap: wrap; gap: 8px; }
+  .term-controls { flex-wrap: wrap; gap: 8px; width: 100%; }
+  .term-controls .btn { flex: 1; padding: 8px; }
+
+  /* Toast — full width at bottom */
+  .flash-toast {
+    left        : 8px;
+    right       : 8px;
+    bottom      : 8px;
+    text-align  : center;
+    font-size   : 12px;
+  }
+
+  /* Feedback text */
+  .feedback { font-size: 11px; }
 }
