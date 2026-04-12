@@ -280,6 +280,34 @@ main.grid {
   border-color: var(--blue);
 }
 
+/* ── PWM slider row ── */
+.pwm-row {
+  display     : flex;
+  align-items : center;
+  gap         : 10px;
+  flex-wrap   : wrap;
+}
+.pwm-controls {
+  display     : flex;
+  align-items : center;
+  gap         : 10px;
+  flex         : 1;
+}
+.pwm-slider {
+  flex          : 1;
+  min-width     : 100px;
+  accent-color  : var(--blue);
+  cursor        : pointer;
+  height        : 4px;
+}
+.pwm-val {
+  font-family   : var(--font-mono);
+  font-size     : 13px;
+  color         : var(--blue);
+  min-width     : 34px;
+  text-align    : right;
+}
+
 /* ── Raw byte input ── */
 .raw-row {
   display       : flex;

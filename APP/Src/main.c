@@ -1,6 +1,7 @@
 #include "STD_TYPES.h"
 #include "RCC.h"
 #include "SwM.h"
+#include "App_Config.h"
 #include "RTC.h"
 #include "GPIO_interface.h"
 #include "CRC.h"

@@ -71,7 +71,7 @@ Linker script and memory map
                 0x08000000                Vector_Table
                 0x08000178                . = ALIGN (0x4)
 
-.text           0x08000178     0x123c
+.text           0x08000178     0x1230
                 0x08000178                . = ALIGN (0x4)
  *(.text)
  .text          0x08000178        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -294,54 +294,54 @@ Linker script and memory map
                 0x08001258                SAI1_IRQHandler
                 0x08001258                DMA1_Stream3_IRQHandler
  *fill*         0x0800125e        0x2 
- .text.main     0x08001260       0xe8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .text.main     0x08001260       0xdc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
                 0x08001260                main
  .text.APP_init
-                0x08001348       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
-                0x08001348                APP_init
+                0x0800133c       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+                0x0800133c                APP_init
  .text.GPIO_PIN_CONFIG
-                0x08001364       0x2a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
-                0x08001364                GPIO_PIN_CONFIG
- *fill*         0x0800138e        0x2 
+                0x08001358       0x2a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+                0x08001358                GPIO_PIN_CONFIG
+ *fill*         0x08001382        0x2 
  .text.SystemInit
-                0x08001390       0x24 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
-                0x08001390                SystemInit
-                0x080013b4                . = ALIGN (0x4)
-                0x080013b4                _etext = .
+                0x08001384       0x24 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+                0x08001384                SystemInit
+                0x080013a8                . = ALIGN (0x4)
+                0x080013a8                _etext = .
 
-.glue_7         0x080013b4        0x0
- .glue_7        0x080013b4        0x0 linker stubs
+.glue_7         0x080013a8        0x0
+ .glue_7        0x080013a8        0x0 linker stubs
 
-.glue_7t        0x080013b4        0x0
- .glue_7t       0x080013b4        0x0 linker stubs
+.glue_7t        0x080013a8        0x0
+ .glue_7t       0x080013a8        0x0 linker stubs
 
-.vfp11_veneer   0x080013b4        0x0
- .vfp11_veneer  0x080013b4        0x0 linker stubs
+.vfp11_veneer   0x080013a8        0x0
+ .vfp11_veneer  0x080013a8        0x0 linker stubs
 
-.v4_bx          0x080013b4        0x0
- .v4_bx         0x080013b4        0x0 linker stubs
+.v4_bx          0x080013a8        0x0
+ .v4_bx         0x080013a8        0x0 linker stubs
 
-.iplt           0x080013b4        0x0
- .iplt          0x080013b4        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x080013a8        0x0
+ .iplt          0x080013a8        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x080013b4       0x14
-                0x080013b4                . = ALIGN (0x4)
+.rodata         0x080013a8       0x14
+                0x080013a8                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x080013b4        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x080013ba        0x2 
- .rodata        0x080013bc        0x7 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .rodata        0x080013a8        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x080013ae        0x2 
+ .rodata        0x080013b0        0x7 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
  *(.rodata*)
- *fill*         0x080013c3        0x1 
+ *fill*         0x080013b7        0x1 
  .rodata.MSP_Value
-                0x080013c4        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
-                0x080013c4                MSP_Value
-                0x080013c8                . = ALIGN (0x4)
-                0x080013c8                _sidata = LOADADDR (.data)
+                0x080013b8        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
+                0x080013b8                MSP_Value
+                0x080013bc                . = ALIGN (0x4)
+                0x080013bc                _sidata = LOADADDR (.data)
 
-.rel.dyn        0x080013c8        0x0
- .rel.iplt      0x080013c8        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x080013bc        0x0
+ .rel.iplt      0x080013bc        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000        0xc load address 0x080013c8
+.data           0x20000000        0xc load address 0x080013bc
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdata = .
  *(.data)
@@ -359,10 +359,10 @@ Linker script and memory map
                 0x2000000c                . = ALIGN (0x4)
                 0x2000000c                _edata = .
 
-.igot.plt       0x2000000c        0x0 load address 0x080013d4
+.igot.plt       0x2000000c        0x0 load address 0x080013c8
  .igot.plt      0x2000000c        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x2000000c       0x2c load address 0x080013d4
+.bss            0x2000000c       0x2c load address 0x080013c8
                 0x2000000c                _sbss = .
  *(.bss)
  .bss           0x2000000c        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -408,7 +408,7 @@ Linker script and memory map
                 0x20000038                _ebss = .
 
 ._user_heap_stack
-                0x20000038     0x1200 load address 0x080013d4
+                0x20000038     0x1200 load address 0x080013c8
                 0x20000038                . = ALIGN (0x8)
                 0x20000238                . = (. + _Min_Heap_Size)
  *fill*         0x20000038      0x200 
@@ -490,14 +490,14 @@ LOAD linker stubs
  .debug_macro   0x00000e97       0xd6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
  .debug_macro   0x00000f6d       0x76 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
-.debug_line     0x00000000      0xef1
+.debug_line     0x00000000      0xeee
  .debug_line    0x00000000      0x2c0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/SysTick/src/SysTick_program.o
  .debug_line    0x000006a0      0x295 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/GPIO/src/GPIO_program.o
  .debug_line    0x00000935      0x369 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_line    0x00000c9e       0xe1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x00000d7f      0x172 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_line    0x00000d7f      0x16f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
 .debug_str      0x00000000     0x4a55
  .debug_str     0x00000000     0x3519 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o

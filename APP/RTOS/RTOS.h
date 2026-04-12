@@ -72,5 +72,6 @@ void RTOS_voidWaitEvent(uint8 Copy_priority);
 
 void  OS_IDLE_TASK(void);
 uint8 RTOS_u8GetCPULoad(void);
+uint8 RTOS_u8GetStackUsage(uint8 priority); /* % of stack used (0–100) */
 
 #endif /* RTOS_INTERFACE_H_ */

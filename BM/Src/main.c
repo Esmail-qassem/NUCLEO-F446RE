@@ -42,8 +42,7 @@ GPIO_PIN_CONFIG();
  PinReset = GET_BIT(RCC_CSR,PIN_RSTF);
  uint8 IwdgReset = GET_BIT(RCC_CSR, IWDG_RSTF);
 
- /*REMOVE THE FLAG*/
- SET_BIT(RCC_CSR,RMVF);
+ /* Do NOT clear RMVF here — APP's BOOT_REASON_REPORT() reads and clears flags */
 while(1) 
 {
 UART_SendSyncBuffer(UART2, (uint8 *)"\n BM \n",7);

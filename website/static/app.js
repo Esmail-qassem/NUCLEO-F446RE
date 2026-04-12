@@ -42,6 +42,7 @@ const alertBanner  = $("alert-banner");
 const alertMsg     = $("alert-msg");
 const alertIcon    = $("alert-icon");
 const tbodyHistory = $("tbody-history");
+const tbodyBoot    = $("tbody-boot");
 
 // ──────────────────────────────────────────────────────────────────
 //  State
@@ -63,6 +64,7 @@ socket.on("disconnect", () => applyState({ connected: false }));
 socket.on("state",      applyState);
 socket.on("terminal",   ({ data }) => appendTerminal(data));
 socket.on("firmware_history", renderHistory);
+socket.on("boot_history",     renderBootHistory);
 
 socket.on("flash_result", ({ version, status }) => {
   const ok  = status === "ok";
@@ -108,6 +110,10 @@ function applyState(s) {
   if (s.temperature)   lblTemp.textContent   = s.temperature;
   if (s.life_counter)  lblLife.textContent   = s.life_counter;
   if (s.ecu_version)   lblEcuVer.textContent = s.ecu_version;
+  if (s.pwm_duty !== undefined) {
+    $("inp-pwm").value = s.pwm_duty;
+    $("lbl-pwm").textContent = s.pwm_duty + "%";
+  }
   if (s.server_version) {
     lblSrvVer.textContent  = s.server_version;
     inpVersion.placeholder = nextPatch(s.server_version);
@@ -387,6 +393,49 @@ function renderHistory(rows) {
   }).join("");
 }
 
+// ──────────────────────────────────────────────────────────────────
+//  Boot history (#9)
+// ──────────────────────────────────────────────────────────────────
+function renderBootHistory(rows) {
+  const REASON_ICON = { SFT: "🔄", POR: "⚡", PIN: "📌", IWDG: "🐕", WWDG: "🪟", UNK: "❓" };
+  if (!rows || !rows.length) {
+    tbodyBoot.innerHTML = `<tr><td colspan="4" class="muted" style="text-align:center">No boot events yet</td></tr>`;
+    return;
+  }
+  tbodyBoot.innerHTML = rows.map(r => {
+    const icon = REASON_ICON[r.reason] || "❓";
+    return `<tr>
+      <td class="muted">#${r.id}</td>
+      <td class="muted">${r.ts}</td>
+      <td>${icon} <strong>${r.reason}</strong></td>
+      <td><span class="ver-tag">v${r.version}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+// ──────────────────────────────────────────────────────────────────
+//  PWM slider (#5)
+// ──────────────────────────────────────────────────────────────────
+$("inp-pwm").addEventListener("input", () => {
+  $("lbl-pwm").textContent = $("inp-pwm").value + "%";
+});
+
+$("btn-pwm").addEventListener("click", async () => {
+  const duty = parseInt($("inp-pwm").value);
+  try {
+    const res  = await fetch("/api/pwm", {
+      method : "POST",
+      headers: { "Content-Type": "application/json" },
+      body   : JSON.stringify({ duty, channel: activeChannel }),
+    });
+    const data = await res.json();
+    if (data.ok) setFeedback(cmdFeedback, `→ PWM duty = ${data.duty}%`, "ok");
+    else         setFeedback(cmdFeedback, data.error || "PWM failed", "err");
+  } catch {
+    setFeedback(cmdFeedback, "PWM request failed", "err");
+  }
+});
+
 async function doRollback(version) {
   if (!confirm(`Restore v${version} as active OTA firmware?`)) return;
   try {
@@ -508,5 +557,10 @@ function formatBytes(n) {
   try {
     const rows = await (await fetch("/api/firmware_history")).json();
     renderHistory(rows);
+  } catch {}
+
+  try {
+    const rows = await (await fetch("/api/boot_history")).json();
+    renderBootHistory(rows);
   } catch {}
 })();

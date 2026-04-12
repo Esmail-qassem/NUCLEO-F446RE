@@ -115,6 +115,35 @@ static void RTOS_voidInitStack(TCB_t *tcb, void (*func)(void), uint8 arg)
     *top-- = 0;          /* R4  */
 
     tcb->stack_pointer = top + 1; /* points to R4 — bottom of full frame */
+
+    /* Fill unused stack (below the initial frame) with watermark pattern
+     * so RTOS_u8GetStackUsage() can measure high-water mark at runtime */
+    uint32 *p = tcb->stack;
+    while (p <= top)
+    {
+        *p++ = 0xDEADBEEFU;
+    }
+}
+
+/*==============================================================================
+ *  Stack watermark — returns % of stack used by task (0–100)
+ *  Scans from the bottom looking for first overwritten watermark word.
+ *============================================================================*/
+
+uint8 RTOS_u8GetStackUsage(uint8 priority)
+{
+    if (priority >= TASK_NUMBER || SysTask[priority].TaskFunc == NULL)
+    {
+        return 0U;
+    }
+    const uint32 *stack = SysTask[priority].TCB.stack;
+    uint16 i;
+    for (i = 0U; i < TASK_STACK_SIZE; i++)
+    {
+        if (stack[i] != 0xDEADBEEFU) break;
+    }
+    /* i = lowest touched index; everything from i to top is "used" */
+    return (uint8)(((uint32)(TASK_STACK_SIZE - i) * 100U) / TASK_STACK_SIZE);
 }
 
 /*==============================================================================

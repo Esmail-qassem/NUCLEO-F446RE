@@ -121,6 +121,16 @@
     </div>
     <div class="divider"></div>
 
+    <!-- PWM slider (#5) -->
+    <div class="pwm-row">
+      <span class="ver-label">PWM duty (PC7)</span>
+      <div class="pwm-controls">
+        <input id="inp-pwm" type="range" min="0" max="100" value="0" class="pwm-slider"/>
+        <span class="pwm-val" id="lbl-pwm">0%</span>
+        <button class="btn btn-secondary" id="btn-pwm">Set</button>
+      </div>
+    </div>
+
     <div class="raw-row">
       <span class="ver-label">Send raw byte</span>
       <div class="raw-input-group">
@@ -230,6 +240,29 @@
           </thead>
           <tbody id="tbody-history">
             <tr><td colspan="6" class="muted" style="text-align:center">No history yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Boot history (#9) -->
+    <div class="card" style="margin-top:20px">
+      <h2>Boot History</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:12px">
+        Every ECU boot is logged with the reset cause from <code>RCC_CSR</code>.
+      </p>
+      <div class="table-wrap">
+        <table id="tbl-boot">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Timestamp</th>
+              <th>Reason</th>
+              <th>Firmware ver</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-boot">
+            <tr><td colspan="4" class="muted" style="text-align:center">No boot events yet</td></tr>
           </tbody>
         </table>
       </div>

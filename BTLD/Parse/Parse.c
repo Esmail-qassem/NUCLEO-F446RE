@@ -131,20 +131,25 @@ uint32 CRC32_Calculate(const uint8 *data, uint32 length)
                         BOOTLOADER ISR HANDLER
 ===========================================================================*/
 static uint8 sync_received = 0;
+static uint8 retry_count   = 0;   /* #14 — counts CRC/verify failures */
+
+#define BTLD_NAK    0xFAU   /* sent to ESP on CRC failure → ESP retries  */
+#define BTLD_ACK    0xACU   /* sent to ESP after successful verification  */
+#define BTLD_FATAL  0xFBU   /* sent after MAX_RETRY failures → give up   */
+#define MAX_RETRY   3U
 
 void BootLoader_Handler(uint8 byte)
 {
-    // if (byte == 0xA1) return;
-
     /* Wait for sync byte 0x55 before accepting any data */
     if (sync_received == 0)
     {
         if (byte == 0x55)
         {
-            sync_received = 1; // ← sync received, ready for firmware
+            sync_received = 1;
+            retry_count   = 0;   /* new session — reset retry counter */
             ms_ticks = 0;
         }
-        return; // ← ignore everything until 0x55 arrives
+        return;
     }
 
     /* Normal firmware receive */
@@ -264,10 +269,29 @@ void BootLoader_MainFunction(void)
         }
         else
         {
-            UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC FAILED!\n", 13);
-            counter = 0;
-            Header = 0;
-            received_crc = 0;
+            /* #14 — CRC retry logic */
+            retry_count++;
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC FAILED! Attempt ", 21);
+            UART_voidSendNumber(UART2, retry_count);
+            UART_SendSyncBuffer(UART2, (uint8 *)"/3\n", 3);
+
+            if (retry_count >= MAX_RETRY)
+            {
+                uint8 fatal = BTLD_FATAL;
+                UART_SendSyncBuffer(UART1, &fatal, 1);
+                UART_SendSyncBuffer(UART2, (uint8 *)"FATAL: max retries — aborting\n", 30);
+                retry_count   = 0;
+                sync_received = 0; /* go back to waiting for a new session */
+            }
+            else
+            {
+                uint8 nak = BTLD_NAK;
+                UART_SendSyncBuffer(UART1, &nak, 1); /* tell ESP to resend */
+            }
+
+            counter       = 0;
+            Header        = 0;
+            received_crc  = 0;
             flash_address = APP_START_ADDRESS;
         }
     }
@@ -281,7 +305,11 @@ void BootLoader_MainFunction(void)
         if ((stack_ptr >= 0x20000000 && stack_ptr <= 0x20020000) &&
             (reset_handler >= 0x08008000 && reset_handler <= 0x08080000))
         {
+            /* #14 — send ACK before reset so ESP knows flash succeeded */
+            uint8 ack = BTLD_ACK;
+            UART_SendSyncBuffer(UART1, &ack, 1);
             UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification OK!\n", 18);
+            retry_count   = 0;
             flash_address = APP_START_ADDRESS;
             Binary_receivingfinished = 0;
             counter = 0;
@@ -291,12 +319,30 @@ void BootLoader_MainFunction(void)
         }
         else
         {
-            UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification FAILED!\n", 21);
+            /* #14 — verification failure also counts as a retry */
+            retry_count++;
+            UART_SendSyncBuffer(UART2, (uint8 *)"\nVerification FAILED! Attempt ", 30);
+            UART_voidSendNumber(UART2, retry_count);
+            UART_SendSyncBuffer(UART2, (uint8 *)"/3\n", 3);
+
+            if (retry_count >= MAX_RETRY)
+            {
+                uint8 fatal = BTLD_FATAL;
+                UART_SendSyncBuffer(UART1, &fatal, 1);
+                UART_SendSyncBuffer(UART2, (uint8 *)"FATAL: max retries — aborting\n", 30);
+                retry_count = 0;
+            }
+            else
+            {
+                uint8 nak = BTLD_NAK;
+                UART_SendSyncBuffer(UART1, &nak, 1);
+            }
+
             counter = 0;
             received_crc = 0;
             sync_received = 0;
             Binary_receivingfinished = 0;
-            flash_address = APP_START_ADDRESS; /* reset for retry */
+            flash_address = APP_START_ADDRESS;
         }
         verify_done = 1;
         UART_START = 0;

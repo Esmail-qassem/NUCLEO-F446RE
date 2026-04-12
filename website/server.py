@@ -68,6 +68,14 @@ def _db_init():
                 life_counter INTEGER
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS boot_history (
+                id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts      TEXT    NOT NULL,
+                reason  TEXT    NOT NULL,
+                version TEXT    DEFAULT '–'
+            )
+        """)
         conn.commit()
 
 # ──────────────────────────────────────────────────────────────────
@@ -97,6 +105,7 @@ state = {
     "rtc_time"      : "--:--:--",
     "last_flash"    : None,
     "esp_ip"        : None,
+    "pwm_duty"      : 0,
 }
 
 ser      = None
@@ -212,6 +221,24 @@ def _parse_line(raw: str):
         state["rtc_time"] = (
             f"{int(m.group(1)):02d}:{int(m.group(2)):02d}:{int(m.group(3)):02d}"
         )
+
+    # Boot reason (#9)
+    m = re.search(r"BOOT:(\w+)", line)
+    if m:
+        reason  = m.group(1)
+        ts      = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        version = state.get("ecu_version", "–")
+        try:
+            with _db_lock, _db() as conn:
+                conn.execute(
+                    "INSERT INTO boot_history (ts, reason, version) VALUES (?,?,?)",
+                    (ts, reason, version)
+                )
+                conn.commit()
+        except Exception as e:
+            print(f"[db] boot_history insert failed: {e}")
+        socketio.emit("boot_history", _get_boot_history())
+        print(f"[boot] reason={reason}  ver={version}")
 
     # Store metrics + check alerts
     if temp_val is not None or life_val is not None:
@@ -397,6 +424,49 @@ def _get_history():
 def route_firmware_history():
     return jsonify(_get_history())
 
+def _get_boot_history():
+    try:
+        with _db_lock, _db() as conn:
+            rows = conn.execute(
+                "SELECT * FROM boot_history ORDER BY id DESC LIMIT 50"
+            ).fetchall()
+            return [dict(r) for r in rows]
+    except Exception:
+        return []
+
+@app.route("/api/boot_history")
+def route_boot_history():
+    return jsonify(_get_boot_history())
+
+# ──────────────────────────────────────────────────────────────────
+#  Route — PWM duty control (#5)
+# ──────────────────────────────────────────────────────────────────
+@app.route("/api/pwm", methods=["POST"])
+def route_pwm():
+    data    = request.get_json(silent=True) or {}
+    duty    = max(0, min(100, int(data.get("duty", 0))))
+    channel = data.get("channel", "both")
+
+    wire_ok = False
+    if channel in ("wire", "both") and ser and ser.is_open:
+        with ser_lock:
+            ser.write(bytes([0x07, duty]))   # 2-byte command
+        wire_ok = True
+
+    wifi_ok = False
+    if channel in ("wifi", "both") and state.get("esp_ip"):
+        # ESP /cmd only supports single bytes; send 0x07 then duty as two calls
+        _esp_cmd_async(0x07)
+        _esp_cmd_async(duty)
+        wifi_ok = True
+
+    if not wire_ok and not wifi_ok:
+        return jsonify(error="No channel available"), 503
+
+    state["pwm_duty"] = duty
+    socketio.emit("state", state)
+    return jsonify(ok=True, duty=duty)
+
 @app.route("/api/rollback/<version>", methods=["POST"])
 def route_rollback(version):
     versioned = UPLOAD_DIR / f"firmware_v{version}.bin"
@@ -559,6 +629,7 @@ def route_state():
 def on_ws_connect():
     emit("state", state)
     emit("firmware_history", _get_history())
+    emit("boot_history", _get_boot_history())
 
 @socketio.on("send_raw")
 def on_send_raw(data):
