@@ -8,7 +8,8 @@
 #include "OLED.h"
 #include "Telemetry.h"
 #include "ISR.h"
-
+#include "MPU.h"
+#include "FPU.h"
 /*------------------------------------------------------------------
  *  Firmware version — single definition, shared via App_Config.h
  *------------------------------------------------------------------*/
@@ -58,6 +59,8 @@ RTC_Time_t Time = { 0, 0, 0, RTC_AM };
 /*------------------------------------------------------------------
  *  APP_init — peripheral bring-up sequence
  *------------------------------------------------------------------*/
+ACCEL_t Bias_accel_data;
+GYRO_t Bias_gyro_data;
 void APP_init(void)
 {
     UART_Init(UART1, &Uart1_configuration, 16000000);
@@ -71,7 +74,14 @@ void APP_init(void)
         RTC_SetTime(&Time);
     }
     I2C_Init(I2C1_PORT, &i2c1_cfg);
-    OLED_Init(I2C1_PORT);
+    //OLED_Init(I2C1_PORT);
+    MPU_Init();
+    /* wait 50 ms */
+    for(uint16 i = 0; i < 3000 ; i++)
+    {
+        for(uint8 j=0;j<255;j++);
+    }
+    MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
     IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000));
 }
 

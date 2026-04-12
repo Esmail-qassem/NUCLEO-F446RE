@@ -6,7 +6,7 @@ C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o: \
  ../MCAL/NVIC/inc/NVIC_interface.h ../MCAL/ADC/inc/ADC.h \
  ../MCAL/GP_TIMER/inc/GP_Timer.h ../MCAL/RCC/inc/RCC.h \
  ../MCAL/IWDG/inc/IWDG.h ../HAL/OLED/OLED.h ../Inc/Telemetry.h \
- ../Inc/ISR.h
+ ../Inc/ISR.h ../HAL/MPU/MPU.h ../MCAL/FPU/inc/FPU.h
 ../Inc/App_Config.h:
 ../Inc/STD_TYPES.h:
 ../MCAL/UART/inc/UART.h:
@@ -24,3 +24,5 @@ C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o: \
 ../HAL/OLED/OLED.h:
 ../Inc/Telemetry.h:
 ../Inc/ISR.h:
+../HAL/MPU/MPU.h:
+../MCAL/FPU/inc/FPU.h:

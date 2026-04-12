@@ -199,6 +199,21 @@ def _store_metric(temp=None, life=None):
 # ──────────────────────────────────────────────────────────────────
 def _parse_line(raw: str):
     line = raw.strip()
+
+    # MPU-6050 sensor data — $DATA:ax,ay,az,gx,gy,gz
+    if line.startswith("$DATA:"):
+        parts = line[6:].split(",")
+        if len(parts) == 6:
+            try:
+                vals = [int(p) for p in parts]
+                socketio.emit("mpu", {
+                    "ax": vals[0], "ay": vals[1], "az": vals[2],
+                    "gx": vals[3], "gy": vals[4], "gz": vals[5],
+                })
+            except ValueError:
+                pass
+        return
+
     temp_val = None
     life_val = None
 

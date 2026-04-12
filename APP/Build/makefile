@@ -30,6 +30,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
 		   $(MCAL_path)/PendSV/src\
            $(HAL_path)/ESP\
            $(HAL_path)/OLED\
+		    $(HAL_path)/MPU\
            $(P1_path)/FLAPPY_Bird\
 		   ../RTOS\
            ../Startup\

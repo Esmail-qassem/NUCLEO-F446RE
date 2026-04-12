@@ -68,6 +68,7 @@
   <button class="tab-btn active" data-tab="tab-main">Control</button>
   <button class="tab-btn" data-tab="tab-history">Firmware History</button>
   <button class="tab-btn" data-tab="tab-metrics">Metrics</button>
+  <button class="tab-btn" data-tab="tab-imu">IMU</button>
 </nav>
 
 <!-- ═══════════════════════════════ TAB: MAIN ══════════════════════════════════ -->
@@ -300,8 +301,78 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════ TAB: IMU ════════════════════════════════════ -->
+<div id="tab-imu" class="tab-content">
+  <div class="tab-inner">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
+
+      <div class="card" style="padding:16px">
+        <h2 style="margin-bottom:12px">Board Orientation</h2>
+        <canvas id="imu-canvas" style="width:100%;border-radius:8px;background:#0d1117;display:block"></canvas>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <h2 style="margin-bottom:16px">Sensor Readings</h2>
+
+        <div style="margin-bottom:16px">
+          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Accelerometer (g)</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">X</div>
+              <div id="imu-ax" style="font-size:18px;font-weight:600;color:#f85149">0.00</div>
+            </div>
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">Y</div>
+              <div id="imu-ay" style="font-size:18px;font-weight:600;color:#3fb950">0.00</div>
+            </div>
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">Z</div>
+              <div id="imu-az" style="font-size:18px;font-weight:600;color:#58a6ff">0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Gyroscope (°/s)</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">X</div>
+              <div id="imu-gx" style="font-size:18px;font-weight:600;color:#f85149">0.00</div>
+            </div>
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">Y</div>
+              <div id="imu-gy" style="font-size:18px;font-weight:600;color:#3fb950">0.00</div>
+            </div>
+            <div style="background:#161b22;border-radius:6px;padding:10px">
+              <div class="muted" style="font-size:11px">Z</div>
+              <div id="imu-gz" style="font-size:18px;font-weight:600;color:#58a6ff">0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Orientation</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:#161b22;border-radius:6px;padding:10px;text-align:center">
+              <div class="muted" style="font-size:11px">Roll</div>
+              <div id="imu-roll" style="font-size:20px;font-weight:700;color:#e3b341">0.0°</div>
+            </div>
+            <div style="background:#161b22;border-radius:6px;padding:10px;text-align:center">
+              <div class="muted" style="font-size:11px">Pitch</div>
+              <div id="imu-pitch" style="font-size:20px;font-weight:700;color:#e3b341">0.0°</div>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:8px" class="muted" style="font-size:11px">Yaw — N/A (no magnetometer)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script src="/static/socket.io.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

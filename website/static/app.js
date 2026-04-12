@@ -209,6 +209,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.add("active");
     $(btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab === "tab-metrics") loadMetrics();
+    if (btn.dataset.tab === "tab-imu")     initImu();
   });
 });
 
@@ -538,6 +539,92 @@ function formatBytes(n) {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / 1024 / 1024).toFixed(2)} MB`;
 }
+
+// ──────────────────────────────────────────────────────────────────
+//  IMU — Three.js 3D board + complementary filter
+// ──────────────────────────────────────────────────────────────────
+let imuScene = null;
+let imuRoll  = 0;
+let imuPitch = 0;
+const IMU_ALPHA = 0.98;
+const IMU_DT    = 0.05;   // 50 ms sample time
+
+function initImu() {
+  if (imuScene) return;   // already initialised
+
+  const canvas   = $("imu-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  const w = canvas.parentElement.clientWidth - 32;
+  const h = Math.round(w * 0.55);
+  renderer.setSize(w, h);
+  canvas.style.height = h + "px";
+
+  const scene  = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d1117);
+  imuScene = scene;
+
+  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+  camera.position.set(0, 2, 5);
+  camera.lookAt(0, 0, 0);
+
+  // Board mesh — Nucleo-like proportions (wide, thin)
+  const geo  = new THREE.BoxGeometry(3, 0.12, 5);
+  const mats = [
+    new THREE.MeshPhongMaterial({ color: 0x1a5c2e }),  // right
+    new THREE.MeshPhongMaterial({ color: 0x1a5c2e }),  // left
+    new THREE.MeshPhongMaterial({ color: 0x2ecc71 }),  // top (PCB green)
+    new THREE.MeshPhongMaterial({ color: 0x1a5c2e }),  // bottom
+    new THREE.MeshPhongMaterial({ color: 0x1a5c2e }),  // front
+    new THREE.MeshPhongMaterial({ color: 0x1a5c2e }),  // back
+  ];
+  const board = new THREE.Mesh(geo, mats);
+  scene.add(board);
+
+  // Axis arrows
+  scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 2, 0xf85149, 0.3, 0.15));
+  scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 2, 0x3fb950, 0.3, 0.15));
+  scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 2, 0x58a6ff, 0.3, 0.15));
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dLight = new THREE.DirectionalLight(0xffffff, 1);
+  dLight.position.set(3, 5, 3);
+  scene.add(dLight);
+
+  // Animate
+  (function render() {
+    requestAnimationFrame(render);
+    board.rotation.x = THREE.MathUtils.degToRad(imuRoll);
+    board.rotation.z = THREE.MathUtils.degToRad(-imuPitch);
+    renderer.render(scene, camera);
+  })();
+}
+
+socket.on("mpu", ({ ax, ay, az, gx, gy, gz }) => {
+  const ax_g  = ax / 100;
+  const ay_g  = ay / 100;
+  const az_g  = az / 100;
+  const gx_ds = gx / 100;
+  const gy_ds = gy / 100;
+
+  const accelRoll  = Math.atan2(ay_g, az_g)                              * 180 / Math.PI;
+  const accelPitch = Math.atan2(-ax_g, Math.sqrt(ay_g*ay_g + az_g*az_g)) * 180 / Math.PI;
+
+  imuRoll  = IMU_ALPHA * (imuRoll  + gx_ds * IMU_DT) + (1 - IMU_ALPHA) * accelRoll;
+  imuPitch = IMU_ALPHA * (imuPitch + gy_ds * IMU_DT) + (1 - IMU_ALPHA) * accelPitch;
+
+  const fmt = v => (v >= 0 ? "+" : "") + v.toFixed(2);
+  $("imu-ax").textContent    = fmt(ax_g);
+  $("imu-ay").textContent    = fmt(ay_g);
+  $("imu-az").textContent    = fmt(az_g);
+  $("imu-gx").textContent    = fmt(gx_ds);
+  $("imu-gy").textContent    = fmt(gy_ds);
+  $("imu-gz").textContent    = fmt(gz / 100);
+  $("imu-roll").textContent  = imuRoll.toFixed(1)  + "°";
+  $("imu-pitch").textContent = imuPitch.toFixed(1) + "°";
+});
 
 // ──────────────────────────────────────────────────────────────────
 //  Boot
