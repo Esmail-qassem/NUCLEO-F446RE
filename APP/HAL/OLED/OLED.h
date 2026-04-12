@@ -22,6 +22,6 @@ void OLED_SendData(I2C_Port_t PORT,uint8 data);
 void OLED_Clear(void);
 void OLED_DrawPixel(uint8 x, uint8 y, OLED_Color_t color);
 void OLED_UpdateScreen(I2C_Port_t PORT);
-void swapBuffer(void);
+void OLED_APP(void);
 
 #endif

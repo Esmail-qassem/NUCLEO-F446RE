@@ -1,24 +1,12 @@
 #include "OLED.h"
 
-uint8 BufferA[OLED_WIDTH * OLED_PAGES];
-uint8 BufferB[OLED_WIDTH * OLED_PAGES];
-
-uint8 *OLED_Buffer= BufferA;        // FOR DRAWING
-uint8 *OLED_DisplayBuffer= BufferB; // FOR DISPLAYING
-
+static uint8 OLED_Buffer[OLED_WIDTH * OLED_PAGES];
 
 #define OLED_COLUMN_OFFSET 2   // OLED has 132 columns, 128 visible
 
 //-----------------------------------------------------//
 //                Low-level Senders                    //
 //-----------------------------------------------------//
-
-void swapBuffer(void)
-{
-    uint8 *temp=OLED_Buffer;
-    OLED_Buffer=OLED_DisplayBuffer;
-    OLED_DisplayBuffer=temp;
-}
 
 
 
@@ -71,7 +59,6 @@ void OLED_Init(I2C_Port_t PORT)
     OLED_SendCommand(PORT, 0xA6); // Normal display
 
     OLED_Clear();
-    swapBuffer();
     OLED_UpdateScreen(PORT);
 
     OLED_SendCommand(PORT, 0xAF); // Display ON
@@ -82,7 +69,7 @@ void OLED_Init(I2C_Port_t PORT)
 //-----------------------------------------------------//
 void OLED_Clear(void)
 {
-    for (uint16 i = 0; i < sizeof(BufferA); i++)
+    for (uint16 i = 0; i < sizeof(OLED_Buffer); i++)
         OLED_Buffer[i] = 0x00;
 }
 
@@ -115,7 +102,7 @@ void OLED_UpdateScreen(I2C_Port_t PORT)
 
         for (uint8 col = 0; col < OLED_WIDTH; col++)
         {
-            data[1 + col] = OLED_DisplayBuffer[page * OLED_WIDTH + col];
+            data[1 + col] = OLED_Buffer[page * OLED_WIDTH + col];
         }
 
         // Send entire page at once
@@ -123,3 +110,25 @@ void OLED_UpdateScreen(I2C_Port_t PORT)
     }
 }
 
+
+
+
+void OLED_APP(void)
+{
+    /* nothing */
+    static uint8 i = 0;
+  static uint8 j = 0;
+  i+=4;
+  if (i ==128)
+  {
+    i = 0;
+    j+=3;
+    if(j == 63)
+    {
+      j = 0;
+    }
+  }
+  OLED_DrawPixel(i, j, OLED_COLOR_WHITE); // Draw a diagonal line for testing
+  OLED_UpdateScreen(I2C1_PORT);
+  OLED_Clear();
+}

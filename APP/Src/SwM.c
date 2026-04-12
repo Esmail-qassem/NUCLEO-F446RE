@@ -9,6 +9,8 @@
 #include "RTC.h"
 #include "IWDG.h"
 #include "LOW_POWER.h"
+#include "I2C.h"`
+#include "OLED.h"
 /*Global Variables*/
 extern uint8 ESP_APPLICATION_FLAG;
 UART_Config_t Uart1_configuration = {
@@ -25,6 +27,18 @@ UART_Config_t Uart2_configuration = {
     UART_STOPBITS_1,
     UART_WORDLEN_8B,
     Interrupt};
+
+
+    I2C_Config_t i2c1_cfg = {
+    .PCLK1_Hz        = 16000000,
+    .ClockSpeed      = 400000,       /* 400 kHz fast mode for OLED */
+    .DutyCycle       = I2C_DUTY_2,
+    .AddressingMode  = I2C_ADDR_7BIT,
+    .OwnAddress      = 0x00,
+    .Acknowledgement = 1,
+    .TransferMode    = I2C_POLLING,
+};
+
 
 /* LSI ~32 kHz: 32000 / 100 / 320 = 1 Hz calendar tick.
    Use RTC_CLK_LSE + prediv_a=127, prediv_s=255 if you have an LSE crystal. */
@@ -61,7 +75,7 @@ RTC_Time_t Get_Time;
 /*************************************************/
 void OS_5ms_Task(void)
 {
-
+  OLED_APP();
 }
 void OS_10ms_Task(void)
 {
@@ -69,12 +83,11 @@ void OS_10ms_Task(void)
 }
 void OS_20ms_Task(void)
 {
-  /* nothing */
 }
 void OS_50ms_Task(void)
 {
-  /* nothing */
 }
+  /* nothing */
 void OS_100ms_Task(void)
 {
   IWDG_Refresh();
@@ -187,6 +200,8 @@ void APP_init(void)
   if (!RTC_IsInitialized()) {
   RTC_SetTime(&Time);
   }
+  I2C_Init(I2C1_PORT, &i2c1_cfg);
+  OLED_Init(I2C1_PORT);
   IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000)); // 250-ms timeout
 }
 /*********************************************************************************************************/
@@ -222,6 +237,12 @@ void GPIO_PIN_CONFIG(void)
 
   /* PC3 BOOTLOADER PIN */
   GPIO_InitPin(GPIO_PORTC, PIN3, GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+  /* I2C1 — PB8 = SCL, PB9 = SDA */
+GPIO_InitPin(GPIO_PORTB, PIN8, GPIO_MODE_AF, GPIO_OTYPE_OD, GPIO_SPEED_FAST, GPIO_PULL_UP);
+GPIO_InitPin(GPIO_PORTB, PIN9, GPIO_MODE_AF, GPIO_OTYPE_OD, GPIO_SPEED_FAST, GPIO_PULL_UP);
+GPIO_SetAF(GPIO_PORTB, PIN8, 4);  /* AF4 = I2C1 */
+GPIO_SetAF(GPIO_PORTB, PIN9, 4);
+
 }
 /*************************************************************************************************/
 /*************************************************************************************************/

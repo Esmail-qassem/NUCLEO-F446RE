@@ -46,5 +46,6 @@ void SystemInit(void)
   RCC_EnableClock(RCC_APB1, APB1_PWR);
   RCC_EnableClock(RCC_APB1, APB1_WWDG);
   RCC_EnableClock(RCC_AHB1, AHB1_CRC);
+  RCC_EnableClock(RCC_APB1, APB1_I2C1);
 
 }
