@@ -25,15 +25,11 @@ void OS_10ms_Task(void)
 
 void OS_20ms_Task(void)
 {
-    
-}
-
-void OS_50ms_Task(void)
-{
-    /* Read sensors at 20 Hz — safe rate for breadboard I2C */
+    static int x=0;
+    static int y=0;
+        /* Read sensors at 20 Hz — safe rate for breadboard I2C */
     MPU_GetAccelerometer(&accel_data);
     MPU_GetGyroscope(&gyro_data);
-
     /* Machine-readable line for Python visualizer — prefix $DATA so parser can filter it */
     UART_SendSyncBuffer(UART2, (uint8 *)"$DATA:", 6);
     UART_voidSendNumber(UART2, accel_data.Accel_X);
@@ -48,6 +44,16 @@ void OS_50ms_Task(void)
     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
     UART_voidSendNumber(UART2, gyro_data.GYRO_Z - Bias_gyro_data.GYRO_Z);
     UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+
+uint8 pixel_x = 64 - ((accel_data.Accel_Y - Bias_accel_data.Accel_Y) * 64) / 100;
+uint8 pixel_y = 32 - ((accel_data.Accel_X - Bias_accel_data.Accel_X) * 32) / 100;
+    OLED_Clear();
+    OLED_DrawPixel(pixel_x, pixel_y, OLED_COLOR_WHITE);
+    OLED_UpdateScreen(I2C1_PORT);
+}
+
+void OS_50ms_Task(void)
+{
 }
 
 void OS_100ms_Task(void)

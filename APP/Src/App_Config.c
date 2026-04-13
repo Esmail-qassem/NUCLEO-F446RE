@@ -46,6 +46,7 @@ I2C_Config_t i2c1_cfg = {
     .TransferMode    = I2C_POLLING,
 };
 
+
 /* LSI ~32 kHz: prediv_a=99, prediv_s=319 → 1 Hz calendar tick */
 RTC_Config_t RTC_config = {
     RTC_CLK_LSI,
@@ -74,7 +75,7 @@ void APP_init(void)
         RTC_SetTime(&Time);
     }
     I2C_Init(I2C1_PORT, &i2c1_cfg);
-    //OLED_Init(I2C1_PORT);
+    OLED_Init(I2C1_PORT);
     MPU_Init();
     /* wait 50 ms */
     for(uint16 i = 0; i < 3000 ; i++)
@@ -124,6 +125,7 @@ void GPIO_PIN_CONFIG(void)
     GPIO_InitPin(GPIO_PORTB, PIN9,  GPIO_MODE_AF,     GPIO_OTYPE_OD, GPIO_SPEED_FAST, GPIO_PULL_UP);
     GPIO_SetAF(GPIO_PORTB, PIN8, 4);
     GPIO_SetAF(GPIO_PORTB, PIN9, 4);
+
 }
 
 /*------------------------------------------------------------------
