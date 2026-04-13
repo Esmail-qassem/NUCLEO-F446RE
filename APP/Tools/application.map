@@ -299,7 +299,7 @@ Linker script and memory map
                 0x08008000                Vector_Table
                 0x08008178                . = ALIGN (0x4)
 
-.text           0x08008178     0x619c
+.text           0x08008178     0x606c
                 0x08008178                . = ALIGN (0x4)
  *(.text)
  .text          0x08008178        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -1082,152 +1082,151 @@ Linker script and memory map
                 0x0800d564                DMA1_Stream3_IRQHandler
  *fill*         0x0800d56a        0x2 
  .text.APP_init
-                0x0800d56c      0x11c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+                0x0800d56c       0xc0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
                 0x0800d56c                APP_init
  .text.GPIO_PIN_CONFIG
-                0x0800d688      0x142 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
-                0x0800d688                GPIO_PIN_CONFIG
+                0x0800d62c      0x142 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+                0x0800d62c                GPIO_PIN_CONFIG
  .text.ENABLE_NVIC_INTERRUPTS
-                0x0800d7ca       0x14 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
-                0x0800d7ca                ENABLE_NVIC_INTERRUPTS
- *fill*         0x0800d7de        0x2 
+                0x0800d76e       0x14 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+                0x0800d76e                ENABLE_NVIC_INTERRUPTS
+ *fill*         0x0800d782        0x2 
  .text.CallBackFunctions
-                0x0800d7e0       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
-                0x0800d7e0                CallBackFunctions
- .text.LED      0x0800d7fc       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d7fc                LED
- .text.LED_ON   0x0800d818       0x18 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d818                LED_ON
- .text.LED_OFF  0x0800d830       0x18 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d830                LED_OFF
+                0x0800d784       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+                0x0800d784                CallBackFunctions
+ .text.LED      0x0800d7a0       0x1c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d7a0                LED
+ .text.LED_ON   0x0800d7bc       0x18 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d7bc                LED_ON
+ .text.LED_OFF  0x0800d7d4       0x18 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d7d4                LED_OFF
  .text.SYS_Reset
-                0x0800d848       0x40 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d848                SYS_Reset
+                0x0800d7ec       0x40 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d7ec                SYS_Reset
  .text.BTLD_Jump
-                0x0800d888       0x2a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d888                BTLD_Jump
+                0x0800d82c       0x2a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d82c                BTLD_Jump
  .text.BTLD_Update
-                0x0800d8b2       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d8b2                BTLD_Update
- .text.PWM_SET  0x0800d8d0       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d8d0                PWM_SET
+                0x0800d856       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d856                BTLD_Update
+ .text.PWM_SET  0x0800d874       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d874                PWM_SET
  .text.duty_cycle_task
-                0x0800d904       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
-                0x0800d904                duty_cycle_task
+                0x0800d8a8       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+                0x0800d8a8                duty_cycle_task
  .text.UART2_ISR
-                0x0800d938       0x9c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
-                0x0800d938                UART2_ISR
+                0x0800d8dc       0x9c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
+                0x0800d8dc                UART2_ISR
  .text.UART1_ISR
-                0x0800d9d4       0xc0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
-                0x0800d9d4                UART1_ISR
+                0x0800d978       0xc0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
+                0x0800d978                UART1_ISR
  .text.Schedular
-                0x0800da94       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800da94                Schedular
- .text.main     0x0800daf8       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800daf8                main
- *fill*         0x0800db16        0x2 
+                0x0800da38       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800da38                Schedular
+ .text.main     0x0800da9c       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800da9c                main
+ *fill*         0x0800daba        0x2 
  .text.SystemInit
-                0x0800db18       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
-                0x0800db18                SystemInit
+                0x0800dabc       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+                0x0800dabc                SystemInit
  .text.OS_5ms_Task
-                0x0800db7c        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800db7c                OS_5ms_Task
+                0x0800db20        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800db20                OS_5ms_Task
  .text.OS_10ms_Task
-                0x0800db8a        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800db8a                OS_10ms_Task
+                0x0800db2e        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800db2e                OS_10ms_Task
+ *fill*         0x0800db3a        0x2 
  .text.OS_20ms_Task
-                0x0800db96        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800db96                OS_20ms_Task
+                0x0800db3c      0x150 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800db3c                OS_20ms_Task
  .text.OS_50ms_Task
-                0x0800dba4       0xe4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800dba4                OS_50ms_Task
+                0x0800dc8c        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800dc8c                OS_50ms_Task
  .text.OS_100ms_Task
-                0x0800dc88        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800dc88                OS_100ms_Task
+                0x0800dc9a        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800dc9a                OS_100ms_Task
+ *fill*         0x0800dca6        0x2 
  .text.OS_1000ms_Task
-                0x0800dc94      0x20c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800dc94                OS_1000ms_Task
+                0x0800dca8       0xc8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800dca8                OS_1000ms_Task
  .text.OS_IDLE_TASK
-                0x0800dea0       0x10 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                0x0800dea0                OS_IDLE_TASK
+                0x0800dd70       0x10 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                0x0800dd70                OS_IDLE_TASK
  .text.LifeCounter
-                0x0800deb0       0x60 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800deb0                LifeCounter
+                0x0800dd80       0x60 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800dd80                LifeCounter
  .text.SW_VERSION
-                0x0800df10       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800df10                SW_VERSION
+                0x0800dde0       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800dde0                SW_VERSION
  .text.RUN_TIME
-                0x0800df44       0xec C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800df44                RUN_TIME
+                0x0800de14       0xec C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800de14                RUN_TIME
  .text.INTERNAL_TEMP_TASK
-                0x0800e030       0x98 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800e030                INTERNAL_TEMP_TASK
+                0x0800df00       0x98 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800df00                INTERNAL_TEMP_TASK
  .text.LDR_TASK
-                0x0800e0c8       0xa8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800e0c8                LDR_TASK
+                0x0800df98       0xa8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800df98                LDR_TASK
  .text.STACK_MONITOR
-                0x0800e170       0xe4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800e170                STACK_MONITOR
+                0x0800e040       0xe4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800e040                STACK_MONITOR
  .text.BOOT_REASON_REPORT
-                0x0800e254       0xc0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x0800e254                BOOT_REASON_REPORT
-                0x0800e314                . = ALIGN (0x4)
-                0x0800e314                _etext = .
+                0x0800e124       0xc0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x0800e124                BOOT_REASON_REPORT
+                0x0800e1e4                . = ALIGN (0x4)
+                0x0800e1e4                _etext = .
 
-.glue_7         0x0800e314        0x0
- .glue_7        0x0800e314        0x0 linker stubs
+.glue_7         0x0800e1e4        0x0
+ .glue_7        0x0800e1e4        0x0 linker stubs
 
-.glue_7t        0x0800e314        0x0
- .glue_7t       0x0800e314        0x0 linker stubs
+.glue_7t        0x0800e1e4        0x0
+ .glue_7t       0x0800e1e4        0x0 linker stubs
 
-.vfp11_veneer   0x0800e314        0x0
- .vfp11_veneer  0x0800e314        0x0 linker stubs
+.vfp11_veneer   0x0800e1e4        0x0
+ .vfp11_veneer  0x0800e1e4        0x0 linker stubs
 
-.v4_bx          0x0800e314        0x0
- .v4_bx         0x0800e314        0x0 linker stubs
+.v4_bx          0x0800e1e4        0x0
+ .v4_bx         0x0800e1e4        0x0 linker stubs
 
-.iplt           0x0800e314        0x0
- .iplt          0x0800e314        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.iplt           0x0800e1e4        0x0
+ .iplt          0x0800e1e4        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.rodata         0x0800e314      0x2d8
-                0x0800e314                . = ALIGN (0x4)
+.rodata         0x0800e1e4      0x244
+                0x0800e1e4                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0800e314        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
- *fill*         0x0800e31a        0x2 
- .rodata        0x0800e31c       0xa7 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
- *fill*         0x0800e3c3        0x1 
- .rodata        0x0800e3c4       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
- *fill*         0x0800e3e2        0x2 
- .rodata        0x0800e3e4       0x27 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
- *fill*         0x0800e40b        0x1 
- .rodata        0x0800e40c        0xf C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
- *fill*         0x0800e41b        0x1 
- .rodata        0x0800e41c        0xa C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
- *fill*         0x0800e426        0x2 
- .rodata        0x0800e428       0xa6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- *fill*         0x0800e4ce        0x2 
- .rodata        0x0800e4d0       0xf3 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .rodata        0x0800e1e4        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/UART/src/UART.o
+ *fill*         0x0800e1ea        0x2 
+ .rodata        0x0800e1ec       0xa7 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/HAL/ESP/ESP.o
+ *fill*         0x0800e293        0x1 
+ .rodata        0x0800e294       0x1e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
+ *fill*         0x0800e2b2        0x2 
+ .rodata        0x0800e2b4        0xf C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+ *fill*         0x0800e2c3        0x1 
+ .rodata        0x0800e2c4        0xa C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
+ *fill*         0x0800e2ce        0x2 
+ .rodata        0x0800e2d0       0x3c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .rodata        0x0800e30c       0xf3 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
  *(.rodata*)
- *fill*         0x0800e5c3        0x1 
+ *fill*         0x0800e3ff        0x1 
  .rodata.IWDG_PrescalerDiv
-                0x0800e5c4        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/IWDG/src/IWDG.o
- *fill*         0x0800e5d2        0x2 
+                0x0800e400        0xe C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/IWDG/src/IWDG.o
+ *fill*         0x0800e40e        0x2 
  .rodata.I2C_BaseAddr
-                0x0800e5d4        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
+                0x0800e410        0xc C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/I2C/src/I2C.o
  .rodata.MSP_Value
-                0x0800e5e0        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
-                0x0800e5e0                MSP_Value
+                0x0800e41c        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
+                0x0800e41c                MSP_Value
  .rodata.FIRMWARE_VERSION
-                0x0800e5e4        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
-                0x0800e5e4                FIRMWARE_VERSION
-                0x0800e5ec                . = ALIGN (0x4)
- *fill*         0x0800e5ea        0x2 
-                0x0800e5ec                _sidata = LOADADDR (.data)
+                0x0800e420        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+                0x0800e420                FIRMWARE_VERSION
+                0x0800e428                . = ALIGN (0x4)
+ *fill*         0x0800e426        0x2 
+                0x0800e428                _sidata = LOADADDR (.data)
 
-.rel.dyn        0x0800e5ec        0x0
- .rel.iplt      0x0800e5ec        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
+.rel.dyn        0x0800e428        0x0
+ .rel.iplt      0x0800e428        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.data           0x20000000       0x60 load address 0x0800e5ec
+.data           0x20000000       0x60 load address 0x0800e428
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdata = .
  *(.data)
@@ -1284,10 +1283,10 @@ Linker script and memory map
                 0x20000060                . = ALIGN (0x4)
                 0x20000060                _edata = .
 
-.igot.plt       0x20000060        0x0 load address 0x0800e64c
+.igot.plt       0x20000060        0x0 load address 0x0800e488
  .igot.plt      0x20000060        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 
-.bss            0x20000060     0x13b8 load address 0x0800e64c
+.bss            0x20000060     0x13c4 load address 0x0800e488
                 0x20000060                _sbss = .
  *(.bss)
  .bss           0x20000060        0x0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -1403,23 +1402,27 @@ Linker script and memory map
  .bss.gyro_data
                 0x20001408        0x6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
                 0x20001408                gyro_data
- .bss.tick.0    0x2000140e        0x1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- *fill*         0x2000140f        0x1 
- .bss.Get_Time  0x20001410        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x20001410                Get_Time
+ *fill*         0x2000140e        0x2 
+ .bss.y.2       0x20001410        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .bss.x.1       0x20001414        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .bss.tick.0    0x20001418        0x1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ *fill*         0x20001419        0x3 
+ .bss.Get_Time  0x2000141c        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x2000141c                Get_Time
  .bss.counter.0
-                0x20001414        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
-                0x20001418                . = ALIGN (0x4)
-                0x20001418                _ebss = .
+                0x20001420        0x4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+                0x20001424                . = ALIGN (0x4)
+                0x20001424                _ebss = .
 
 ._user_heap_stack
-                0x20001418     0x1200 load address 0x0800e64c
-                0x20001418                . = ALIGN (0x8)
-                0x20001618                . = (. + _Min_Heap_Size)
- *fill*         0x20001418      0x200 
-                0x20002618                . = (. + _Min_Stack_Size)
- *fill*         0x20001618     0x1000 
-                0x20002618                . = ALIGN (0x8)
+                0x20001424     0x1204 load address 0x0800e488
+                0x20001428                . = ALIGN (0x8)
+ *fill*         0x20001424        0x4 
+                0x20001628                . = (. + _Min_Heap_Size)
+ *fill*         0x20001428      0x200 
+                0x20002628                . = (. + _Min_Stack_Size)
+ *fill*         0x20001628     0x1000 
+                0x20002628                . = ALIGN (0x8)
 LOAD C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
 LOAD C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
 LOAD C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -1453,7 +1456,7 @@ LOAD C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 OUTPUT(C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Tools/application.elf elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x00000000     0x73a0
+.debug_info     0x00000000     0x7422
  .debug_info    0x00000000      0x3e2 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_info    0x000003e2      0x303 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_info    0x000006e5      0x26b C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -1482,10 +1485,10 @@ LOAD linker stubs
  .debug_info    0x000066c9      0x31f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
  .debug_info    0x000069e8      0x124 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
  .debug_info    0x00006b0c      0x3df C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_info    0x00006eeb      0x1fb C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- .debug_info    0x000070e6      0x2ba C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .debug_info    0x00006eeb      0x27d C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .debug_info    0x00007168      0x2ba C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 
-.debug_abbrev   0x00000000     0x2446
+.debug_abbrev   0x00000000     0x2462
  .debug_abbrev  0x00000000      0x134 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_abbrev  0x00000134      0x12e C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_abbrev  0x00000262      0x144 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -1514,8 +1517,8 @@ LOAD linker stubs
  .debug_abbrev  0x00001f44      0x113 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
  .debug_abbrev  0x00002057       0xd4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
  .debug_abbrev  0x0000212b      0x108 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_abbrev  0x00002233       0xf4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- .debug_abbrev  0x00002327      0x11f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .debug_abbrev  0x00002233      0x110 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .debug_abbrev  0x00002343      0x11f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 
 .debug_aranges  0x00000000      0xb20
  .debug_aranges
@@ -1682,7 +1685,7 @@ LOAD linker stubs
  .debug_macro   0x00002455       0x87 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
  .debug_macro   0x000024dc       0xa4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 
-.debug_line     0x00000000     0x4f00
+.debug_line     0x00000000     0x4ec2
  .debug_line    0x00000000      0x2c0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_line    0x000002c0      0x206 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_line    0x000004c6      0x1da C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -1707,14 +1710,14 @@ LOAD linker stubs
  .debug_line    0x00003bcf      0x101 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/P1/FLAPPY_Bird/FLAPPY_Bird.o
  .debug_line    0x00003cd0      0x430 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/RTOS/RTOS.o
  .debug_line    0x00004100       0xe1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Startup/startup_stm32f103.o
- .debug_line    0x000041e1      0x2a6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
- .debug_line    0x00004487      0x21c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
- .debug_line    0x000046a3      0x18b C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
- .debug_line    0x0000482e      0x17a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_line    0x000049a8      0x266 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- .debug_line    0x00004c0e      0x2f2 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .debug_line    0x000041e1      0x28d C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o
+ .debug_line    0x0000446e      0x21c C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
+ .debug_line    0x0000468a      0x18b C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
+ .debug_line    0x00004815      0x17a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
+ .debug_line    0x0000498f      0x241 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .debug_line    0x00004bd0      0x2f2 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 
-.debug_str      0x00000000     0x9533
+.debug_str      0x00000000     0x9543
  .debug_str     0x00000000     0x351a C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x3598 (size before relaxing)
  .debug_str     0x0000351a      0x4c4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
@@ -1771,9 +1774,9 @@ LOAD linker stubs
                                0x3c12 (size before relaxing)
  .debug_str     0x0000932c       0x37 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
                                0x4740 (size before relaxing)
- .debug_str     0x00009363       0x6f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
-                               0x3e59 (size before relaxing)
- .debug_str     0x000093d2      0x161 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .debug_str     0x00009363       0x7f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+                               0x3eb8 (size before relaxing)
+ .debug_str     0x000093e2      0x161 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
                                0x430c (size before relaxing)
 
 .comment        0x00000000       0x49
@@ -1872,7 +1875,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x000005e4       0x34 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
 
-.debug_frame    0x00000000     0x264c
+.debug_frame    0x00000000     0x2654
  .debug_frame   0x00000000      0x1c8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_frame   0x000001c8      0x100 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/NVIC/src/NVIC_program.o
  .debug_frame   0x000002c8      0x120 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/MCAL/SysTick/src/SysTick_program.o
@@ -1901,5 +1904,5 @@ LOAD linker stubs
  .debug_frame   0x000022a8      0x114 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Ctrl.o
  .debug_frame   0x000023bc       0x58 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/ISR.o
  .debug_frame   0x00002414       0x64 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/main.o
- .debug_frame   0x00002478       0xe0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
- .debug_frame   0x00002558       0xf4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o
+ .debug_frame   0x00002478       0xe8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/SwM.o
+ .debug_frame   0x00002560       0xf4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/Telemetry.o

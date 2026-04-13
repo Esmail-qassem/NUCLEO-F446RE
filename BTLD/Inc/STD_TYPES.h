@@ -7,6 +7,10 @@
 #ifndef STD_TYPES_H_
 #define STD_TYPES_H_
 
+
+
+#define false 0
+#define true  1
 typedef enum
 {
 	E_Ok,
@@ -20,6 +24,7 @@ enum Ability
 	Disable,
 	Enable
 };
+
 typedef signed char sint8;
 typedef signed short int sint16;
 typedef signed long int sint32;

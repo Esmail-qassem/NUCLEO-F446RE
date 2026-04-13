@@ -1,7 +1,6 @@
 #ifndef PARSE_H_
 #define PARSE_H_
 
-#include "STD_TYPES.h"
 #include "UART.h"
 #include "FLASH.h"
 #define SCB_AIRCR *((volatile uint32*)0xE000ED0C)
