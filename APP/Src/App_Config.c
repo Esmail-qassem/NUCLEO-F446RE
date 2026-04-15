@@ -15,6 +15,8 @@
 #include "FPU.h"
 #include "UART.h"
 #include "RTC.h"
+#include "FLAPPY_Bird.h"
+#include "FLAPPY_Bird_Cfg.h"
 
 /*------------------------------------------------------------------
  *  Firmware version — single definition, shared via App_Config.h
@@ -140,6 +142,8 @@ void APP_Init(void)
     MPU_SettleDelay();
     MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
 
+    Game_Init();
+
     IWDG_Init(IWDG_PRE_32,
               IWDG_CalcReload(IWDG_TIMEOUT_MS, IWDG_PRE_32, IWDG_LSI_HZ));
 }
@@ -181,6 +185,10 @@ static void GPIO_PinConfig(void)
 
     /* Bootloader trigger pin — input pull-up */
     GPIO_InitPin(BTLD_TRIG_PORT, BTLD_TRIG_PIN, GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+
+    /* Flappy-Bird buttons — input pull-up, active low */
+    GPIO_InitPin(GAME_BTN_JUMP_PORT,  GAME_BTN_JUMP_PIN,  GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+    GPIO_InitPin(GAME_BTN_RESET_PORT, GAME_BTN_RESET_PIN, GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
 
     /* I2C1 — PB8 SCL, PB9 SDA (AF4, open-drain) */
     GPIO_InitPin(GPIO_PORTB, PIN8,  GPIO_MODE_AF,     GPIO_OTYPE_OD, GPIO_SPEED_FAST, GPIO_PULL_UP);

@@ -17,4 +17,10 @@ void  Bird_Jump(void);
 uint8 Bird_GetY(void);
 void  Bird_Draw(void);
 
+/*------------------------------------------------------------------
+ *  Game engine
+ *------------------------------------------------------------------*/
+void Game_Init(void);
+void Game_Task(void);   /* call periodically (one frame per call) */
+
 #endif /* FLAPPY_BIRD_H_ */

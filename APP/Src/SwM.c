@@ -7,6 +7,7 @@
 #include "IWDG.h"
 #include "MPU.h"
 #include "UART.h"
+#include "FLAPPY_Bird.h"
 
 /*------------------------------------------------------------------
  *  Scheduler task table (consumed by main.c)
@@ -31,7 +32,6 @@ static GYRO_t  gyro_data;
  *  Local prototypes
  *------------------------------------------------------------------*/
 static void SwM_SendImuLine(void);
-static void SwM_DrawTiltPixel(void);
 static void SwM_PrintMpuTemp(void);
 
 /*==================================================================
@@ -54,12 +54,11 @@ void OS_20ms_Task(void)
     MPU_GetGyroscope(&gyro_data);
 
     SwM_SendImuLine();
-    SwM_DrawTiltPixel();
 }
 
 void OS_50ms_Task(void)
 {
-    /* reserved */
+    Game_Task();    /* Flappy-Bird @ 20 Hz — owns the OLED */
 }
 
 void OS_100ms_Task(void)
@@ -128,33 +127,6 @@ static void SwM_SendImuLine(void)
     UART_SendSyncBuffer(UART2, (uint8 *)",", 1U);
     UART_voidSendNumber(UART2, gyro_data.GYRO_Z - Bias_gyro_data.GYRO_Z);
     UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", sizeof("\r\n") - 1U);
-}
-
-/*------------------------------------------------------------------
- *  SwM_DrawTiltPixel
- *  Map bias-corrected accelerometer (centi-g) to an OLED pixel.
- *------------------------------------------------------------------*/
-static void SwM_DrawTiltPixel(void)
-{
-    sint32 px;
-    sint32 py;
-
-    px = (sint32)OLED_CENTER_X -
-         (((sint32)accel_data.Accel_Y - (sint32)Bias_accel_data.Accel_Y)
-          * (sint32)OLED_CENTER_X) / (sint32)ACCEL_FULL_SCALE_CG;
-
-    py = (sint32)OLED_CENTER_Y -
-         (((sint32)accel_data.Accel_X - (sint32)Bias_accel_data.Accel_X)
-          * (sint32)OLED_CENTER_Y) / (sint32)ACCEL_FULL_SCALE_CG;
-
-    if (px < 0)                          { px = 0; }
-    if (px > (sint32)(OLED_WIDTH  - 1U)) { px = (sint32)(OLED_WIDTH  - 1U); }
-    if (py < 0)                          { py = 0; }
-    if (py > (sint32)(OLED_HEIGHT - 1U)) { py = (sint32)(OLED_HEIGHT - 1U); }
-
-    OLED_Clear();
-    OLED_DrawPixel((uint8)px, (uint8)py, OLED_COLOR_WHITE);
-    OLED_UpdateScreen(I2C1_PORT);
 }
 
 /*------------------------------------------------------------------
