@@ -1,52 +1,51 @@
 #include "STD_TYPES.h"
-#include "RCC.h"
-#include "SwM.h"
 #include "App_Config.h"
-#include "RTC.h"
-#include "GPIO_interface.h"
-#include "CRC.h"
-RCC_Config_t RCC_Configuration =
-    {
-        RCC_CLK_HSI,
-        {0, 0, 0, 0, 0},
-        AHB_PRE_1,
-        APB_PRE_1,
-        APB_PRE_1};
+#include "SwM_Cfg.h"
+#include "RTOS.h"
 
+/*------------------------------------------------------------------
+ *  Local prototypes
+ *------------------------------------------------------------------*/
+static void Scheduler(void);
 
-void Schedular(void)
-{
-  RTOS_voidCreateTask(0, 5,    OS_5ms_Task);
-  RTOS_voidCreateTask(1, 10,   OS_10ms_Task);
-  RTOS_voidCreateTask(2, 20,   OS_20ms_Task);
-  RTOS_voidCreateTask(3, 50,   OS_50ms_Task);
-  RTOS_voidCreateTask(4, 100,  OS_100ms_Task);
-  RTOS_voidCreateTask(5, 1000, OS_1000ms_Task);
-  RTOS_voidStart();
-}
-
-
+/*------------------------------------------------------------------
+ *  main
+ *------------------------------------------------------------------*/
 int main(void)
 {
-  GPIO_PIN_CONFIG();
-  ENABLE_NVIC_INTERRUPTS();
-  CallBackFunctions();
-  APP_init();
-  Schedular();
+    APP_Init();
+    Scheduler();
+
+    /* RTOS_voidStart() never returns; loop is defensive only. */
+    for (;;)
+    {
+        /* unreachable */
+    }
 }
 
+/*------------------------------------------------------------------
+ *  Scheduler — register all periodic tasks and start the RTOS.
+ *------------------------------------------------------------------*/
+static void Scheduler(void)
+{
+    uint8 i;
+
+    for (i = 0U; i < (uint8)TASK_ID_COUNT; i++)
+    {
+        (void)RTOS_voidCreateTask(SwM_TaskTable[i].priority,
+                                  SwM_TaskTable[i].period_ms,
+                                  SwM_TaskTable[i].handler);
+    }
+    RTOS_voidStart();
+}
+
+/*------------------------------------------------------------------
+ *  SystemInit — called by the reset handler before main().
+ *  Prototype provided here to satisfy MISRA Rule 8.4; the symbol
+ *  is referenced only from startup assembly.
+ *------------------------------------------------------------------*/
+void SystemInit(void);
 void SystemInit(void)
 {
-  RCC_Init(&RCC_Configuration);
-  RCC_EnableClock(RCC_AHB1, AHB1_GPIOA);
-  RCC_EnableClock(RCC_AHB1, AHB1_GPIOB);
-  RCC_EnableClock(RCC_AHB1, AHB1_GPIOC);
-  RCC_EnableClock(RCC_APB1, APB1_USART2);
-  RCC_EnableClock(RCC_APB2, APB2_USART1);
-  RCC_EnableClock(RCC_APB2, APB2_ADC1);
-  RCC_EnableClock(RCC_APB1, APB1_PWR);
-  RCC_EnableClock(RCC_APB1, APB1_WWDG);
-  RCC_EnableClock(RCC_AHB1, AHB1_CRC);
-  RCC_EnableClock(RCC_APB1, APB1_I2C1);
-
+    APP_ClockInit();
 }

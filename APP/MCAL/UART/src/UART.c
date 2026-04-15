@@ -1,243 +1,246 @@
 #include "UART.h"
-uint8 rx_test;
-void (*uart1_funcPtr)(uint8)=NULL;
-void (*uart2_funcPtr)(uint8)=NULL;
-void (*uart3_funcPtr)(uint8)=NULL;
+#include "UART_private.h"
 
-uint32 Get_BASE_ADD(uint8 base)
+/*------------------------------------------------------------------
+ *  RX callback pointers — one per hardware unit
+ *------------------------------------------------------------------*/
+static void (*uart1_funcPtr)(uint8) = NULL;
+static void (*uart2_funcPtr)(uint8) = NULL;
+static void (*uart3_funcPtr)(uint8) = NULL;
+
+/*------------------------------------------------------------------
+ *  Local prototypes
+ *------------------------------------------------------------------*/
+static uint32 Get_BASE_ADD(UART_HardWare_t base);
+static void   Write_UART_Number(UART_HardWare_t HardWare_Unit, sint32 Copy_sint32Number);
+static void   UART_IrqCommon(uint32 Add, void (*callback)(uint8));
+
+/*==================================================================
+ *  Get_BASE_ADD — map logical UART id to peripheral base address
+ *================================================================*/
+static uint32 Get_BASE_ADD(UART_HardWare_t base)
 {
-    uint32 x=0;
-    switch(base)
+    uint32 x = 0U;
+
+    switch (base)
     {
-        case UART1 :   x= USART1_BASE; break;
-        case UART2 :   x= USART2_BASE; break;
-        case UART3 :   x= USART3_BASE; break;
-        default :      break; 
+        case UART1:  x = USART1_BASE;  break;
+        case UART2:  x = USART2_BASE;  break;
+        case UART3:  x = USART3_BASE;  break;
+        default:     /* invalid id */  break;
     }
     return x;
 }
-void Write_UART_Number(UART_HardWare_t HardWare_Unit, sint32 Copy_sint32Number)
+
+/*==================================================================
+ *  Write_UART_Number — emit a positive decimal number, MSB first
+ *================================================================*/
+static void Write_UART_Number(UART_HardWare_t HardWare_Unit, sint32 Copy_sint32Number)
 {
-    uint8 NUM[10];
-    uint8 Local_uint8Counter=0;
-    while(Copy_sint32Number>0)
+    uint8 NUM[UART_NUM_BUF_LEN];
+    uint8 Local_uint8Counter = 0U;
+    uint8 i;
+
+    while (Copy_sint32Number > 0)
     {
-    	NUM[Local_uint8Counter++]=(Copy_sint32Number%10)+'0';
-    	Copy_sint32Number/=10;
+        NUM[Local_uint8Counter] = (uint8)((Copy_sint32Number % 10) + (sint32)'0');
+        Local_uint8Counter++;
+        Copy_sint32Number /= 10;
     }
-    /*reverse*/
-    for(uint8 i=Local_uint8Counter;i>0;i--)
+
+    /* Digits were stored LSB-first; send in reverse order. */
+    for (i = Local_uint8Counter; i > 0U; i--)
     {
-        UART_SendSyncBuffer(HardWare_Unit,(uint8*)(NUM + i - 1),1u);
+        UART_SendSyncBuffer(HardWare_Unit, &NUM[i - 1U], 1U);
     }
 }
-/* ---------------- Initialization ---------------- */
+
+/*==================================================================
+ *  UART_Init
+ *================================================================*/
 void UART_Init(UART_HardWare_t base, const UART_Config_t *cfg, uint32 pclk)
 {
-    if (!cfg) return;
-    uint32 Add =Get_BASE_ADD(base);
+    uint32 Add;
+    uint32 usartdiv;
+    uint32 cr1;
+    uint32 cr2;
 
-    /* Disable USART before config */
-    CLEAR_BIT(USART_CR1(Add), 13);
+    if (cfg == NULL)
+    {
+        return;
+    }
 
-    /* ---------------- Baud Rate Setup ---------------- */
-    uint32 usartdiv = (pclk + (cfg->BaudRate / 2U)) / cfg->BaudRate;
+    Add = Get_BASE_ADD(base);
+
+    /* Disable USART before reconfiguration. */
+    USART_CR1(Add) &= ~USART_CR1_UE;
+
+    /* ---- Baud rate (rounded integer divider) -------------------- */
+    usartdiv       = (pclk + (cfg->BaudRate / 2U)) / cfg->BaudRate;
     USART_BRR(Add) = usartdiv;
 
-    /* ---------------- Word Length ---------------- */
-    if (cfg->WordLength == UART_WORDLEN_9B)
-        SET_BIT(USART_CR1(Add), 12);
-    else
-        CLEAR_BIT(USART_CR1(Add), 12);
+    /* ---- CR1: word length, parity, mode, RX interrupt ----------- */
+    cr1  = USART_CR1(Add);
+    cr1 &= ~(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS);
 
-    /* ---------------- Parity ---------------- */
-    if (cfg->Parity == UART_PARITY_NONE) {
-        CLEAR_BIT(USART_CR1(Add), 10); // Parity control disable
-    } else {
-        SET_BIT(USART_CR1(Add), 10); // Enable parity
-        if (cfg->Parity == UART_PARITY_ODD)
-            SET_BIT(USART_CR1(Add), 9);
-        else
-            CLEAR_BIT(USART_CR1(Add), 9);
+    if (cfg->WordLength == UART_WORDLEN_9B)
+    {
+        cr1 |= USART_CR1_M;
     }
 
-    /* ---------------- Stop Bits ---------------- */
-    USART_CR2(Add) &= ~(0x3 << 12);
-    USART_CR2(Add) |= (cfg->StopBits << 12);
+    if (cfg->Parity != UART_PARITY_NONE)
+    {
+        cr1 |= USART_CR1_PCE;
+        if (cfg->Parity == UART_PARITY_ODD)
+        {
+            cr1 |= USART_CR1_PS;
+        }
+    }
 
-    /* ---------------- INTERRUPT (Tx/Rx) ---------------- */
-    USART_CR1(Add) |= cfg->Sync_Mode;
+    cr1 |= (uint32)cfg->Sync_Mode;   /* RXNEIE when Interrupt mode */
+    cr1 |= (uint32)cfg->Mode;        /* TE / RE                    */
 
-    /* ---------------- Mode (Tx/Rx) ---------------- */
-    USART_CR1(Add) |= cfg->Mode;
+    USART_CR1(Add) = cr1;
 
-    /* ---------------- Enable USART ---------------- */
-    SET_BIT(USART_CR1(Add), 13);
+    /* ---- CR2: stop bits ----------------------------------------- */
+    cr2  = USART_CR2(Add);
+    cr2 &= ~USART_CR2_STOP_MSK;
+    cr2 |= ((uint32)cfg->StopBits << USART_CR2_STOP_POS);
+    USART_CR2(Add) = cr2;
+
+    /* ---- Enable USART ------------------------------------------- */
+    USART_CR1(Add) |= USART_CR1_UE;
 }
 
-/* ---------------- Transmit Single Byte ---------------- */
+/*==================================================================
+ *  UART_SendSyncBuffer — blocking transmit of <size> bytes
+ *================================================================*/
 void UART_SendSyncBuffer(UART_HardWare_t base, const uint8 *buf, uint8 size)
-
 {
     uint32 Add = Get_BASE_ADD(base);
+    uint8  i;
 
-    for (uint8 i = 0; i < size; i++)
+    for (i = 0U; i < size; i++)
     {
-        while (!GET_BIT(USART_SR(Add), 7)); // Wait until TXE = 1
-        USART_DR(Add) = *(buf + i);
+        /* Wait until the transmit data register is empty. */
+        while ((USART_SR(Add) & USART_SR_TXE) == 0U)
+        {
+            /* busy-wait */
+        }
+        USART_DR(Add) = buf[i];
     }
-
-    }
-void UART_voidSendNumber(UART_HardWare_t HardWare_Unit,sint32 Copy_sint32Number)
-{
-	if(Copy_sint32Number<0)
-	{
-		UART_SendSyncBuffer(HardWare_Unit,(uint8*)"-",1u);
-		Copy_sint32Number= -Copy_sint32Number;
-	}
-	if(Copy_sint32Number==0)
-	{
-        UART_SendSyncBuffer(HardWare_Unit,(uint8*)"0",1u);
-		return;
-	}
-    Write_UART_Number(HardWare_Unit,Copy_sint32Number);
 }
 
-void UART1_CALLBACK(void(*p2function)(uint8))
+/*==================================================================
+ *  UART_voidSendNumber — signed decimal print
+ *================================================================*/
+void UART_voidSendNumber(UART_HardWare_t HardWare_Unit, sint32 Copy_sint32Number)
 {
-    if(p2function!= NULL)
+    if (Copy_sint32Number < 0)
     {
-         uart1_funcPtr = p2function;
+        UART_SendSyncBuffer(HardWare_Unit, (const uint8 *)"-", 1U);
+        Copy_sint32Number = -Copy_sint32Number;
+    }
+
+    if (Copy_sint32Number == 0)
+    {
+        UART_SendSyncBuffer(HardWare_Unit, (const uint8 *)"0", 1U);
+    }
+    else
+    {
+        Write_UART_Number(HardWare_Unit, Copy_sint32Number);
     }
 }
-void UART2_CALLBACK(void(*p2function)(uint8))
+
+/*==================================================================
+ *  Callback registration
+ *================================================================*/
+void UART1_CALLBACK(void (*p2function)(uint8))
 {
-    if(p2function!= NULL)
+    if (p2function != NULL)
     {
-         uart2_funcPtr = p2function;
+        uart1_funcPtr = p2function;
     }
 }
-void UART3_CALLBACK(void(*p2function)(uint8))
+
+void UART2_CALLBACK(void (*p2function)(uint8))
 {
-    if(p2function!= NULL)
+    if (p2function != NULL)
     {
-         uart3_funcPtr = p2function;
+        uart2_funcPtr = p2function;
     }
+}
+
+void UART3_CALLBACK(void (*p2function)(uint8))
+{
+    if (p2function != NULL)
+    {
+        uart3_funcPtr = p2function;
+    }
+}
+
+/*==================================================================
+ *  UART_IrqCommon
+ *  Shared body for all USART interrupt handlers: deliver received
+ *  byte to the registered callback and clear error flags.
+ *================================================================*/
+static void UART_IrqCommon(uint32 Add, void (*callback)(uint8))
+{
+    uint32          status = USART_SR(Add);
+    volatile uint32 dummy;
+
+    /* RX data available — reading DR clears RXNE. */
+    if ((status & USART_SR_RXNE) != 0U)
+    {
+        uint8 rx = (uint8)USART_DR(Add);
+        if (callback != NULL)
+        {
+            callback(rx);
+        }
+    }
+
+    /* Overrun — cleared by reading SR then DR. */
+    if ((status & USART_SR_ORE) != 0U)
+    {
+        dummy = USART_SR(Add);
+        dummy = USART_DR(Add);
+        (void)dummy;
+    }
+
+    /* Framing error — cleared by reading SR. */
+    if ((status & USART_SR_FE) != 0U)
+    {
+        dummy = USART_SR(Add);
+        (void)dummy;
+    }
+
+    /* Noise error — cleared by reading SR. */
+    if ((status & USART_SR_NE) != 0U)
+    {
+        dummy = USART_SR(Add);
+        (void)dummy;
+    }
+}
+
+/*==================================================================
+ *  IRQ handlers — referenced from the vector table.
+ *  Prototypes provided here to satisfy MISRA Rule 8.4.
+ *================================================================*/
+void USART1_IRQHandler(void);
+void USART2_IRQHandler(void);
+void USART3_IRQHandler(void);
+
+void USART1_IRQHandler(void)
+{
+    UART_IrqCommon(Get_BASE_ADD(UART1), uart1_funcPtr);
 }
 
 void USART2_IRQHandler(void)
-{   
-    uint32 Add = Get_BASE_ADD(UART2);
-    uint32 status = USART_SR(Add);
-    
-    /* RX Data Available */
-    if (status & (1 << 5))  // RXNE
-    {
-        rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
-        uart2_funcPtr(rx_test);
-    }
-    
-    /* Overrun Error */
-    if (status & (1 << 3))  // ORE
-    {
-        // Clear by reading SR then DR
-        volatile uint32 temp = USART_SR(Add);
-        temp = USART_DR(Add);
-        (void)temp;
-    }
-    
-    /* Framing Error */
-    if (status & (1 << 2))  // FE
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }
-    
-    /* Noise Error */
-    if (status & (1 << 1))  // NE  
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }
+{
+    UART_IrqCommon(Get_BASE_ADD(UART2), uart2_funcPtr);
 }
 
 void USART3_IRQHandler(void)
 {
-        uint32 Add = Get_BASE_ADD(UART3);
-    uint32 status = USART_SR(Add);
-    
-    /* RX Data Available */
-    if (status & (1 << 5))  // RXNE
-    {
-        rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
-        uart3_funcPtr(rx_test);
-    }
-    
-    /* Overrun Error */
-    if (status & (1 << 3))  // ORE
-    {
-        // Clear by reading SR then DR
-        volatile uint32 temp = USART_SR(Add);
-        temp = USART_DR(Add);
-        (void)temp;
-    }
-    
-    /* Framing Error */
-    if (status & (1 << 2))  // FE
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }
-    
-    /* Noise Error */
-    if (status & (1 << 1))  // NE  
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }
-
-
-}
-
-void USART1_IRQHandler(void)
-{
-        uint32 Add = Get_BASE_ADD(UART1);
-    uint32 status = USART_SR(Add);
-    
-    /* RX Data Available */
-    if (status & (1 << 5))  // RXNE
-    {
-        rx_test= (uint8)USART_DR(Add);  // Reading DR clears RXNE
-        uart1_funcPtr(rx_test);
-    }
-    
-    /* Overrun Error */
-    if (status & (1 << 3))  // ORE
-    {
-        // Clear by reading SR then DR
-        volatile uint32 temp = USART_SR(Add);
-        temp = USART_DR(Add);
-        (void)temp;
-    }
-    
-    /* Framing Error */
-    if (status & (1 << 2))  // FE
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }
-    
-    /* Noise Error */
-    if (status & (1 << 1))  // NE  
-    {
-        // Clear by reading SR
-        volatile uint32 temp = USART_SR(Add);
-        (void)temp;
-    }    
-
+    UART_IrqCommon(Get_BASE_ADD(UART3), uart3_funcPtr);
 }

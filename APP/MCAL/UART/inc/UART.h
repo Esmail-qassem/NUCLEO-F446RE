@@ -2,7 +2,6 @@
 #define USART_H_
 
 #include "STD_TYPES.h"
-#include "BIT_MATH.h"
 
 /* ---------------- Base Addresses ---------------- */
 #define USART1_BASE   0x40011000UL

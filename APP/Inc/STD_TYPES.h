@@ -31,5 +31,9 @@ typedef double float64;
 typedef long double float128;
 typedef unsigned long long int uint128;
 typedef signed long long int sint128;
-#define NULL 0
+
+#ifndef NULL
+#define NULL ((void *)0)
 #endif
+
+#endif /* STD_TYPES_H_ */
