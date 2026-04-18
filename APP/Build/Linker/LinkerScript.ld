@@ -11,9 +11,17 @@ _Min_Heap_Size = 0x200 ;  /* Required amount of heap */
 _Min_Stack_Size = 0x1000 ; /* Required amount of stack */
 
 /* Memories definition -> Label_Name(AttributeList) : ORIGIN = StartMemoryAddress,   LENGTH = MemoryLength */
+/*
+ * FLASH length is 352K (sectors 2..6). The last 128K sector (sector 7
+ * @ 0x08060000) is intentionally excluded from the app region so that
+ * it can be used as a dedicated data sector by the Snake score
+ * manager (see APP/P1/Snake/Snake_Score.c). Keeping it out of the
+ * linker ensures it is never overwritten by code/constants and also
+ * lets us erase it at runtime safely.
+ */
 MEMORY
 {
-  FLASH (rx)  : ORIGIN = 0x08008000, LENGTH = 480K
+  FLASH (rx)  : ORIGIN = 0x08008000, LENGTH = 352K
   RAM (xrw)   : ORIGIN = 0x20000000, LENGTH = 128K
 }
 

@@ -10,6 +10,7 @@
 #include "ISR.h"
 #include "MPU.h"
 #include "FPU.h"
+#include "Snake_Game.h"
 /*------------------------------------------------------------------
  *  Firmware version — single definition, shared via App_Config.h
  *------------------------------------------------------------------*/
@@ -83,6 +84,12 @@ void APP_init(void)
         for(uint8 j=0;j<255;j++);
     }
     MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
+
+    /* Snake game: configures the four direction buttons (PC0/PC1/PC2/PC4),
+       loads the persisted high score from flash and shows the welcome
+       screen on the OLED. Must run after OLED and I2C are up.          */
+    Snake_Init();
+
     IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000));
 }
 

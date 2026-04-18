@@ -32,6 +32,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(HAL_path)/OLED\
 		    $(HAL_path)/MPU\
            $(P1_path)/FLAPPY_Bird\
+           $(P1_path)/Snake\
 		   ../RTOS\
            ../Startup\
 		   ../Src\
