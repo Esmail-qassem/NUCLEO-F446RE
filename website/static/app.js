@@ -627,6 +627,138 @@ socket.on("mpu", ({ ax, ay, az, gx, gy, gz }) => {
 });
 
 // ──────────────────────────────────────────────────────────────────
+//  Build
+// ──────────────────────────────────────────────────────────────────
+const btnBuild     = $("btn-build");
+const buildLog     = $("build-log");
+const buildStatus  = $("build-status");
+
+btnBuild.addEventListener("click", async () => {
+  buildLog.textContent = "";
+  buildLog.style.display = "block";
+  buildStatus.textContent = "Building...";
+  btnBuild.disabled = true;
+
+  try {
+    const res  = await fetch("/api/build", { method: "POST" });
+    const data = await res.json();
+    if (!data.ok) {
+      buildStatus.textContent = data.error;
+      btnBuild.disabled = false;
+    }
+  } catch {
+    buildStatus.textContent = "Request failed";
+    btnBuild.disabled = false;
+  }
+});
+
+socket.on("build_log", ({ msg, ts }) => {
+  buildLog.textContent += `[${ts}] ${msg}\n`;
+  buildLog.scrollTop = buildLog.scrollHeight;
+});
+
+socket.on("build_done", ({ ok }) => {
+  btnBuild.disabled = false;
+  buildStatus.textContent = ok ? "✅ Build successful" : "❌ Build failed";
+  buildStatus.style.color  = ok ? "var(--green)"      : "var(--red)";
+});
+
+// ──────────────────────────────────────────────────────────────────
+//  UART Flash tab
+// ──────────────────────────────────────────────────────────────────
+let ufFile = null;
+
+const ufDropZone     = $("uf-drop-zone");
+const ufInpFile      = $("uf-inp-file");
+const ufFileInfo     = $("uf-file-info");
+const ufFiName       = $("uf-fi-name");
+const ufFiSize       = $("uf-fi-size");
+const ufBtnClear     = $("uf-btn-clear");
+const ufLog          = $("uf-log");
+const ufProgressWrap = $("uf-progress-wrap");
+const ufProgressBar  = $("uf-progress-bar");
+const btnUartFlash   = $("btn-uart-flash");
+
+ufDropZone.addEventListener("click", () => ufInpFile.click());
+ufDropZone.addEventListener("dragover",  e => { e.preventDefault(); ufDropZone.classList.add("drag-over"); });
+ufDropZone.addEventListener("dragleave", () => ufDropZone.classList.remove("drag-over"));
+ufDropZone.addEventListener("drop", e => {
+  e.preventDefault(); ufDropZone.classList.remove("drag-over");
+  if (e.dataTransfer.files[0]) ufSelectFile(e.dataTransfer.files[0]);
+});
+ufInpFile.addEventListener("change", () => { if (ufInpFile.files[0]) ufSelectFile(ufInpFile.files[0]); });
+
+function ufSelectFile(file) {
+  ufFile = file;
+  ufFiName.textContent = file.name;
+  ufFiSize.textContent = formatBytes(file.size);
+  ufFileInfo.style.display = "flex";
+  ufDropZone.style.display  = "none";
+}
+
+ufBtnClear.addEventListener("click", () => {
+  ufFile = null; ufInpFile.value = "";
+  ufFileInfo.style.display = "none";
+  ufDropZone.style.display  = "block";
+});
+
+function ufAppendLog(ts, msg) {
+  ufLog.textContent += `[${ts}] ${msg}\n`;
+  ufLog.scrollTop = ufLog.scrollHeight;
+}
+
+socket.on("uart_flash_log", ({ msg, ts }) => {
+  ufAppendLog(ts, msg);
+  appendTerminal(`[UART Flash] ${msg}\n`);
+});
+
+socket.on("uart_flash_progress", ({ pct, sent, total }) => {
+  ufProgressBar.style.width = pct + "%";
+});
+
+socket.on("uart_flash_done", ({ ok }) => {
+  btnUartFlash.disabled = false;
+  if (ok) {
+    ufProgressBar.style.width = "100%";
+    setTimeout(() => { ufProgressWrap.style.display = "none"; }, 2000);
+    showToast("Transfer complete — check terminal for CRC / verification result", "ok");
+  } else {
+    ufProgressWrap.style.display = "none";
+    showToast("UART Flash encountered an error", "err");
+  }
+});
+
+btnUartFlash.addEventListener("click", async () => {
+  if (!isConnected) {
+    ufAppendLog(new Date().toLocaleTimeString(), "ERROR: ECU not connected via wire");
+    return;
+  }
+  if (!confirm("This will reset the ECU and flash new firmware via UART2. Continue?")) return;
+
+  ufLog.textContent = "";
+  ufProgressWrap.style.display = "block";
+  ufProgressBar.style.width    = "0%";
+  btnUartFlash.disabled = true;
+
+  const form = new FormData();
+  if (ufFile) form.append("firmware", ufFile);
+
+  try {
+    const res  = await fetch("/api/uart_flash", { method: "POST", body: form });
+    const data = await res.json();
+    if (!data.ok) {
+      ufAppendLog(new Date().toLocaleTimeString(), `ERROR: ${data.error}`);
+      ufProgressWrap.style.display = "none";
+      btnUartFlash.disabled = false;
+    }
+  } catch {
+    ufAppendLog(new Date().toLocaleTimeString(), "ERROR: Request to server failed");
+    ufProgressWrap.style.display = "none";
+    btnUartFlash.disabled = false;
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────
 //  Boot
 // ──────────────────────────────────────────────────────────────────
 (async function init() {

@@ -468,7 +468,7 @@ LOAD linker stubs
  .debug_ranges  0x00000180       0x18 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
  .debug_ranges  0x00000198       0x28 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
-.debug_macro    0x00000000      0xfe3
+.debug_macro    0x00000000      0xff5
  .debug_macro   0x00000000       0x32 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000032      0xa66 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
  .debug_macro   0x00000a98       0x10 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -486,9 +486,9 @@ LOAD linker stubs
  .debug_macro   0x00000d8b       0x32 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_macro   0x00000dbd       0x70 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/UART/src/UART.o
  .debug_macro   0x00000e2d       0x17 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
- .debug_macro   0x00000e44       0x53 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
- .debug_macro   0x00000e97       0xd6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
- .debug_macro   0x00000f6d       0x76 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_macro   0x00000e44       0x65 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_macro   0x00000ea9       0xd6 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+ .debug_macro   0x00000f7f       0x76 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
 .debug_line     0x00000000      0xeee
  .debug_line    0x00000000      0x2c0 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
@@ -499,7 +499,7 @@ LOAD linker stubs
  .debug_line    0x00000c9e       0xe1 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
  .debug_line    0x00000d7f      0x16f C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
 
-.debug_str      0x00000000     0x4a55
+.debug_str      0x00000000     0x4abd
  .debug_str     0x00000000     0x3519 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o
                                0x3597 (size before relaxing)
  .debug_str     0x00003519      0x4c4 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/NVIC/src/NVIC_program.o
@@ -512,8 +512,8 @@ LOAD linker stubs
                                0x32cd (size before relaxing)
  .debug_str     0x000046d8       0xa5 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Startup/startup_stm32f103.o
                                0x2d41 (size before relaxing)
- .debug_str     0x0000477d      0x2d8 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
-                               0x3e6e (size before relaxing)
+ .debug_str     0x0000477d      0x340 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/Src/main.o
+                               0x3ed6 (size before relaxing)
 
 .comment        0x00000000       0x49
  .comment       0x00000000       0x49 C:/Users/s_a_a/Desktop/NUCLEO-F446RE/BM/Build/Object/MCAL/RCC/src/RCC_program.o

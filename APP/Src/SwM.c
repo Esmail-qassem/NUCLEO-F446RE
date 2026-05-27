@@ -25,31 +25,31 @@ void OS_10ms_Task(void)
 
 void OS_20ms_Task(void)
 {
-    static int x=0;
-    static int y=0;
-        /* Read sensors at 20 Hz — safe rate for breadboard I2C */
-    MPU_GetAccelerometer(&accel_data);
-    MPU_GetGyroscope(&gyro_data);
-    /* Machine-readable line for Python visualizer — prefix $DATA so parser can filter it */
-    UART_SendSyncBuffer(UART2, (uint8 *)"$DATA:", 6);
-    UART_voidSendNumber(UART2, accel_data.Accel_X);
-    UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-    UART_voidSendNumber(UART2, accel_data.Accel_Y);
-    UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-    UART_voidSendNumber(UART2, accel_data.Accel_Z);
-    UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-    UART_voidSendNumber(UART2, gyro_data.GYRO_X - Bias_gyro_data.GYRO_X);
-    UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-    UART_voidSendNumber(UART2, gyro_data.GYRO_Y - Bias_gyro_data.GYRO_Y);
-    UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-    UART_voidSendNumber(UART2, gyro_data.GYRO_Z - Bias_gyro_data.GYRO_Z);
-    UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+//     static int x=0;
+//     static int y=0;
+//         /* Read sensors at 20 Hz — safe rate for breadboard I2C */
+//     MPU_GetAccelerometer(&accel_data);
+//     MPU_GetGyroscope(&gyro_data);
+//     /* Machine-readable line for Python visualizer — prefix $DATA so parser can filter it */
+//     UART_SendSyncBuffer(UART2, (uint8 *)"$DATA:", 6);
+//     UART_voidSendNumber(UART2, accel_data.Accel_X);
+//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
+//     UART_voidSendNumber(UART2, accel_data.Accel_Y);
+//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
+//     UART_voidSendNumber(UART2, accel_data.Accel_Z);
+//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
+//     UART_voidSendNumber(UART2, gyro_data.GYRO_X - Bias_gyro_data.GYRO_X);
+//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
+//     UART_voidSendNumber(UART2, gyro_data.GYRO_Y - Bias_gyro_data.GYRO_Y);
+//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
+//     UART_voidSendNumber(UART2, gyro_data.GYRO_Z - Bias_gyro_data.GYRO_Z);
+//     UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
 
-uint8 pixel_x = 64 - ((accel_data.Accel_Y - Bias_accel_data.Accel_Y) * 64) / 100;
-uint8 pixel_y = 32 - ((accel_data.Accel_X - Bias_accel_data.Accel_X) * 32) / 100;
-    OLED_Clear();
-    OLED_DrawPixel(pixel_x, pixel_y, OLED_COLOR_WHITE);
-    OLED_UpdateScreen(I2C1_PORT);
+// uint8 pixel_x = 64 - ((accel_data.Accel_Y - Bias_accel_data.Accel_Y) * 64) / 100;
+// uint8 pixel_y = 32 - ((accel_data.Accel_X - Bias_accel_data.Accel_X) * 32) / 100;
+//     OLED_Clear();
+//     OLED_DrawPixel(pixel_x, pixel_y, OLED_COLOR_WHITE);
+//     OLED_UpdateScreen(I2C1_PORT);
 }
 
 void OS_50ms_Task(void)
@@ -78,10 +78,10 @@ void OS_1000ms_Task(void)
         SW_VERSION(); /* once on first tick */
 
     /* MPU display — every 1 s, same task as other prints so no interleaving */
-    UART_SendSyncBuffer(UART2, (uint8 *)"=== MPU-6050 ===\r\n", 18);
-    UART_SendSyncBuffer(UART2, (uint8 *)"Temp  : ", 8);
-    UART_voidSendNumber(UART2, MPU_GetTemp());
-    UART_SendSyncBuffer(UART2, (uint8 *)" (x100 C)\r\n", 11);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"=== MPU-6050 ===\r\n", 18);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"Temp  : ", 8);
+    // UART_voidSendNumber(UART2, MPU_GetTemp());
+    // UART_SendSyncBuffer(UART2, (uint8 *)" (x100 C)\r\n", 11);
 }
 
 void OS_IDLE_TASK(void)

@@ -66,6 +66,7 @@
 <!-- ═══════════════════════════════ TAB NAV ════════════════════════════════════ -->
 <nav class="tab-nav">
   <button class="tab-btn active" data-tab="tab-main">Control</button>
+  <button class="tab-btn" data-tab="tab-uartflash">UART Flash</button>
   <button class="tab-btn" data-tab="tab-history">Firmware History</button>
   <button class="tab-btn" data-tab="tab-metrics">Metrics</button>
   <button class="tab-btn" data-tab="tab-imu">IMU</button>
@@ -217,6 +218,66 @@
   </section>
 
 </main>
+</div>
+
+<!-- ═══════════════════════════════ TAB: UART FLASH ═══════════════════════════ -->
+<div id="tab-uartflash" class="tab-content">
+  <div class="tab-inner">
+    <div class="card">
+      <h2>Build</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:16px">
+        Runs <code>./build.sh</code> inside <code>combined_image/</code> — compiles APP, BTLD and creates <code>APP_BTLD.bin</code>.
+      </p>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="btn btn-secondary" id="btn-build">🔨 Build</button>
+        <span id="build-status" class="muted" style="font-size:12px"></span>
+      </div>
+
+      <pre id="build-log" style="margin-top:12px;background:#0d1117;border-radius:8px;padding:12px;
+           font-size:11px;min-height:60px;max-height:260px;overflow-y:auto;
+           color:#e6edf3;border:1px solid #21262d;white-space:pre-wrap;display:none"></pre>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Flash via UART</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:16px">
+        Send an <code>APP_BTLD.bin</code> directly to the ECU over UART2.
+        The dashboard sends the jump command, waits 3 s for the bootloader, then streams the binary.
+        Leave the file picker empty to use the last firmware uploaded to the server.
+      </p>
+
+      <div class="drop-zone" id="uf-drop-zone">
+        <input type="file" id="uf-inp-file" accept=".bin" hidden/>
+        <div class="drop-inner">
+          <span class="drop-icon">📁</span>
+          <span>Drop <code>APP_BTLD.bin</code> here or click to select</span>
+        </div>
+      </div>
+
+      <div class="file-info" id="uf-file-info" style="display:none">
+        <span class="fi-icon">📦</span>
+        <div class="fi-details">
+          <span id="uf-fi-name">—</span>
+          <span id="uf-fi-size" class="muted">—</span>
+        </div>
+        <button class="btn btn-ghost" id="uf-btn-clear">✕</button>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-warning" id="btn-uart-flash">⚡ Flash via UART</button>
+        <span class="muted" style="font-size:12px">ECU must be connected via wire (UART2)</span>
+      </div>
+
+      <div id="uf-progress-wrap" class="progress-wrap" style="display:none;margin-top:16px">
+        <div class="progress-bar" id="uf-progress-bar"></div>
+      </div>
+
+      <pre id="uf-log" style="margin-top:16px;background:#0d1117;border-radius:8px;padding:12px;
+           font-size:12px;min-height:80px;max-height:300px;overflow-y:auto;
+           color:#e6edf3;border:1px solid #21262d;white-space:pre-wrap"></pre>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════ TAB: HISTORY ═══════════════════════════════ -->

@@ -5,6 +5,7 @@ ECU Dashboard Server  —  http://0.0.0.0:5000
 import re
 import socket
 import sqlite3
+import subprocess
 import threading
 import time
 import datetime
@@ -421,6 +422,159 @@ def route_esp_register():
         socketio.emit("state", state)
         print(f"[esp]  registered at {ip}")
     return "ok"
+
+# ──────────────────────────────────────────────────────────────────
+#  Build — runs combined_image/build.sh via bash
+# ──────────────────────────────────────────────────────────────────
+BUILD_DIR    = BASE_DIR.parent / "combined_image"
+_build_running = False
+
+def _find_bash() -> str:
+    # Prefer Git for Windows bash — avoids WSL path conversion (/mnt/c/...)
+    for p in [
+        r"C:\Program Files\Git\bin\bash.exe",
+        r"C:\Program Files\Git\usr\bin\bash.exe",
+        r"C:\Program Files (x86)\Git\bin\bash.exe",
+    ]:
+        if Path(p).exists():
+            return p
+    return shutil.which("bash") or "bash"
+
+def _do_build():
+    global _build_running
+
+    def log(msg: str):
+        socketio.emit("build_log", {
+            "msg": msg,
+            "ts" : datetime.datetime.now().strftime("%H:%M:%S")
+        })
+        print(f"[build] {msg}")
+
+    tmp_script = BUILD_DIR / "_tmp_build.sh"
+    try:
+        bash_exe = _find_bash()
+        log(f"bash: {bash_exe}")
+        log(f"dir:  {BUILD_DIR}")
+
+        # Strip Windows CRLF line endings so bash doesn't see \r as a command
+        script_text = (BUILD_DIR / "build.sh").read_text(encoding="utf-8", errors="replace")
+        script_text = script_text.replace("\r\n", "\n").replace("\r", "\n")
+        tmp_script.write_text(script_text, encoding="utf-8")
+
+        log("Running build.sh ...")
+        proc = subprocess.Popen(
+            [bash_exe, str(tmp_script)],
+            cwd=str(BUILD_DIR),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+
+        for line in proc.stdout:
+            log(line.rstrip())
+
+        proc.wait()
+        ok = proc.returncode == 0
+        log("Build OK" if ok else f"Build FAILED (exit {proc.returncode})")
+        socketio.emit("build_done", {"ok": ok})
+
+    except FileNotFoundError:
+        log("ERROR: bash not found — install Git for Windows")
+        socketio.emit("build_done", {"ok": False})
+    except Exception as e:
+        log(f"ERROR: {e}")
+        socketio.emit("build_done", {"ok": False})
+    finally:
+        _build_running = False
+        tmp_script.unlink(missing_ok=True)
+
+@app.route("/api/build", methods=["POST"])
+def route_build():
+    global _build_running
+    if _build_running:
+        return jsonify(error="Build already in progress"), 409
+    if not BUILD_DIR.exists():
+        return jsonify(error=f"combined_image/ not found at {BUILD_DIR}"), 500
+    _build_running = True
+    threading.Thread(target=_do_build, daemon=True).start()
+    return jsonify(ok=True)
+
+# ──────────────────────────────────────────────────────────────────
+#  UART Flash — direct UART2 firmware update
+# ──────────────────────────────────────────────────────────────────
+_uart_flash_running = False
+
+def _do_uart_flash(payload: bytes):
+    global _uart_flash_running
+
+    def log(msg: str):
+        socketio.emit("uart_flash_log", {
+            "msg": msg,
+            "ts" : datetime.datetime.now().strftime("%H:%M:%S")
+        })
+        print(f"[uart_flash] {msg}")
+
+    try:
+        total = len(payload)
+        log(f"Payload: {total:,} bytes")
+
+        log("Sending BTLD_JUMP (0x03) ...")
+        with ser_lock:
+            ser.write(bytes([0x03]))
+
+        log("Waiting 3 s for bootloader to start ...")
+        time.sleep(3)
+
+        log("Sending sync 0x55 ...")
+        with ser_lock:
+            ser.write(b'\x55')
+
+        log("Streaming firmware ...")
+        CHUNK = 512
+        for i in range(0, total, CHUNK):
+            with ser_lock:
+                ser.write(payload[i:i + CHUNK])
+            sent = min(i + CHUNK, total)
+            socketio.emit("uart_flash_progress", {
+                "pct"  : int(sent / total * 100),
+                "sent" : sent,
+                "total": total,
+            })
+            time.sleep(0.005)
+
+        log(f"Transfer done — {total:,} bytes sent")
+        log("Waiting for CRC + verification (watch terminal) ...")
+        socketio.emit("uart_flash_done", {"ok": True})
+
+    except Exception as e:
+        log(f"ERROR: {e}")
+        socketio.emit("uart_flash_done", {"ok": False})
+    finally:
+        _uart_flash_running = False
+
+@app.route("/api/uart_flash", methods=["POST"])
+def route_uart_flash():
+    global _uart_flash_running
+    if _uart_flash_running:
+        return jsonify(error="Flash already in progress"), 409
+    if not (ser and ser.is_open):
+        return jsonify(error="ECU not connected via UART"), 503
+
+    if "firmware" in request.files:
+        payload = request.files["firmware"].read()
+    elif FIRMWARE_BIN.exists():
+        payload = FIRMWARE_BIN.read_bytes()
+    else:
+        return jsonify(error="No firmware — upload one first or select a file"), 400
+
+    if len(payload) == 0:
+        return jsonify(error="Firmware file is empty"), 400
+
+    _uart_flash_running = True
+    threading.Thread(target=_do_uart_flash, args=(payload,), daemon=True).start()
+    return jsonify(ok=True, size=len(payload))
 
 # ──────────────────────────────────────────────────────────────────
 #  Routes — Firmware History

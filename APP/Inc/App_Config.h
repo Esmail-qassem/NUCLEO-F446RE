@@ -9,7 +9,7 @@
 /*------------------------------------------------------------------
  *  Shared globals (defined in App_Config.c, used across modules)
  *------------------------------------------------------------------*/
-#define FIRMWARE_VERSION_STR  "1.0.1"
+#define FIRMWARE_VERSION_STR  "1.0.0"
 extern const uint8        FIRMWARE_VERSION[];
 extern UART_Config_t      Uart1_configuration;
 extern UART_Config_t      Uart2_configuration;

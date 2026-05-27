@@ -20,7 +20,10 @@ UART_Config_t Uart_configuration={
   UART_WORDLEN_8B,
   Polling
 };
-#define VTOR  *((volatile uint32*)0xE000ED08)
+#define VTOR       *((volatile uint32*)0xE000ED08)
+#define PWR_CR     *((volatile uint32*)0x40007000)   /* PWR control register   */
+#define RTC_BKP0R  *((volatile uint32*)0x40002850)   /* RTC backup register 0  */
+#define BTLD_MAGIC  0xB007B007U                       /* "boot-boot"            */
 void(*Jump_toApplication)(void)=NULL;
 void(*Jump_toBootLoader)(void)=NULL;
 uint8 SwReset,PowerReset,PinReset;
