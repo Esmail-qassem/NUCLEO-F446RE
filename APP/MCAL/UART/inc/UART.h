@@ -1,5 +1,45 @@
+#include "UART.hpp"
+/* Legacy C-style compatibility shim — new code uses UART.hpp directly */
+/* Old enum values remapped for callers that haven't been migrated yet  */
 #ifndef USART_H_
 #define USART_H_
+
+/* Hardware enum shim */
+#define UART1 UART_HardWare::UART1
+#define UART2 UART_HardWare::UART2
+#define UART3 UART_HardWare::UART3
+
+/* Mode shim */
+#define UART_MODE_TX     UART_Mode::TX
+#define UART_MODE_RX     UART_Mode::RX
+#define UART_MODE_TX_RX  UART_Mode::TX_RX
+
+/* Parity shim */
+#define UART_PARITY_NONE  UART_Parity::NONE
+#define UART_PARITY_EVEN  UART_Parity::EVEN
+#define UART_PARITY_ODD   UART_Parity::ODD
+
+/* StopBits shim */
+#define UART_STOPBITS_1   UART_StopBits::BITS_1
+#define UART_STOPBITS_0_5 UART_StopBits::BITS_0_5
+#define UART_STOPBITS_2   UART_StopBits::BITS_2
+#define UART_STOPBITS_1_5 UART_StopBits::BITS_1_5
+
+/* WordLength shim */
+#define UART_WORDLEN_8B  UART_WordLength::BITS_8
+#define UART_WORDLEN_9B  UART_WordLength::BITS_9
+
+/* Synch shim */
+#define Polling   UART_Synch::Polling
+#define Interrupt UART_Synch::Interrupt
+
+/* Function shims */
+#define UART_Init(hw,cfg,pclk)           UART::Init(hw, *(cfg), pclk)
+#define UART_SendSyncBuffer(hw,buf,sz)   UART::SendSyncBuffer(hw, buf, sz)
+#define UART_voidSendNumber(hw,n)        UART::SendNumber(hw, n)
+#define UART1_CALLBACK(fn)               UART::SetCallback1(fn)
+#define UART2_CALLBACK(fn)               UART::SetCallback2(fn)
+#define UART3_CALLBACK(fn)               UART::SetCallback3(fn)
 
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"

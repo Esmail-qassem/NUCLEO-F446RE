@@ -1,3 +1,13 @@
+#include "SysTick.hpp"
+/* Legacy shims */
+#define SysTick_voidInit()                          SysTick::Init()
+#define SysTick_voidSetBusyWait(ms)                 SysTick::BusyWait(ms)
+#define SysTick_voidSetIntervalSingle(t,fn)         SysTick::SetIntervalSingle(t, fn)
+#define SysTick_voidSetIntervalPeriodoc(t,fn)       SysTick::SetIntervalPeriodic(t, fn)
+#define SysTick_voidStopTimer()                     SysTick::StopTimer()
+#define SysTick_GetElapsedTime()                    SysTick::GetElapsedTime()
+#define SysTick_GetRemaningTime()                   SysTick::GetRemainingTime()
+
 /*
  * SysTick_interface.h
  *

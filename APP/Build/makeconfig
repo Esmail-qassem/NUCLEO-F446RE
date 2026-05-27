@@ -1,14 +1,21 @@
 OBJDIR =$(realpath ./Object)
 LinkerDir =$(realpath ./Linker)
 Images =$(realpath .././Tools)
-CC=arm-none-eabi-gcc
-CPU := cortex-m4
-FPU := fpv4-sp-d16
+CC       = arm-none-eabi-gcc
+CXX      = arm-none-eabi-g++
+CPU     := cortex-m4
+FPU     := fpv4-sp-d16
 FLOAT_ABI := hard
-CFLAGS := -mcpu=$(CPU) -mthumb -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
-CFLAGS += -O0 -g3 -Wall -std=gnu11 -ffunction-sections -fdata-sections
-CFLAGS += -specs=nano.specs -lc -lm -lnosys
-LD=arm-none-eabi-ld
+CFLAGS  := -mcpu=$(CPU) -mthumb -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
+CFLAGS  += -O0 -g3 -Wall -std=gnu11 -ffunction-sections -fdata-sections
+CFLAGS  += -specs=nano.specs -lc -lm -lnosys
+CXXFLAGS := -mcpu=$(CPU) -mthumb -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
+CXXFLAGS += -O0 -g3 -Wall -std=gnu++17 -ffunction-sections -fdata-sections
+CXXFLAGS += -fno-rtti -fno-exceptions -fno-threadsafe-statics
+CXXFLAGS += -specs=nano.specs -lc -lm -lnosys
+LDFLAGS  := -mcpu=$(CPU) -mthumb -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI)
+LDFLAGS  += -specs=nano.specs -lc -lm -lnosys -Wl,--gc-sections
+LD       = arm-none-eabi-ld
 BIN=arm-none-eabi-objcopy
 STL=st-flash
 MCAL_path := ../MCAL

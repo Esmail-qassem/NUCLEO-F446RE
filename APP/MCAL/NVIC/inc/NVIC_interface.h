@@ -1,3 +1,15 @@
+#include "NVIC.hpp"
+/* Legacy shims */
+#define NVIC_EnableInterrupt(n)        NVIC::EnableInterrupt(n)
+#define NVIC_DisableInterrupt(n)       NVIC::DisableInterrupt(n)
+#define NVIC_SetPendingFlag(n)         NVIC::SetPendingFlag(n)
+#define NVIC_ClearPendingFlag(n)       NVIC::ClearPendingFlag(n)
+#define NVIC_GetActiveInterrupt(n,p)   NVIC::GetActiveFlag(n, *(p))
+#define NVIC_SetPriority(id,g,s)       NVIC::SetPriority(id, g, s)
+/* Status shims */
+#define NVIC_OK  NVIC_Status::OK
+#define NVIC_NOK NVIC_Status::NOK
+
 /***********************************************************************/
 /*Aauthor     : Esamil Qassem                                          */
 /*Data        : 3 FEB 2024                                             */

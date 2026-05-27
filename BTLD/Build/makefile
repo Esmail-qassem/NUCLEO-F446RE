@@ -29,11 +29,17 @@ INC_DIRS = ../Inc/ \
 
 INC_FLAGS = $(addprefix -I,$(INC_DIRS))
 
-# Source and object files
-SRC_FILES = $(wildcard $(addsuffix /*.c,$(SRC_DIRS)))
-OBJ_FILES = $(patsubst ../%, $(OBJDIR)/%, $(SRC_FILES:.c=.o))
-DEP_FILES = $(OBJ_FILES:.o=.d)
+# Source and object files — C
+SRC_FILES     = $(wildcard $(addsuffix /*.c,$(SRC_DIRS)))
+OBJ_FILES     = $(patsubst ../%, $(OBJDIR)/%, $(SRC_FILES:.c=.o))
+DEP_FILES     = $(OBJ_FILES:.o=.d)
 vpath %.c $(SRC_DIRS)
+
+# Source and object files — C++
+SRC_FILES_CPP = $(wildcard $(addsuffix /*.cpp,$(SRC_DIRS)))
+OBJ_FILES_CPP = $(patsubst ../%, $(OBJDIR)/%, $(SRC_FILES_CPP:.cpp=.o))
+DEP_FILES_CPP = $(OBJ_FILES_CPP:.o=.d)
+vpath %.cpp $(SRC_DIRS)
 
 # Color codes
 COLOR_GREEN = \033[0;32m
@@ -54,8 +60,8 @@ $(Images)/BTLD.bin: $(Images)/BTLD.elf
 	@cp $(@:.bin=.hex) $(@:.bin=.txt)
 	@printf  "$(COLOR_BLUE)++ Binary files generated$(COLOR_RESET)\n"
 
-$(Images)/BTLD.elf: $(OBJ_FILES)
-	@if [ -z "$(OBJ_FILES)" ]; then \
+$(Images)/BTLD.elf: $(OBJ_FILES) $(OBJ_FILES_CPP)
+	@if [ -z "$(OBJ_FILES)$(OBJ_FILES_CPP)" ]; then \
 		printf  "$(COLOR_RED)Error: No object files found - check compilation$(COLOR_RESET)\n"; \
 		exit 1; \
 	fi
@@ -65,7 +71,7 @@ $(Images)/BTLD.elf: $(OBJ_FILES)
 # 	@$(info SRC_FILES = $(SRC_FILES))
 # 	@$(info OBJ_FILES = $(OBJ_FILES))
 	@printf  "$(COLOR_BLUE)Linking with objects:. . .$(COLOR_RESET)\n"
-	@$(LD) -Map $(Images)/BTLD.map -T $(LinkerDir)/LinkerScript.ld $(OBJ_FILES) -o $@
+	@$(CXX) $(LDFLAGS) -Wl,-Map,$(Images)/BTLD.map -T $(LinkerDir)/LinkerScript.ld $(OBJ_FILES) $(OBJ_FILES_CPP) -o $@
 	@printf  "$(COLOR_BLUE)++ Linking complete$(COLOR_RESET)\n"
 
 
@@ -73,6 +79,11 @@ $(OBJDIR)/%.o: ../%.c
 	@mkdir -p $(dir $@)
 	@printf  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)\n"
 	@$(CC) $(CFLAGS) $(INC_FLAGS) -MMD -MP -MF $(@:.o=.d) -c $< -o $@
+
+$(OBJDIR)/%.o: ../%.cpp
+	@mkdir -p $(dir $@)
+	@printf  "$(COLOR_GREEN)Compiling $(notdir $<)$(COLOR_RESET)\n"
+	@$(CXX) $(CXXFLAGS) $(INC_FLAGS) -MMD -MP -MF $(@:.o=.d) -c $< -o $@
 
 clean:
 	@rm -rf $(OBJDIR)/* $(Images)/*.elf $(Images)/*.map $(Images)/*.bin $(Images)/*.hex $(Images)/*.txt
@@ -84,4 +95,4 @@ flash: $(Images)/BTLD.bin
 erase:
 	@$(STL) -c port=swd  all
 
--include $(DEP_FILES)
+-include $(DEP_FILES) $(DEP_FILES_CPP)

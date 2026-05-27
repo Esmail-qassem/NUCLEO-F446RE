@@ -1,3 +1,42 @@
+#include "I2C.hpp"
+/* Legacy shims */
+#define I2C1_PORT  I2C_Port::I2C1
+#define I2C2_PORT  I2C_Port::I2C2
+#define I2C3_PORT  I2C_Port::I2C3
+#define I2C_PORT_COUNT static_cast<uint8>(I2C_Port::COUNT)
+#define I2C_OK      I2C_Status::OK
+#define I2C_ERROR   I2C_Status::ERROR
+#define I2C_BUSY    I2C_Status::BUSY
+#define I2C_TIMEOUT I2C_Status::TIMEOUT
+#define I2C_IDLE    I2C_State::IDLE
+#define I2C_BUSY_TX I2C_State::BUSY_TX
+#define I2C_BUSY_RX I2C_State::BUSY_RX
+#define I2C_POLLING   I2C_TransferMode::POLLING
+#define I2C_INTERRUPT I2C_TransferMode::INTERRUPT
+#define I2C_ADDR_7BIT  I2C_AddressingMode::ADDR_7BIT
+#define I2C_ADDR_10BIT I2C_AddressingMode::ADDR_10BIT
+#define I2C_DUTY_2    I2C_DutyCycle::DUTY_2
+#define I2C_DUTY_16_9 I2C_DutyCycle::DUTY_16_9
+#define I2C_Init(p,c)                      I2C::Init(p, *(c))
+#define I2C_DeInit(p)                      I2C::DeInit(p)
+#define I2C_Start(p)                       I2C::Start(p)
+#define I2C_Stop(p)                        I2C::Stop(p)
+#define I2C_SendAddress(p,a,d)             I2C::SendAddress(p,a,d)
+#define I2C_SendData(p,d)                  I2C::SendData(p,d)
+#define I2C_ReceiveData(p,d,a)             I2C::ReceiveData(p,*(d),a)
+#define I2C_MasterTransmit(p,a,b,s,r)     I2C::MasterTransmit(p,a,b,s,r)
+#define I2C_MasterReceive(p,a,b,s,r)      I2C::MasterReceive(p,a,b,s,r)
+#define I2C_MasterTransmit_IT(p,a,b,s)    I2C::MasterTransmit_IT(p,a,b,s)
+#define I2C_MasterReceive_IT(p,a,b,s)     I2C::MasterReceive_IT(p,a,b,s)
+#define I2C_WriteRegister(p,sa,r,v)        I2C::WriteRegister(p,sa,r,v)
+#define I2C_ReadRegister(p,sa,r,v)         I2C::ReadRegister(p,sa,r,*(v))
+#define I2C_ReadRegisters(p,sa,r,b,l)     I2C::ReadRegisters(p,sa,r,b,l)
+#define I2C_RegisterTxCallback(p,cb)      I2C::RegisterTxCallback(p,cb)
+#define I2C_RegisterRxCallback(p,cb)      I2C::RegisterRxCallback(p,cb)
+#define I2C_RegisterErrorCallback(p,cb)   I2C::RegisterErrCallback(p,cb)
+#define I2C_GetState(p)                    I2C::GetState(p)
+#define I2C_ReadStatus(b)                  I2C::ReadStatus(b)
+
 #ifndef I2C_H_
 #define I2C_H_
 

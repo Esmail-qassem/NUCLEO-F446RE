@@ -1,3 +1,5 @@
+#include "DMA.hpp"
+
 #ifndef DMA_H_
 #define DMA_H_
 

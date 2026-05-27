@@ -1,3 +1,13 @@
+#include "ADC.hpp"
+/* Legacy shims */
+#define ADC_Init()              ADC::Init()
+#define ADC_Read(ch)            ADC::Read(ch)
+#define ADC_ReadAveraged(ch)    ADC::ReadAveraged(ch)
+#define ADC_ReadVoltage_mV(ch)  ADC::ReadVoltage_mV(ch)
+#define ADC_SetSampleTime(ch,s) ADC::SetSampleTime(ch, static_cast<ADC_SampleTime>(s))
+#define ADC_SAMPLETIME_3   ADC_SampleTime::CYCLES_3
+#define ADC_SAMPLETIME_480 ADC_SampleTime::CYCLES_480
+
 #ifndef ADC_H
 #define ADC_H
 

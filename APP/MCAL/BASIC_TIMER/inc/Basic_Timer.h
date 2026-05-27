@@ -1,3 +1,12 @@
+#include "BasicTimer.hpp"
+/* Legacy shims */
+#define TIMER6  BasicTimer_ID::TIM6
+#define TIMER7  BasicTimer_ID::TIM7
+#define Timer_Init(t)         BasicTimer::Init(t)
+#define Timer_Start(t)        BasicTimer::Start(t)
+#define Timer_Stop(t)         BasicTimer::Stop(t)
+#define Timer_SetCallback(t,cb) BasicTimer::SetCallback(t,cb)
+
 #ifndef BASIC_TIMER_H_
 #define BASIC_TIMER_H_
 #include "STD_TYPES.h"

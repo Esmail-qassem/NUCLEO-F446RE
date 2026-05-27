@@ -1,3 +1,13 @@
+#include "CRC.hpp"
+/* Legacy shims */
+#define CRC_Init()           CRC::Init()
+#define CRC_Reset()          CRC::Reset()
+#define CRC_AccumulateWord(w) CRC::AccumulateWord(w)
+#define CRC_Calculate(b,l)   CRC::Calculate(b,l)
+#define CRC_Verify(b,l)      CRC::Verify(b,l)
+#define CRC_GetResult()      CRC::GetResult()
+/* Old AHB1_CRC kept in RCC.h */
+
 #ifndef CRC_H_
 #define CRC_H_
 
