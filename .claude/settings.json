@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://raw.githubusercontent.com/LubomirKurpel/Arduino-Nyan-Cat-on-OLED-Sketch/master/nyan.h\")"
+    ]
+  }
+}

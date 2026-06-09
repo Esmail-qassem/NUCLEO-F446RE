@@ -12,7 +12,7 @@
 #define DWT_CTRL   (*((volatile uint32*)0xE0001000U))  /* bit 0  = CYCCNTENA */
 #define DWT_CYCCNT (*((volatile uint32*)0xE0001004U))  /* 32-bit cycle count */
 #define DEM_CR     (*((volatile uint32*)0xE000EDFCU))  /* bit 24 = TRCENA    */
-#define CPU_FREQ_HZ 16000000UL                         /* HSI = 16 MHz       */
+#define CPU_FREQ_HZ 180000000UL                         /* PLL SYSCLK = 180 MHz */
 
 /*==============================================================================
  *  Private Variables
@@ -185,9 +185,11 @@ static void RTOS_voidTickCallback(void)
         {
             if (SysTask[i].TaskFunc != NULL)
             {
-                /* load% = exec_cycles / CPU_FREQ_HZ × 100 */
+                /* load% = exec_cycles / (CPU_FREQ_HZ / 100)
+                 * Divide first to avoid uint32 overflow: exec_cycles can be
+                 * as large as CPU_FREQ_HZ itself (a task using ~100% CPU). */
                 SysTask[i].cpu_load  = (uint8)(
-                    (SysTask[i].exec_cycles * 100UL) / CPU_FREQ_HZ
+                    SysTask[i].exec_cycles / (CPU_FREQ_HZ / 100UL)
                 );
                 SysTask[i].exec_cycles = 0U;  /* reset for next window */
             }

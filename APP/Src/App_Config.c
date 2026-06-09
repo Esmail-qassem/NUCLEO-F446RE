@@ -38,7 +38,7 @@ UART_Config_t Uart2_configuration = {
 };
 
 I2C_Config_t i2c1_cfg = {
-    .PCLK1_Hz        = 16000000,
+    .PCLK1_Hz        = 45000000,
     .ClockSpeed      = 400000,
     .DutyCycle       = I2C_DUTY_2,
     .AddressingMode  = I2C_ADDR_7BIT,
@@ -65,8 +65,8 @@ ACCEL_t Bias_accel_data;
 GYRO_t Bias_gyro_data;
 void APP_init(void)
 {
-    UART_Init(UART1, &Uart1_configuration, 16000000);
-    UART_Init(UART2, &Uart2_configuration, 16000000);
+    UART_Init(UART1, &Uart1_configuration, 90000000);
+    UART_Init(UART2, &Uart2_configuration, 45000000);
     BOOT_REASON_REPORT();   
     ADC_Init();
     GP_Timer_PWM_Init(TIMER3);

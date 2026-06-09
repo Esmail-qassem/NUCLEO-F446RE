@@ -9,8 +9,9 @@ static void RCC_EnableHSI(void)
 
 static void RCC_EnableHSE(void)
 {
-    SET_BIT(RCC_CR, 16);
-    while(!GET_BIT(RCC_CR, 17));
+    SET_BIT(RCC_CR, 18);          // HSEBYP — external clock, not crystal
+    SET_BIT(RCC_CR, 16);          // HSEON
+    while(!GET_BIT(RCC_CR, 17));  // wait HSERDY
 }
 
 static void RCC_EnablePLL(void)
@@ -24,9 +25,12 @@ static void RCC_DisablePLL(void)
     CLEAR_BIT(RCC_CR, 24);
     while(GET_BIT(RCC_CR, 25));
 }
+#define FLASH_ACR (*(volatile uint32*)0x40023C00)
 
 static void RCC_SelectSystemClock(RCC_ClockSource_t clkSrc)
 {
+    FLASH_ACR |= (5 << 0) | (1 << 8) | (1 << 9) | (1 << 10); // LATENCY=5, PRFTEN, ICEN, DCEN
+
     RCC_CFGR &= ~(0x3);
     RCC_CFGR |= (clkSrc & 0x3);
 
@@ -85,6 +89,12 @@ void RCC_Init(const RCC_Config_t *cfg)
             break;
 
         case RCC_CLK_PLL:
+            /* PLLON cannot be cleared while PLL drives SYSCLK (e.g. a
+               previous boot stage already switched to PLL) — switch to
+               HSI first so the PLL can be safely reconfigured */
+            RCC_EnableHSI();
+            RCC_SelectSystemClock(RCC_CLK_HSI);
+
             if (cfg->PLL_Config.PLL_Source == RCC_PLLSRC_HSE)
                 RCC_EnableHSE();
             else

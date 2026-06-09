@@ -1094,6 +1094,7 @@ $("btn-uart-flash-local").addEventListener("click", async () => {
 // ──────────────────────────────────────────────────────────────────
 const SNAKE_KEYS = {
   w: "77", a: "61", s: "73", d: "64", r: "72",
+  i: "69", j: "6a",
   ArrowUp: "77", ArrowLeft: "61", ArrowDown: "73", ArrowRight: "64",
 };
 

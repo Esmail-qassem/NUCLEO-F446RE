@@ -10,11 +10,11 @@
 void (*Pt2Func_App)(void)=NULL;
 RCC_Config_t RCC_Configuration=
 {
-  RCC_CLK_HSI,
-  {0, 0, 0, 0, 0},
+  RCC_CLK_PLL,
+  {RCC_PLLSRC_HSE, 4, 180, 2, 8},
   AHB_PRE_1,
-  APB_PRE_1,
-  APB_PRE_1
+  APB_PRE_4,
+  APB_PRE_2
 };
 
 UART_Config_t Uart1_configuration={
@@ -77,8 +77,8 @@ while(1)
 
 void APP_init(void)
 {
- UART_Init(UART2, &Uart2_configuration, 16000000);
- UART_Init(UART1, &Uart1_configuration, 16000000);
+ UART_Init(UART2, &Uart2_configuration, 45000000);
+ UART_Init(UART1, &Uart1_configuration, 90000000);
 }
 
 void GPIO_PIN_CONFIG(void)

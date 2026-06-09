@@ -5,14 +5,14 @@
 #include "RTC.h"
 #include "GPIO_interface.h"
 #include "CRC.h"
-RCC_Config_t RCC_Configuration =
-    {
-        RCC_CLK_HSI,
-        {0, 0, 0, 0, 0},
-        AHB_PRE_1,
-        APB_PRE_1,
-        APB_PRE_1};
-
+RCC_Config_t RCC_Configuration=
+{
+  RCC_CLK_PLL,
+  {RCC_PLLSRC_HSE, 4, 180, 2, 8},
+  AHB_PRE_1,
+  APB_PRE_4,
+  APB_PRE_2
+};
 
 void Schedular(void)
 {
