@@ -9,7 +9,7 @@
 ===========================================================================*/
 #define WIFI_SSID        "ZzZz"
 #define WIFI_PASSWORD    "Esmail_122001"
-#define SERVER_IP        "192.168.1.2"
+#define SERVER_IP        "192.168.1.19"
 #define SERVER_PORT      5000
 #define TELEMETRY_PORT   5001          /* UDP — fire-and-forget, no handshake */
 #define POLL_INTERVAL_MS 30000

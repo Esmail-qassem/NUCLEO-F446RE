@@ -6,6 +6,15 @@
 #include "UART.h"
 
 /*==============================================================================
+ *  DWT cycle counter  (ARM Cortex-M4 Data Watchpoint and Trace unit)
+ *  Used to measure exact CPU cycles consumed by each task per second.
+ *============================================================================*/
+#define DWT_CTRL   (*((volatile uint32*)0xE0001000U))  /* bit 0  = CYCCNTENA */
+#define DWT_CYCCNT (*((volatile uint32*)0xE0001004U))  /* 32-bit cycle count */
+#define DEM_CR     (*((volatile uint32*)0xE000EDFCU))  /* bit 24 = TRCENA    */
+#define CPU_FREQ_HZ 16000000UL                         /* HSI = 16 MHz       */
+
+/*==============================================================================
  *  Private Variables
  *============================================================================*/
 
@@ -31,6 +40,11 @@ static void RTOS_voidIdleTask(void);
 
 void RTOS_voidStart(void)
 {
+    /* Enable DWT cycle counter */
+    DEM_CR     |= (1UL << 24);  /* enable trace subsystem */
+    DWT_CYCCNT  = 0U;           /* reset counter          */
+    DWT_CTRL   |= (1UL << 0);   /* start counting cycles  */
+
     PendSV_Init();
     SysTick_voidInit();
     SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS, &RTOS_voidTickCallback);
@@ -69,7 +83,12 @@ static void RTOS_TaskEntry(uint8 priority)
 {
     while (1)
     {
+        uint32 start = DWT_CYCCNT;
+
         SysTask[priority].TaskFunc();
+
+        /* Accumulate cycles spent inside this task's body */
+        SysTask[priority].exec_cycles += (DWT_CYCCNT - start);
 
         /* Task finished one period — suspend self and yield to idle */
         SysTask[priority].state = SUSPENDED;
@@ -152,7 +171,28 @@ uint8 RTOS_u8GetStackUsage(uint8 priority)
 
 static void RTOS_voidTickCallback(void)
 {
+    static uint16 load_tick = 0U;
+
     RTOS_voidSchedular();
+
+    load_tick++;
+    if (load_tick >= 1000U)   /* 1000 × 1ms = 1-second measurement window */
+    {
+        uint8 i;
+        load_tick = 0U;
+
+        for (i = 0U; i < TASK_NUMBER; i++)
+        {
+            if (SysTask[i].TaskFunc != NULL)
+            {
+                /* load% = exec_cycles / CPU_FREQ_HZ × 100 */
+                SysTask[i].cpu_load  = (uint8)(
+                    (SysTask[i].exec_cycles * 100UL) / CPU_FREQ_HZ
+                );
+                SysTask[i].exec_cycles = 0U;  /* reset for next window */
+            }
+        }
+    }
 }
 
 static void RTOS_voidSchedular(void)
@@ -261,6 +301,29 @@ void RTOS_voidResumeTask(uint8 Copy_priority)
 void RTOS_voidWaitEvent(uint8 Copy_priority)
 {
     SysTask[Copy_priority].state = WAITING;
+}
+
+/*==============================================================================
+ *  CPU load getters
+ *============================================================================*/
+
+uint8 RTOS_u8GetTaskCPULoad(uint8 priority)
+{
+    if (priority >= TASK_NUMBER || SysTask[priority].TaskFunc == NULL)
+        return 0U;
+    return SysTask[priority].cpu_load;
+}
+
+uint8 RTOS_u8GetCPULoad(void)
+{
+    uint8 i;
+    uint16 total = 0U;
+    for (i = 0U; i < TASK_NUMBER; i++)
+    {
+        if (SysTask[i].TaskFunc != NULL)
+            total += SysTask[i].cpu_load;
+    }
+    return (total > 100U) ? 100U : (uint8)total;
 }
 
 /*==============================================================================

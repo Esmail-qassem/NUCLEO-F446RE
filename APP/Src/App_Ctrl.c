@@ -8,6 +8,9 @@
  *------------------------------------------------------------------*/
 #define SCB_AIRCR  (*((volatile uint32*)0xE000ED0Cu))
 
+/* IWDG key register — write 0xAAAA to refresh without including driver */
+#define IWDG_KR    (*((volatile uint32*)0x40003000U))
+
 /*------------------------------------------------------------------
  *  Shared state
  *------------------------------------------------------------------*/
@@ -39,9 +42,10 @@ void LED_OFF(void)
  *------------------------------------------------------------------*/
 void SYS_Reset(void)
 {
+    IWDG_KR = 0xAAAAU;   /* refresh watchdog — gives a fresh 150ms window */
     UART_SendSyncBuffer(UART2, (uint8 *)"Resetting...\r\n", 14);
     volatile uint32 i;
-    for (i = 0; i < 100000u; i++) { __asm("NOP"); }
+    for (i = 0; i < 10000u; i++) { __asm("NOP"); }  /* ~4ms — enough for UART TX */
     SCB_AIRCR = (0x5FAu << 16u) | (1u << 2u);
     while (1) {}
 }

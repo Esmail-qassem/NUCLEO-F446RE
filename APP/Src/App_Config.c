@@ -8,8 +8,9 @@
 #include "OLED.h"
 #include "Telemetry.h"
 #include "ISR.h"
-#include "MPU.h"
+#include "MPU_6050.h"
 #include "FPU.h"
+#include "Snake.h"
 /*------------------------------------------------------------------
  *  Firmware version — single definition, shared via App_Config.h
  *------------------------------------------------------------------*/
@@ -66,7 +67,7 @@ void APP_init(void)
 {
     UART_Init(UART1, &Uart1_configuration, 16000000);
     UART_Init(UART2, &Uart2_configuration, 16000000);
-    BOOT_REASON_REPORT();   /* must run right after UART init */
+    BOOT_REASON_REPORT();   
     ADC_Init();
     GP_Timer_PWM_Init(TIMER3);
     RTC_Init(&RTC_config);
@@ -76,14 +77,15 @@ void APP_init(void)
     }
     I2C_Init(I2C1_PORT, &i2c1_cfg);
     OLED_Init(I2C1_PORT);
-    MPU_Init();
+    //MPU_Init();
     /* wait 50 ms */
-    for(uint16 i = 0; i < 3000 ; i++)
-    {
-        for(uint8 j=0;j<255;j++);
-    }
-    MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
+    //for(uint16 i = 0; i < 3000 ; i++)
+   // {
+     //   for(uint8 j=0;j<255;j++);
+    //}
+    //MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
     IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000));
+    Snake_Init();
 }
 
 /*------------------------------------------------------------------

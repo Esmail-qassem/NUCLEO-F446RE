@@ -141,6 +141,23 @@ EOF
     trap - INT TSTP
 }
 
+# ─── Game input (WASD) ───────────────────────────────────────────────────────
+_stm_game_input() {
+    printf "[STM] Game input — w/s/a/d to move, r to reset, i/j for options, q to quit\n"
+    while IFS= read -r -s -n1 key; do
+        case "$key" in
+            w|W) _stm_send_byte "0x77" && printf "  ↑\r" ;;
+            s|S) _stm_send_byte "0x73" && printf "  ↓\r" ;;
+            a|A) _stm_send_byte "0x61" && printf "  ←\r" ;;
+            d|D) _stm_send_byte "0x64" && printf "  →\r" ;;
+            r|R) _stm_send_byte "0x72" && printf "  Reset\r" ;;
+            i|I) _stm_send_byte "0x69" && printf "  [i]\r" ;;
+            j|J) _stm_send_byte "0x6A" && printf "  [j]\r" ;;
+            q|Q) printf "\n[STM] Game input closed\n"; break ;;
+        esac
+    done
+}
+
 # ─── LED ──────────────────────────────────────────────────────────────────────
 _stm_led_on() {
     _stm_send_byte "0x01" && printf "[STM] LED ON\n"
@@ -272,6 +289,16 @@ stm() {
         time)
             _stm_time
             ;;        
+        game)
+            _stm_game_input
+            ;;
+        send)
+            if [ -z "$sub" ]; then
+                printf "Usage: stm send <0xHH>\n"
+            else
+                _stm_send_byte "$sub" && printf "[STM] Sent $sub\n"
+            fi
+            ;;
         clean)
             _stm_clean
             ;;
@@ -279,7 +306,7 @@ stm() {
             _stm_exit
             ;;
         *)
-            printf "Usage: stm [led|connect|monitor|bootloader|build|flash|clean|exit]\n"
+            printf "Usage: stm [led|connect|monitor|bootloader|build|flash|send|clean|exit]\n"
             printf "\n"
             printf "  led        [on|off]\n"
             printf "  connect\n"
@@ -287,6 +314,8 @@ stm() {
             printf "  bootloader [jump|update <file.bin>]\n"
             printf "  build      [all|app|bm|btld]\n"
             printf "  flash      [all|app|bm|btld]\n"
+            printf "  game               (interactive WASD input)\n"
+            printf "  send       <0xHH>  (raw byte to UART2)\n"
             printf "  clean\n"
             printf "  exit\n"
             ;;

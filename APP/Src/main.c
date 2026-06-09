@@ -49,4 +49,7 @@ void SystemInit(void)
   RCC_EnableClock(RCC_AHB1, AHB1_CRC);
   RCC_EnableClock(RCC_APB1, APB1_I2C1);
 
+  /* PC3 is wired to NRST — configure as INPUT PULLUP immediately
+   * so it never floats and glitches NRST during startup */
+  GPIO_InitPin(GPIO_PORTC, PIN3, GPIO_MODE_INPUT, GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
 }

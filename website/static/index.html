@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>ECU Dashboard — NUCLEO-F446RE</title>
   <link rel="stylesheet" href="/static/style.css"/>
 </head>
 <body>
 
-<!-- ═══════════════════════════════ ALERT BANNER ═══════════════════════════════ -->
+<!-- ══════════════ ALERT BANNER ══════════════ -->
 <div id="alert-banner" class="alert-banner" style="display:none">
   <span id="alert-icon">⚠</span>
   <span id="alert-msg">–</span>
   <button class="btn btn-ghost alert-close" onclick="dismissAlert()">✕</button>
 </div>
 
-<!-- ═══════════════════════════════ HEADER ═════════════════════════════════════ -->
+<!-- ══════════════ HEADER ══════════════ -->
 <header>
   <div class="header-left">
-    <span class="chip-icon">⚙</span>
+    <div class="chip-icon">⚙</div>
     <div>
       <h1>ECU Dashboard</h1>
       <span class="sub">NUCLEO-F446RE · STM32F446</span>
@@ -28,12 +26,12 @@
   </div>
 
   <div class="status-pills">
-    <div class="pill" id="pill-conn">
+    <div class="pill">
       <span class="dot" id="dot-conn"></span>
-      <span class="pill-label">WIRE</span>
+      <span class="pill-label">UART</span>
       <span id="lbl-conn">Disconnected</span>
     </div>
-    <div class="pill" id="pill-esp">
+    <div class="pill">
       <span class="dot" id="dot-esp"></span>
       <span class="pill-label">WiFi</span>
       <span id="lbl-esp">No ESP</span>
@@ -63,22 +61,193 @@
   </div>
 </header>
 
-<!-- ═══════════════════════════════ TAB NAV ════════════════════════════════════ -->
+<!-- ══════════════ TAB NAV ══════════════ -->
 <nav class="tab-nav">
-  <button class="tab-btn active" data-tab="tab-main">Control</button>
-  <button class="tab-btn" data-tab="tab-uartflash">UART Flash</button>
-  <button class="tab-btn" data-tab="tab-history">Firmware History</button>
-  <button class="tab-btn" data-tab="tab-metrics">Metrics</button>
-  <button class="tab-btn" data-tab="tab-imu">IMU</button>
+  <button class="tab-btn active" data-tab="tab-overview">
+    <span class="tab-icon">📊</span> Overview
+  </button>
+  <button class="tab-btn" data-tab="tab-main">
+    <span class="tab-icon">⚡</span> Control
+  </button>
+  <button class="tab-btn" data-tab="tab-uartflash">
+    <span class="tab-icon">🔥</span> UART Flash
+  </button>
+  <button class="tab-btn" data-tab="tab-history">
+    <span class="tab-icon">📋</span> History
+  </button>
+  <button class="tab-btn" data-tab="tab-metrics">
+    <span class="tab-icon">📈</span> Metrics
+  </button>
+  <button class="tab-btn" data-tab="tab-oled">
+    <span class="tab-icon">🖥</span> OLED
+  </button>
+  <button class="tab-btn" data-tab="tab-imu">
+    <span class="tab-icon">🎯</span> IMU
+  </button>
 </nav>
 
-<!-- ═══════════════════════════════ TAB: MAIN ══════════════════════════════════ -->
-<div id="tab-main" class="tab-content active">
+<!-- ══════════════ TAB: OVERVIEW ══════════════ -->
+<div id="tab-overview" class="tab-content active">
+<div class="overview-wrapper">
+
+  <!-- Stat cards row -->
+  <div class="stat-grid">
+
+    <div class="stat-card accent-green">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Connection</span>
+        <div class="stat-card-icon green">🔌</div>
+      </div>
+      <div class="stat-card-value" id="ov-conn-val" style="font-size:18px">Disconnected</div>
+      <div class="stat-card-sub" id="ov-conn-sub">—</div>
+    </div>
+
+    <div class="stat-card accent-red">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Temperature</span>
+        <div class="stat-card-icon red">🌡</div>
+      </div>
+      <div class="stat-card-value" id="ov-temp-val">–</div>
+      <div class="stat-card-sub" id="ov-temp-sub">Internal STM32</div>
+    </div>
+
+    <div class="stat-card accent-blue">
+      <div class="stat-card-header">
+        <span class="stat-card-label">Uptime</span>
+        <div class="stat-card-icon blue">⏱</div>
+      </div>
+      <div class="stat-card-value" id="ov-life-val">–</div>
+      <div class="stat-card-sub" id="ov-life-sub">Life counter</div>
+    </div>
+
+    <div class="stat-card accent-purple">
+      <div class="stat-card-header">
+        <span class="stat-card-label">ECU Version</span>
+        <div class="stat-card-icon purple">🏷</div>
+      </div>
+      <div class="stat-card-value" id="ov-ver-val">–</div>
+      <div class="stat-card-sub" id="ov-ver-sub">Firmware</div>
+    </div>
+
+  </div>
+
+  <!-- Body: live chart + quick commands + health -->
+  <div class="overview-body">
+
+    <div class="overview-left">
+
+      <!-- Live temperature sparkline -->
+      <div class="card">
+        <h2>📉 Live Temperature — last 30 readings</h2>
+        <canvas id="chart-temp-live" height="100"></canvas>
+      </div>
+
+      <!-- Quick commands -->
+      <div class="card">
+        <h2>⚡ Quick Commands</h2>
+        <div class="quick-cmds">
+          <button class="quick-cmd-btn success cmd-btn" data-cmd="led_on">
+            <span class="qc-icon">💡</span> LED ON
+          </button>
+          <button class="quick-cmd-btn cmd-btn" data-cmd="led_off">
+            <span class="qc-icon">🌑</span> LED OFF
+          </button>
+          <button class="quick-cmd-btn cmd-btn" data-cmd="run_time">
+            <span class="qc-icon">🕐</span> RTC Time
+          </button>
+          <button class="quick-cmd-btn cmd-btn" data-cmd="get_version">
+            <span class="qc-icon">🏷</span> Version
+          </button>
+          <button class="quick-cmd-btn cmd-btn" data-cmd="btld_jump">
+            <span class="qc-icon">⚡</span> Bootloader
+          </button>
+          <button class="quick-cmd-btn danger cmd-btn" data-cmd="sys_reset"
+                  onclick="return confirm('Reset the ECU now?')">
+            <span class="qc-icon">⟳</span> Reset
+          </button>
+        </div>
+        <div id="ov-cmd-feedback" class="feedback" style="margin-top:10px"></div>
+      </div>
+
+    </div>
+
+    <!-- ECU Health panel -->
+    <div class="card">
+      <h2>🩺 ECU Health</h2>
+
+      <div class="health-row">
+        <div>
+          <div class="health-score" id="health-score" style="color: var(--accent)">–</div>
+          <div class="muted" style="font-size:11px;margin-top:2px">/ 100</div>
+        </div>
+        <div style="flex:1">
+          <div class="health-bar-wrap">
+            <div class="health-bar" id="health-bar" style="width:0%;background:var(--accent)"></div>
+          </div>
+          <div class="muted" style="font-size:11px;margin-top:4px" id="health-label">No data</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="health-items">
+        <div class="health-item">
+          <div class="hi-dot" id="hi-uart" style="background:var(--text-3)"></div>
+          <span>UART connection</span>
+          <span class="muted" id="hi-uart-val" style="margin-left:auto">–</span>
+        </div>
+        <div class="health-item">
+          <div class="hi-dot" id="hi-wifi" style="background:var(--text-3)"></div>
+          <span>WiFi / ESP</span>
+          <span class="muted" id="hi-wifi-val" style="margin-left:auto">–</span>
+        </div>
+        <div class="health-item">
+          <div class="hi-dot" id="hi-temp" style="background:var(--text-3)"></div>
+          <span>Temperature</span>
+          <span class="muted" id="hi-temp-val" style="margin-left:auto">–</span>
+        </div>
+        <div class="health-item">
+          <div class="hi-dot" id="hi-life" style="background:var(--text-3)"></div>
+          <span>Life counter</span>
+          <span class="muted" id="hi-life-val" style="margin-left:auto">–</span>
+        </div>
+        <div class="health-item">
+          <div class="hi-dot" id="hi-ver" style="background:var(--text-3)"></div>
+          <span>Version match</span>
+          <span class="muted" id="hi-ver-val" style="margin-left:auto">–</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">System Info</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="muted">RTC</span>
+          <span id="ov-rtc" style="font-family:var(--font-mono)">--:--:--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="muted">PWM Duty</span>
+          <span id="ov-pwm" style="font-family:var(--font-mono);color:var(--blue-h)">0%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="muted">Server ver</span>
+          <span id="ov-srv-ver" style="font-family:var(--font-mono);color:var(--accent)">–</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ TAB: CONTROL ══════════════ -->
+<div id="tab-main" class="tab-content">
 <main class="grid">
 
-  <!-- ── Control Panel ── -->
+  <!-- Control Panel -->
   <section class="card" id="card-control">
-    <h2>Control</h2>
+    <h2>⚡ Control</h2>
 
     <div class="version-row">
       <div class="ver-box">
@@ -103,18 +272,18 @@
     <div class="divider"></div>
 
     <div class="btn-group">
-      <button class="btn btn-success  cmd-btn" data-cmd="led_on">💡 LED ON</button>
-      <button class="btn btn-danger   cmd-btn" data-cmd="led_off">🌑 LED OFF</button>
+      <button class="btn btn-success cmd-btn" data-cmd="led_on">💡 LED ON</button>
+      <button class="btn btn-danger  cmd-btn" data-cmd="led_off">🌑 LED OFF</button>
     </div>
     <div class="divider"></div>
     <div class="btn-group">
-      <button class="btn btn-warning  cmd-btn" data-cmd="btld_jump">⚡ Jump to Bootloader</button>
-      <button class="btn btn-secondary cmd-btn" data-cmd="btld_update">🔄 Trigger Update</button>
+      <button class="btn btn-warning  cmd-btn" data-cmd="btld_jump">⚡ Jump to BTLD</button>
+      <button class="btn btn-secondary cmd-btn" data-cmd="btld_update">🔄 OTA Update</button>
     </div>
     <div class="divider"></div>
     <div class="btn-group">
       <button class="btn btn-info cmd-btn" data-cmd="get_version">🏷 Get Version</button>
-      <button class="btn btn-info cmd-btn" data-cmd="run_time">🕐 Get RTC Time</button>
+      <button class="btn btn-info cmd-btn" data-cmd="run_time">🕐 Get RTC</button>
     </div>
     <div class="divider"></div>
     <div class="btn-group">
@@ -123,7 +292,6 @@
     </div>
     <div class="divider"></div>
 
-    <!-- PWM slider (#5) -->
     <div class="pwm-row">
       <span class="ver-label">PWM duty (PC7)</span>
       <div class="pwm-controls">
@@ -144,9 +312,8 @@
 
     <div id="cmd-feedback" class="feedback"></div>
 
-    <!-- Alert thresholds config -->
     <div class="divider"></div>
-    <h2>Alert Thresholds</h2>
+    <h2>🔔 Alert Thresholds</h2>
     <div class="alert-cfg-row">
       <div class="input-labeled">
         <label for="inp-temp-thresh">Temp limit (°C)</label>
@@ -161,13 +328,13 @@
     <div id="alert-cfg-feedback" class="feedback"></div>
   </section>
 
-  <!-- ── Firmware Upload ── -->
+  <!-- Firmware Upload -->
   <section class="card" id="card-firmware">
-    <h2>Firmware Update</h2>
+    <h2>📦 Firmware Update</h2>
 
     <div class="drop-zone" id="drop-zone">
       <input type="file" id="inp-file" accept=".bin" hidden/>
-      <div class="drop-inner" id="drop-inner">
+      <div class="drop-inner">
         <span class="drop-icon">📁</span>
         <span>Drop <code>.bin</code> here or click to select</span>
       </div>
@@ -197,20 +364,22 @@
 
     <div class="ota-hint">
       <span class="hint-icon">ℹ</span>
-      After upload, press <strong>Jump to Bootloader</strong> on the left
-      <em>or</em> wait up to 30 s for ESP8266 auto-OTA.
+      After upload, press <strong>Jump to BTLD</strong>
+      or wait up to 30 s for ESP8266 auto-OTA.
     </div>
   </section>
 
-  <!-- ── Terminal ── -->
+  <!-- Terminal -->
   <section class="card" id="card-terminal">
     <div class="term-header">
-      <h2>Live Terminal  <span class="muted" id="term-port">(COM5 · 115200)</span></h2>
+      <h2 style="margin:0;padding:0;border:none">💻 Terminal
+        <span class="muted" id="term-port" style="font-weight:400">(not connected)</span>
+      </h2>
       <div class="term-controls">
         <label class="chk-label">
           <input type="checkbox" id="chk-scroll" checked/> Auto-scroll
         </label>
-        <button class="btn btn-ghost" id="btn-clear-term">Clear</button>
+        <button class="btn btn-ghost btn-sm" id="btn-clear-term">Clear</button>
       </div>
     </div>
     <pre id="terminal"></pre>
@@ -220,38 +389,64 @@
 </main>
 </div>
 
-<!-- ═══════════════════════════════ TAB: UART FLASH ═══════════════════════════ -->
+<!-- ══════════════ TAB: UART FLASH ══════════════ -->
 <div id="tab-uartflash" class="tab-content">
   <div class="tab-inner">
+
     <div class="card">
-      <h2>Build</h2>
-      <p class="muted" style="font-size:12px;margin-bottom:16px">
-        Runs <code>./build.sh</code> inside <code>combined_image/</code> — compiles APP, BTLD and creates <code>APP_BTLD.bin</code>.
+      <h2>🔨 Build</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:16px;line-height:1.6">
+        Runs <code>./build.sh</code> inside <code>combined_image/</code> —
+        compiles APP, BTLD and produces <code>APP_BTLD.bin</code>.
       </p>
-
-      <div style="display:flex;gap:12px;align-items:center">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <button class="btn btn-secondary" id="btn-build">🔨 Build</button>
-        <span id="build-status" class="muted" style="font-size:12px"></span>
+        <span id="build-status" class="muted" style="font-size:12px;font-family:var(--font-mono)"></span>
       </div>
-
-      <pre id="build-log" style="margin-top:12px;background:#0d1117;border-radius:8px;padding:12px;
+      <pre id="build-log" style="margin-top:12px;background:#030710;border-radius:8px;padding:12px;
            font-size:11px;min-height:60px;max-height:260px;overflow-y:auto;
-           color:#e6edf3;border:1px solid #21262d;white-space:pre-wrap;display:none"></pre>
+           color:var(--accent);border:1px solid var(--border);white-space:pre-wrap;display:none;
+           font-family:var(--font-mono)"></pre>
     </div>
 
     <div class="card" style="margin-top:16px">
-      <h2>Flash via UART</h2>
-      <p class="muted" style="font-size:12px;margin-bottom:16px">
-        Send an <code>APP_BTLD.bin</code> directly to the ECU over UART2.
-        The dashboard sends the jump command, waits 3 s for the bootloader, then streams the binary.
-        Leave the file picker empty to use the last firmware uploaded to the server.
+      <h2>⚡ Flash via UART</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:16px;line-height:1.6">
+        Sends firmware to the ECU over UART2. The dashboard sends the jump command,
+        waits 3 s for the bootloader, then streams the binary.
       </p>
 
+      <!-- Option A — use latest build directly -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">
+              📂 Use latest build
+            </div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent)" id="btld-local-path">
+              APP/Tools/APP_BTLD.bin
+            </div>
+            <div style="font-size:11px;color:var(--text-2);margin-top:2px" id="btld-local-info">
+              Checking…
+            </div>
+          </div>
+          <button class="btn btn-warning" id="btn-uart-flash-local">⚡ Flash Latest Build</button>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span class="muted" style="font-size:11px;white-space:nowrap">OR use a different file</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- Option B — drag and drop -->
       <div class="drop-zone" id="uf-drop-zone">
         <input type="file" id="uf-inp-file" accept=".bin" hidden/>
         <div class="drop-inner">
           <span class="drop-icon">📁</span>
-          <span>Drop <code>APP_BTLD.bin</code> here or click to select</span>
+          <span>Drop <code>.bin</code> here or click to select</span>
         </div>
       </div>
 
@@ -264,8 +459,8 @@
         <button class="btn btn-ghost" id="uf-btn-clear">✕</button>
       </div>
 
-      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-warning" id="btn-uart-flash">⚡ Flash via UART</button>
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-secondary" id="btn-uart-flash">⚡ Flash Selected File</button>
         <span class="muted" style="font-size:12px">ECU must be connected via wire (UART2)</span>
       </div>
 
@@ -273,71 +468,65 @@
         <div class="progress-bar" id="uf-progress-bar"></div>
       </div>
 
-      <pre id="uf-log" style="margin-top:16px;background:#0d1117;border-radius:8px;padding:12px;
+      <pre id="uf-log" style="margin-top:16px;background:#030710;border-radius:8px;padding:12px;
            font-size:12px;min-height:80px;max-height:300px;overflow-y:auto;
-           color:#e6edf3;border:1px solid #21262d;white-space:pre-wrap"></pre>
+           color:var(--accent);border:1px solid var(--border);white-space:pre-wrap;
+           font-family:var(--font-mono)"></pre>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ TAB: HISTORY ═══════════════════════════════ -->
+<!-- ══════════════ TAB: HISTORY ══════════════ -->
 <div id="tab-history" class="tab-content">
   <div class="tab-inner">
+
     <div class="card">
-      <h2>Firmware History</h2>
-      <p class="muted" style="font-size:12px;margin-bottom:12px">
-        Each uploaded binary is stored. Click <strong>Rollback</strong> to restore a previous version as the active OTA binary.
+      <h2>📋 Firmware History</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.6">
+        Each uploaded binary is stored on the server.
+        Click <strong>Rollback</strong> to restore a previous version as the active OTA binary.
       </p>
       <div class="table-wrap">
-        <table id="tbl-history">
+        <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Version</th>
-              <th>Uploaded</th>
-              <th>Size</th>
-              <th>Flash result</th>
-              <th>Action</th>
+              <th>#</th><th>Version</th><th>Uploaded</th>
+              <th>Size</th><th>Flash result</th><th>Action</th>
             </tr>
           </thead>
           <tbody id="tbody-history">
-            <tr><td colspan="6" class="muted" style="text-align:center">No history yet</td></tr>
+            <tr><td colspan="6" class="muted" style="text-align:center;padding:24px">No history yet</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Boot history (#9) -->
-    <div class="card" style="margin-top:20px">
-      <h2>Boot History</h2>
-      <p class="muted" style="font-size:12px;margin-bottom:12px">
+    <div class="card" style="margin-top:16px">
+      <h2>🔄 Boot History</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:12px;line-height:1.6">
         Every ECU boot is logged with the reset cause from <code>RCC_CSR</code>.
       </p>
       <div class="table-wrap">
-        <table id="tbl-boot">
+        <table>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Timestamp</th>
-              <th>Reason</th>
-              <th>Firmware ver</th>
-            </tr>
+            <tr><th>#</th><th>Timestamp</th><th>Reason</th><th>Firmware ver</th></tr>
           </thead>
           <tbody id="tbody-boot">
-            <tr><td colspan="4" class="muted" style="text-align:center">No boot events yet</td></tr>
+            <tr><td colspan="4" class="muted" style="text-align:center;padding:24px">No boot events yet</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ═══════════════════════════════ TAB: METRICS ═══════════════════════════════ -->
+<!-- ══════════════ TAB: METRICS ══════════════ -->
 <div id="tab-metrics" class="tab-content">
   <div class="tab-inner">
     <div class="card">
       <div class="metrics-header">
-        <h2>Metrics</h2>
+        <h2 style="margin:0;padding:0;border:none">📈 Metrics</h2>
         <div class="metrics-controls">
           <select id="sel-hours">
             <option value="1">Last 1 h</option>
@@ -348,82 +537,245 @@
           <button class="btn btn-secondary" id="btn-refresh-metrics">Refresh</button>
         </div>
       </div>
+
       <div class="charts-grid">
         <div class="chart-box">
-          <div class="chart-title">Internal Temperature (°C)</div>
+          <div class="chart-title">🌡 Internal Temperature (°C)</div>
           <canvas id="chart-temp" height="180"></canvas>
         </div>
         <div class="chart-box">
-          <div class="chart-title">Life Counter</div>
+          <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>⏱ Life Counter (uptime)</span>
+            <button class="btn btn-ghost btn-sm" id="btn-clear-life-chart">Clear</button>
+          </div>
           <canvas id="chart-life" height="180"></canvas>
         </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span>⚡ CPU Load per Task — live (every 10 s)</span>
+          <span id="lbl-cpu-ts" class="muted" style="font-size:11px"></span>
+        </div>
+        <canvas id="chart-cpu" height="120"></canvas>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span>📦 Stack Usage per Task — live (every 30 s)</span>
+          <span id="lbl-stack-ts" class="muted" style="font-size:11px"></span>
+        </div>
+        <canvas id="chart-stack" height="120"></canvas>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ TAB: IMU ════════════════════════════════════ -->
+<!-- ══════════════ TAB: OLED ══════════════ -->
+<div id="tab-oled" class="tab-content">
+  <div class="tab-inner">
+    <div class="oled-layout">
+
+      <!-- Left: display + controls -->
+      <div>
+        <div class="card" style="display:inline-block">
+          <h2>🖥 SSD1306 — 128×64 Simulation</h2>
+          <div class="oled-bezel">
+            <canvas id="oled-canvas" width="512" height="256"></canvas>
+          </div>
+          <div class="oled-controls">
+            <button class="btn btn-secondary" id="btn-oled-toggle">⏸ Pause</button>
+            <div class="oled-info-row">
+              <span class="muted">Frame</span>
+              <span id="oled-frame-num" style="font-family:var(--font-mono);color:var(--accent)">0</span>
+              <span class="muted">/ 11</span>
+            </div>
+            <div class="oled-info-row">
+              <span class="muted">FPS</span>
+              <span id="oled-fps" style="font-family:var(--font-mono);color:var(--blue-h)">16</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="muted" style="font-size:11px">Speed</span>
+              <input id="oled-speed" type="range" min="1" max="30" value="16"
+                     style="width:80px;accent-color:var(--accent)"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2>🐍 Snake Game Controls</h2>
+          <p class="muted" style="font-size:12px;margin-bottom:14px;line-height:1.6">
+            Sends the same WASD/R bytes the ECU's <code>UART2_ISR</code> listens for —
+            identical to <code>stm game</code> in <code>scripts/stm.sh</code>.
+          </p>
+          <div class="dpad">
+            <button class="btn btn-secondary dpad-btn dpad-up"    data-key="w" title="Up (W)">▲</button>
+            <button class="btn btn-secondary dpad-btn dpad-left"  data-key="a" title="Left (A)">◀</button>
+            <button class="btn btn-warning   dpad-btn dpad-reset" data-key="r" title="Restart (R)">⟳</button>
+            <button class="btn btn-secondary dpad-btn dpad-right" data-key="d" title="Right (D)">▶</button>
+            <button class="btn btn-secondary dpad-btn dpad-down"  data-key="s" title="Down (S)">▼</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px">
+            <label class="chk-label">
+              <input type="checkbox" id="chk-snake-kbd" checked/> Keyboard (WASD / arrows / R) while this tab is open
+            </label>
+            <span id="snake-feedback" class="muted" style="font-size:12px;font-family:var(--font-mono)"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: info panel -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <div class="card">
+          <h2>📋 Display Specs</h2>
+          <div class="oled-spec-grid">
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Driver</div>
+              <div style="font-family:var(--font-mono);font-weight:700">SSD1306</div>
+            </div>
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Resolution</div>
+              <div style="font-family:var(--font-mono);font-weight:700">128 × 64 px</div>
+            </div>
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Interface</div>
+              <div style="font-family:var(--font-mono);font-weight:700">I2C — 0x3C</div>
+            </div>
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Color</div>
+              <div style="font-family:var(--font-mono);font-weight:700">Monochrome</div>
+            </div>
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Pages</div>
+              <div style="font-family:var(--font-mono);font-weight:700">8 (8 rows each)</div>
+            </div>
+            <div class="oled-spec-item">
+              <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em">Buffer size</div>
+              <div style="font-family:var(--font-mono);font-weight:700">1024 bytes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🎞 Animation Info</h2>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">Content</span>
+              <span style="font-weight:600">Nyan Cat GIF</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">Total frames</span>
+              <span style="font-family:var(--font-mono)">12</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">Sprite size</span>
+              <span style="font-family:var(--font-mono)">128 × 32 px</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">Y position</span>
+              <span style="font-family:var(--font-mono)">Pages 2–5 (centered)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">Bytes / frame</span>
+              <span style="font-family:var(--font-mono)">512</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span class="muted">ECU task</span>
+              <span style="font-family:var(--font-mono)">OS_20ms (OLED_APP)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>💡 How it works</h2>
+          <div class="muted" style="font-size:12px;line-height:1.7">
+            The ECU writes pixel data into <code>OLED_Buffer[1024]</code> in
+            <strong>page format</strong> — each byte represents 8 vertical pixels.
+            The buffer is pushed to the display via <strong>I2C</strong> every frame.<br><br>
+            This simulation fetches the same frame data that was compiled into the ECU
+            and replays the animation in your browser at the same speed.<br><br>
+            <span style="color:var(--yellow-h)">⚠ Simulation mode</span> — not a live mirror.
+            To mirror the real display, the ECU would need to stream
+            <code>$OLED:&lt;1024 bytes&gt;</code> over UART.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TAB: IMU ══════════════ -->
 <div id="tab-imu" class="tab-content">
   <div class="tab-inner">
     <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
 
-      <div class="card" style="padding:16px">
-        <h2 style="margin-bottom:12px">Board Orientation</h2>
-        <canvas id="imu-canvas" style="width:100%;border-radius:8px;background:#0d1117;display:block"></canvas>
+      <div class="card">
+        <h2>🎯 Board Orientation</h2>
+        <canvas id="imu-canvas" style="width:100%;border-radius:8px;background:#030710;display:block"></canvas>
       </div>
 
-      <div class="card" style="padding:16px">
-        <h2 style="margin-bottom:16px">Sensor Readings</h2>
+      <div class="card">
+        <h2>📡 Sensor Readings</h2>
 
         <div style="margin-bottom:16px">
-          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Accelerometer (g)</div>
+          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+            Accelerometer (g)
+          </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">X</div>
-              <div id="imu-ax" style="font-size:18px;font-weight:600;color:#f85149">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">X</div>
+              <div id="imu-ax" style="font-size:17px;font-weight:700;color:var(--red-h);font-family:var(--font-mono)">0.00</div>
             </div>
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">Y</div>
-              <div id="imu-ay" style="font-size:18px;font-weight:600;color:#3fb950">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Y</div>
+              <div id="imu-ay" style="font-size:17px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">0.00</div>
             </div>
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">Z</div>
-              <div id="imu-az" style="font-size:18px;font-weight:600;color:#58a6ff">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Z</div>
+              <div id="imu-az" style="font-size:17px;font-weight:700;color:var(--blue-h);font-family:var(--font-mono)">0.00</div>
             </div>
           </div>
         </div>
 
         <div style="margin-bottom:16px">
-          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Gyroscope (°/s)</div>
+          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+            Gyroscope (°/s)
+          </div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">X</div>
-              <div id="imu-gx" style="font-size:18px;font-weight:600;color:#f85149">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">X</div>
+              <div id="imu-gx" style="font-size:17px;font-weight:700;color:var(--red-h);font-family:var(--font-mono)">0.00</div>
             </div>
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">Y</div>
-              <div id="imu-gy" style="font-size:18px;font-weight:600;color:#3fb950">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Y</div>
+              <div id="imu-gy" style="font-size:17px;font-weight:700;color:var(--accent);font-family:var(--font-mono)">0.00</div>
             </div>
-            <div style="background:#161b22;border-radius:6px;padding:10px">
-              <div class="muted" style="font-size:11px">Z</div>
-              <div id="imu-gz" style="font-size:18px;font-weight:600;color:#58a6ff">0.00</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Z</div>
+              <div id="imu-gz" style="font-size:17px;font-weight:700;color:var(--blue-h);font-family:var(--font-mono)">0.00</div>
             </div>
           </div>
         </div>
 
         <div>
-          <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Orientation</div>
+          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+            Orientation
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div style="background:#161b22;border-radius:6px;padding:10px;text-align:center">
-              <div class="muted" style="font-size:11px">Roll</div>
-              <div id="imu-roll" style="font-size:20px;font-weight:700;color:#e3b341">0.0°</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Roll</div>
+              <div id="imu-roll" style="font-size:22px;font-weight:800;color:var(--yellow-h);font-family:var(--font-mono)">0.0°</div>
             </div>
-            <div style="background:#161b22;border-radius:6px;padding:10px;text-align:center">
-              <div class="muted" style="font-size:11px">Pitch</div>
-              <div id="imu-pitch" style="font-size:20px;font-weight:700;color:#e3b341">0.0°</div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">
+              <div class="muted" style="font-size:10px;margin-bottom:4px">Pitch</div>
+              <div id="imu-pitch" style="font-size:22px;font-weight:800;color:var(--yellow-h);font-family:var(--font-mono)">0.0°</div>
             </div>
           </div>
-          <div style="text-align:center;margin-top:8px" class="muted" style="font-size:11px">Yaw — N/A (no magnetometer)</div>
+          <div style="text-align:center;margin-top:8px;font-size:11px" class="muted">
+            Yaw — N/A (no magnetometer)
+          </div>
         </div>
       </div>
 

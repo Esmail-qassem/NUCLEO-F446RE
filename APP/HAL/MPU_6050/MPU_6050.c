@@ -1,4 +1,4 @@
-#include "MPU.h"
+#include "MPU_6050.h"
 #include "I2C.h"
 #include "App_Config.h"
 

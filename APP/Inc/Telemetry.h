@@ -18,6 +18,7 @@ void RUN_TIME(void);
 void INTERNAL_TEMP_TASK(void);
 void LDR_TASK(void);
 void STACK_MONITOR(void);
+void CPU_LOAD_TASK(void);
 void BOOT_REASON_REPORT(void);
 
 #endif /* TELEMETRY_H_ */

@@ -95,6 +95,10 @@ function applyState(s) {
     lblConn.textContent    = isConnected ? `${s.serial_port} · ${s.baud}` : "Disconnected";
     btnConnect.textContent = isConnected ? "Disconnect" : "Connect";
     termPort.textContent   = isConnected ? `(${s.serial_port} · ${s.baud})` : "(not connected)";
+
+    // Overview stat card
+    $("ov-conn-val").textContent = isConnected ? (s.serial_port || "Connected") : "Disconnected";
+    $("ov-conn-sub").textContent = isConnected ? `${s.baud} baud` : "No UART link";
   }
 
   if ("esp_ip" in s) {
@@ -106,17 +110,53 @@ function applyState(s) {
 
   updateCmdAvailability();
 
-  if (s.rtc_time)      lblRtc.textContent    = s.rtc_time;
-  if (s.temperature)   lblTemp.textContent   = s.temperature;
-  if (s.life_counter)  lblLife.textContent   = s.life_counter;
-  if (s.ecu_version)   lblEcuVer.textContent = s.ecu_version;
-  if (s.pwm_duty !== undefined) {
-    $("inp-pwm").value = s.pwm_duty;
-    $("lbl-pwm").textContent = s.pwm_duty + "%";
+  if (s.rtc_time) {
+    lblRtc.textContent    = s.rtc_time;
+    $("ov-rtc").textContent = s.rtc_time;
   }
+
+  if (s.temperature) {
+    lblTemp.textContent = s.temperature;
+    const rawT = parseInt(s.temperature);
+    $("ov-temp-val").textContent = isNaN(rawT) ? s.temperature : rawT + "°C";
+    $("ov-temp-sub").textContent = isNaN(rawT) ? "Internal STM32"
+      : rawT > 55 ? "⚠ High — check cooling" : "Normal range";
+    $("ov-temp-val").style.color = (!isNaN(rawT) && rawT > 55) ? "var(--red-h)" : "var(--text)";
+    // Push to live sparkline
+    if (chartTempLive && !isNaN(rawT)) {
+      const t = new Date().toLocaleTimeString();
+      chartTempLive.data.labels.push(t);
+      chartTempLive.data.datasets[0].data.push(rawT);
+      if (chartTempLive.data.labels.length > 30) {
+        chartTempLive.data.labels.shift();
+        chartTempLive.data.datasets[0].data.shift();
+      }
+      chartTempLive.update("none");
+    }
+  }
+
+  if (s.life_counter) {
+    lblLife.textContent = s.life_counter;
+    const n = parseInt(s.life_counter);
+    $("ov-life-val").textContent = isNaN(n) ? s.life_counter : fmtUptime(n);
+    $("ov-life-sub").textContent = isNaN(n) ? "Life counter" : `Tick #${n}`;
+  }
+
+  if (s.ecu_version) {
+    lblEcuVer.textContent         = s.ecu_version;
+    $("ov-ver-val").textContent   = s.ecu_version;
+  }
+
+  if (s.pwm_duty !== undefined) {
+    $("inp-pwm").value          = s.pwm_duty;
+    $("lbl-pwm").textContent    = s.pwm_duty + "%";
+    $("ov-pwm").textContent     = s.pwm_duty + "%";
+  }
+
   if (s.server_version) {
-    lblSrvVer.textContent  = s.server_version;
-    inpVersion.placeholder = nextPatch(s.server_version);
+    lblSrvVer.textContent          = s.server_version;
+    inpVersion.placeholder         = nextPatch(s.server_version);
+    $("ov-srv-ver").textContent    = s.server_version;
   }
 
   const mismatch = s.ecu_version && s.server_version &&
@@ -124,6 +164,66 @@ function applyState(s) {
                    s.ecu_version !== s.server_version;
   lblSrvVer.style.color = mismatch ? "var(--yellow-h)" : "";
   lblEcuVer.style.color = mismatch ? "var(--yellow-h)" : "";
+  if (s.ecu_version) {
+    $("ov-ver-sub").textContent  = mismatch ? "⚠ Mismatch with server" : "Matches server";
+    $("ov-ver-val").style.color  = mismatch ? "var(--yellow-h)" : "var(--text)";
+  }
+
+  updateHealth(s);
+}
+
+function updateHealth(s) {
+  let score = 0;
+  const set = (id, dotId, ok, val) => {
+    $(id).textContent            = val;
+    $(dotId).style.background    = ok ? "var(--accent)" : "var(--red-h)";
+  };
+
+  // UART (25 pts)
+  if (isConnected) { score += 25; set("hi-uart-val","hi-uart", true, "OK"); }
+  else             { set("hi-uart-val","hi-uart", false, "Offline"); }
+
+  // WiFi (15 pts)
+  if (espIp) { score += 15; set("hi-wifi-val","hi-wifi", true, espIp); }
+  else       { set("hi-wifi-val","hi-wifi", false, "No ESP"); }
+
+  // Temp (25 pts)
+  const rawT = parseInt((s.temperature || "").replace(/[^-\d]/g, ""));
+  if (!isNaN(rawT)) {
+    const ok = rawT < 55;
+    score += ok ? 25 : 10;
+    set("hi-temp-val","hi-temp", ok, rawT + "°C");
+  } else { $("hi-temp-val").textContent = "–"; }
+
+  // Life counter (20 pts)
+  const life = parseInt(s.life_counter);
+  if (!isNaN(life) && life > 0) { score += 20; set("hi-life-val","hi-life", true, "Running"); }
+  else if (!isNaN(life))        { set("hi-life-val","hi-life", false, "Stalled"); }
+  else                          { $("hi-life-val").textContent = "–"; }
+
+  // Version match (15 pts)
+  const mismatch = s.ecu_version && s.server_version &&
+    s.ecu_version !== "–" && s.server_version !== "–" &&
+    s.ecu_version !== s.server_version;
+  if (s.ecu_version && s.ecu_version !== "–") {
+    const ok = !mismatch;
+    score += ok ? 15 : 5;
+    set("hi-ver-val","hi-ver", ok, ok ? "Match" : "Mismatch");
+  } else { $("hi-ver-val").textContent = "–"; }
+
+  $("health-score").textContent = isConnected ? score : "–";
+  const bar = $("health-bar");
+  bar.style.width = isConnected ? score + "%" : "0%";
+  bar.style.background = score >= 80 ? "var(--accent)"
+                       : score >= 50 ? "var(--yellow-h)"
+                       : "var(--red-h)";
+  $("health-score").style.color = score >= 80 ? "var(--accent)"
+                                : score >= 50 ? "var(--yellow-h)"
+                                : "var(--red-h)";
+  $("health-label").textContent = !isConnected ? "Connect ECU to see health"
+    : score >= 80 ? "All systems nominal"
+    : score >= 50 ? "Some issues detected"
+    : "Critical issues";
 }
 
 function updateCmdAvailability() {
@@ -210,6 +310,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     $(btn.dataset.tab).classList.add("active");
     if (btn.dataset.tab === "tab-metrics") loadMetrics();
     if (btn.dataset.tab === "tab-imu")     initImu();
+    if (btn.dataset.tab === "tab-oled")    initOled();
   });
 });
 
@@ -220,7 +321,8 @@ function appendTerminal(text) {
   terminal.textContent += text;
   if (terminal.textContent.length > MAX_TERM_LEN)
     terminal.textContent = terminal.textContent.slice(-MAX_TERM_LEN / 2);
-  if (chkScroll.checked) terminal.scrollTop = terminal.scrollHeight;
+  if (chkScroll.checked)
+    requestAnimationFrame(() => { terminal.scrollTop = terminal.scrollHeight; });
 }
 
 btnClearTerm.addEventListener("click", () => { terminal.textContent = ""; });
@@ -276,12 +378,16 @@ cmdBtns.forEach(btn => {
       const data = await res.json();
       if (data.ok) {
         const via = channelLabel(data.wire, data.wifi);
-        setFeedback(cmdFeedback, `→ ${cmd}  (0x${data.byte.slice(2).toUpperCase()})  ${via}`, "ok");
+        const msg = `→ ${cmd}  (0x${data.byte.slice(2).toUpperCase()})  ${via}`;
+        setFeedback(cmdFeedback, msg, "ok");
+        setFeedback($("ov-cmd-feedback"), msg, "ok");
       } else {
         setFeedback(cmdFeedback, data.error, "err");
+        setFeedback($("ov-cmd-feedback"), data.error, "err");
       }
     } catch {
       setFeedback(cmdFeedback, "Request failed", "err");
+      setFeedback($("ov-cmd-feedback"), "Request failed", "err");
     }
   });
 });
@@ -452,8 +558,16 @@ async function doRollback(version) {
 // ──────────────────────────────────────────────────────────────────
 //  Metrics charts
 // ──────────────────────────────────────────────────────────────────
-let chartTemp = null;
-let chartLife = null;
+let chartTemp     = null;
+let chartLife     = null;
+let chartStack    = null;
+let chartCpuLoad  = null;
+let chartTempLive = null;
+
+const TASK_LABELS = ["T0 5ms", "T1 10ms", "T2 20ms", "T3 50ms", "T4 100ms", "T5 1000ms"];
+
+const MUTED  = "#4a5568";
+const GRID   = "#1e2d42";
 
 const CHART_OPTS = {
   responsive: true,
@@ -461,51 +575,189 @@ const CHART_OPTS = {
   plugins   : { legend: { display: false } },
   scales    : {
     x: {
-      ticks: { color: "#8b949e", maxTicksLimit: 8, maxRotation: 0 },
-      grid : { color: "#21262d" },
+      ticks: { color: MUTED, maxTicksLimit: 8, maxRotation: 0, font: { size: 10 } },
+      grid : { color: GRID },
     },
     y: {
-      ticks: { color: "#8b949e" },
-      grid : { color: "#21262d" },
+      ticks: { color: MUTED, font: { size: 10 } },
+      grid : { color: GRID },
     },
   },
 };
 
 function buildCharts() {
-  const ctxT = $("chart-temp").getContext("2d");
-  const ctxL = $("chart-life").getContext("2d");
+  const ctxT  = $("chart-temp").getContext("2d");
+  const ctxL  = $("chart-life").getContext("2d");
+  const ctxS  = $("chart-stack").getContext("2d");
+  const ctxC  = $("chart-cpu").getContext("2d");
+  const ctxTL = $("chart-temp-live").getContext("2d");
+
+  /* Live sparkline on overview */
+  chartTempLive = new Chart(ctxTL, {
+    type: "line",
+    data: {
+      labels  : [],
+      datasets: [{
+        data           : [],
+        borderColor    : "#ef4444",
+        backgroundColor: "rgba(239,68,68,.08)",
+        fill           : true,
+        tension        : 0.4,
+        pointRadius    : 0,
+        borderWidth    : 2,
+      }],
+    },
+    options: {
+      responsive: true,
+      animation : false,
+      plugins   : {
+        legend : { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} °C` } },
+      },
+      scales: {
+        x: { display: false },
+        y: {
+          ticks: { color: MUTED, font: { size: 10 }, callback: v => v + "°" },
+          grid : { color: GRID },
+        },
+      },
+    },
+  });
 
   chartTemp = new Chart(ctxT, {
     type: "line",
-    data: { labels: [], datasets: [{ data: [], borderColor: "#f85149", backgroundColor: "rgba(248,81,73,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] },
-    options: { ...CHART_OPTS, scales: { ...CHART_OPTS.scales, y: { ...CHART_OPTS.scales.y, title: { display: true, text: "°C", color: "#8b949e" } } } },
+    data: { labels: [], datasets: [{ data: [], borderColor: "#ef4444", backgroundColor: "rgba(239,68,68,.08)", fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 }] },
+    options: { ...CHART_OPTS, scales: { ...CHART_OPTS.scales, y: { ...CHART_OPTS.scales.y, title: { display: true, text: "°C", color: MUTED } } } },
+  });
+
+  chartCpuLoad = new Chart(ctxC, {
+    type: "bar",
+    data: {
+      labels  : TASK_LABELS,
+      datasets: [{
+        data           : [0, 0, 0, 0, 0, 0],
+        backgroundColor: ["#3b82f6","#00d9a3","#f59e0b","#8b5cf6","#ef4444","#f97316"],
+        borderRadius   : 6,
+        borderWidth    : 0,
+      }],
+    },
+    options: {
+      responsive: true,
+      animation : false,
+      plugins: {
+        legend : { display: false },
+        tooltip: { callbacks: { label: ctx => ` CPU load: ${ctx.parsed.y}%` } },
+      },
+      scales: {
+        x: { ticks: { color: MUTED, font: { size: 11 } }, grid: { color: GRID } },
+        y: {
+          min  : 0,
+          max  : 100,
+          ticks: { color: MUTED, callback: v => v + "%", font: { size: 10 } },
+          grid : { color: GRID },
+          title: { display: true, text: "CPU load %", color: MUTED },
+        },
+      },
+    },
+  });
+
+  chartStack = new Chart(ctxS, {
+    type: "bar",
+    data: {
+      labels  : TASK_LABELS,
+      datasets: [{
+        data           : [0, 0, 0, 0, 0, 0],
+        backgroundColor: ["#3b82f6","#00d9a3","#f59e0b","#8b5cf6","#ef4444","#f97316"],
+        borderRadius   : 6,
+        borderWidth    : 0,
+      }],
+    },
+    options: {
+      responsive: true,
+      animation : false,
+      plugins   : {
+        legend : { display: false },
+        tooltip: { callbacks: { label: ctx => ` Stack used: ${ctx.parsed.y}%` } },
+      },
+      scales: {
+        x: { ticks: { color: MUTED, font: { size: 11 } }, grid: { color: GRID } },
+        y: {
+          min  : 0,
+          max  : 100,
+          ticks: { color: MUTED, callback: v => v + "%", font: { size: 10 } },
+          grid : { color: GRID },
+          title: { display: true, text: "Stack used %", color: MUTED },
+        },
+      },
+    },
   });
 
   chartLife = new Chart(ctxL, {
     type: "line",
-    data: { labels: [], datasets: [{ data: [], borderColor: "#3fb950", backgroundColor: "rgba(63,185,80,0.1)", fill: true, tension: 0.3, pointRadius: 2 }] },
-    options: { ...CHART_OPTS },
+    data: { labels: [], datasets: [{ data: [], borderColor: "#00d9a3", backgroundColor: "rgba(0,217,163,.08)", fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 }] },
+    options: {
+      ...CHART_OPTS,
+      scales: {
+        ...CHART_OPTS.scales,
+        y: {
+          ...CHART_OPTS.scales.y,
+          title: { display: true, text: "Uptime", color: MUTED },
+          ticks: {
+            color: MUTED,
+            callback: v => fmtUptime(v),
+          },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => " Uptime: " + fmtUptime(ctx.parsed.y),
+          },
+        },
+      },
+    },
   });
 }
 
+function fmtUptime(s) {
+  if (s == null || isNaN(s)) return "–";
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return `${h}h ${m.toString().padStart(2,"0")}m`;
+  if (m > 0) return `${m}m ${sec.toString().padStart(2,"0")}s`;
+  return `${sec}s`;
+}
+
+function fmtLabel(tsStr, spanHours) {
+  const d = new Date(tsStr);
+  const hh = d.getHours().toString().padStart(2,"0");
+  const mm = d.getMinutes().toString().padStart(2,"0");
+  const ss = d.getSeconds().toString().padStart(2,"0");
+  if (spanHours > 24) {
+    const mo = (d.getMonth()+1).toString().padStart(2,"0");
+    const dd = d.getDate().toString().padStart(2,"0");
+    return `${mo}/${dd} ${hh}:${mm}`;
+  }
+  return `${hh}:${mm}:${ss}`;
+}
+
 async function loadMetrics() {
-  const hours = $("sel-hours").value;
+  const hours = parseInt($("sel-hours").value);
   try {
     const rows = await (await fetch(`/api/metrics?hours=${hours}`)).json();
 
-    const labels = rows.map(r => {
-      const d = new Date(r.ts);
-      return `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
-    });
+    const labels = rows.map(r => fmtLabel(r.ts, hours));
     const temps  = rows.map(r => r.temperature);
     const lifes  = rows.map(r => r.life_counter);
 
-    chartTemp.data.labels                  = labels;
-    chartTemp.data.datasets[0].data        = temps;
+    chartTemp.data.labels           = labels;
+    chartTemp.data.datasets[0].data = temps;
     chartTemp.update();
 
-    chartLife.data.labels                  = labels;
-    chartLife.data.datasets[0].data        = lifes;
+    chartLife.data.labels           = labels;
+    chartLife.data.datasets[0].data = lifes;
     chartLife.update();
   } catch (e) {
     console.error("Metrics load failed", e);
@@ -513,7 +765,27 @@ async function loadMetrics() {
 }
 
 $("btn-refresh-metrics").addEventListener("click", loadMetrics);
-$("sel-hours").addEventListener("change", loadMetrics);
+$("sel-hours").addEventListener("change",          loadMetrics);
+
+socket.on("cpu_load", data => {
+  const vals = TASK_LABELS.map((_, i) => data[`T${i}`] ?? 0);
+  chartCpuLoad.data.datasets[0].data = vals;
+  chartCpuLoad.update();
+  $("lbl-cpu-ts").textContent = new Date().toLocaleTimeString();
+});
+
+socket.on("stack_usage", data => {
+  const vals = TASK_LABELS.map((_, i) => data[`T${i}`] ?? 0);
+  chartStack.data.datasets[0].data = vals;
+  chartStack.update();
+  $("lbl-stack-ts").textContent = new Date().toLocaleTimeString();
+});
+
+$("btn-clear-life-chart").addEventListener("click", () => {
+  chartLife.data.labels           = [];
+  chartLife.data.datasets[0].data = [];
+  chartLife.update();
+});
 
 // ──────────────────────────────────────────────────────────────────
 //  Toast
@@ -717,7 +989,8 @@ socket.on("uart_flash_progress", ({ pct, sent, total }) => {
 });
 
 socket.on("uart_flash_done", ({ ok }) => {
-  btnUartFlash.disabled = false;
+  btnUartFlash.disabled       = false;
+  $("btn-uart-flash-local").disabled = false;
   if (ok) {
     ufProgressBar.style.width = "100%";
     setTimeout(() => { ufProgressWrap.style.display = "none"; }, 2000);
@@ -759,6 +1032,220 @@ btnUartFlash.addEventListener("click", async () => {
 });
 
 // ──────────────────────────────────────────────────────────────────
+//  UART Flash — local APP_BTLD.bin button
+// ──────────────────────────────────────────────────────────────────
+
+async function loadBtldInfo() {
+  try {
+    const d = await (await fetch("/api/app_btld_info")).json();
+    if (d.exists) {
+      $("btld-local-info").textContent =
+        `${formatBytes(d.size)}  ·  modified ${d.modified}`;
+      $("btld-local-info").style.color = "";
+    } else {
+      $("btld-local-info").textContent = "File not found — run Build first";
+      $("btld-local-info").style.color = "var(--red-h)";
+    }
+  } catch {
+    $("btld-local-info").textContent = "Could not read file info";
+    $("btld-local-info").style.color = "var(--red-h)";
+  }
+}
+
+loadBtldInfo();  /* load on page open */
+
+$("btn-uart-flash-local").addEventListener("click", async () => {
+  if (!isConnected) {
+    ufAppendLog(new Date().toLocaleTimeString(), "ERROR: ECU not connected via wire");
+    return;
+  }
+  if (!confirm("Flash APP/Tools/APP_BTLD.bin to ECU via UART2?")) return;
+
+  ufLog.textContent = "";
+  ufProgressWrap.style.display = "block";
+  ufProgressBar.style.width    = "0%";
+  $("btn-uart-flash-local").disabled = true;
+  btnUartFlash.disabled              = true;
+
+  try {
+    const res  = await fetch("/api/uart_flash_local", { method: "POST" });
+    const data = await res.json();
+    if (!data.ok) {
+      ufAppendLog(new Date().toLocaleTimeString(), `ERROR: ${data.error}`);
+      ufProgressWrap.style.display = "none";
+      $("btn-uart-flash-local").disabled = false;
+      btnUartFlash.disabled              = false;
+    } else {
+      ufAppendLog(new Date().toLocaleTimeString(),
+        `Flashing APP/Tools/APP_BTLD.bin  (${formatBytes(data.size)})`);
+    }
+  } catch {
+    ufAppendLog(new Date().toLocaleTimeString(), "ERROR: Request to server failed");
+    ufProgressWrap.style.display = "none";
+    $("btn-uart-flash-local").disabled = false;
+    btnUartFlash.disabled              = false;
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────
+//  Snake game controls (#OLED tab)
+//  Same bytes as `stm game` in scripts/stm.sh — UART2_ISR reads the
+//  raw ASCII char and maps it to MOVE_*/GAME_RESET.
+// ──────────────────────────────────────────────────────────────────
+const SNAKE_KEYS = {
+  w: "77", a: "61", s: "73", d: "64", r: "72",
+  ArrowUp: "77", ArrowLeft: "61", ArrowDown: "73", ArrowRight: "64",
+};
+
+const snakeFeedback = $("snake-feedback");
+const chkSnakeKbd   = $("chk-snake-kbd");
+
+function sendSnakeByte(hex, label) {
+  if (!isConnected) {
+    snakeFeedback.textContent = "Not connected — open UART first";
+    return;
+  }
+  socket.emit("send_raw", { byte: hex, channel: "wire" });
+  snakeFeedback.textContent = `→ ${label}  [0x${hex.toUpperCase()}]`;
+}
+
+document.querySelectorAll(".dpad-btn").forEach(btn => {
+  btn.addEventListener("click", () => sendSnakeByte(SNAKE_KEYS[btn.dataset.key], btn.title));
+});
+
+document.addEventListener("keydown", e => {
+  if (!chkSnakeKbd.checked) return;
+  if (!$("tab-oled").classList.contains("active")) return;
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+  const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  const hex = SNAKE_KEYS[key];
+  if (!hex) return;
+  e.preventDefault();
+  sendSnakeByte(hex, key);
+});
+
+// ──────────────────────────────────────────────────────────────────
+//  OLED simulation
+// ──────────────────────────────────────────────────────────────────
+const OLED_W      = 128;
+const OLED_H      = 64;
+const OLED_PAGES  = 8;
+const OLED_SCALE  = 4;
+
+let oledFrames    = null;
+let oledFrameIdx  = 0;
+let oledTimer     = null;
+let oledRunning   = false;
+let oledFps       = 16;
+let oledLastRender= 0;
+
+/* Build a full 1024-byte OLED buffer from a 512-byte Nyan Cat frame.
+   The sprite occupies pages 2–5 (rows 16–47) on the 128×64 display. */
+function buildOledBuffer(frame, yOffsetPages) {
+  const buf = new Uint8Array(1024);
+  const start = yOffsetPages * OLED_W;
+  for (let i = 0; i < 512; i++) buf[start + i] = frame[i];
+  return buf;
+}
+
+/* Render a 1024-byte page-format buffer to the OLED canvas.
+   Page format: buf[page*128 + col] → 8 vertical pixels, bit0=top. */
+function renderOledBuffer(buf, ctx) {
+  /* Background — very dark green tint like a real OLED */
+  ctx.fillStyle = "#060c06";
+  ctx.fillRect(0, 0, OLED_W * OLED_SCALE, OLED_H * OLED_SCALE);
+
+  const gap = 1; /* 1px gap between pixels for authentic OLED look */
+  const sz  = OLED_SCALE - gap;
+
+  for (let page = 0; page < OLED_PAGES; page++) {
+    for (let col = 0; col < OLED_W; col++) {
+      const byte = buf[page * OLED_W + col];
+      if (byte === 0) continue; /* skip blank columns for performance */
+      for (let bit = 0; bit < 8; bit++) {
+        if ((byte >> bit) & 1) {
+          const px = col * OLED_SCALE;
+          const py = (page * 8 + bit) * OLED_SCALE;
+          /* Glow behind pixel */
+          ctx.fillStyle = "rgba(0,255,120,.12)";
+          ctx.fillRect(px - 1, py - 1, OLED_SCALE + 2, OLED_SCALE + 2);
+          /* Pixel */
+          ctx.fillStyle = "#00ff88";
+          ctx.fillRect(px, py, sz, sz);
+        }
+      }
+    }
+  }
+}
+
+function oledTick() {
+  if (!oledFrames || !oledRunning) return;
+  const canvas = $("oled-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const buf = buildOledBuffer(oledFrames[oledFrameIdx], 2);
+  renderOledBuffer(buf, ctx);
+  $("oled-frame-num").textContent = oledFrameIdx;
+  oledFrameIdx = (oledFrameIdx + 1) % oledFrames.length;
+}
+
+function oledSetFps(fps) {
+  oledFps = fps;
+  $("oled-fps").textContent = fps;
+  if (oledTimer) { clearInterval(oledTimer); oledTimer = null; }
+  if (oledRunning) oledTimer = setInterval(oledTick, 1000 / fps);
+}
+
+async function initOled() {
+  /* Already initialised — just make sure it's running */
+  if (oledFrames) {
+    if (!oledRunning) { oledRunning = true; oledSetFps(oledFps); }
+    return;
+  }
+
+  const canvas = $("oled-canvas");
+  const ctx    = canvas.getContext("2d");
+  ctx.fillStyle = "#060c06";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#4a5568";
+  ctx.font = "14px monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("Loading frames…", canvas.width / 2, canvas.height / 2);
+
+  try {
+    const res  = await fetch("/api/oled_frames");
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    oledFrames  = data.frames;
+    oledRunning = true;
+    oledSetFps(oledFps);
+  } catch (e) {
+    ctx.fillStyle = "#ef4444";
+    ctx.fillText("Failed: " + e.message, canvas.width / 2, canvas.height / 2);
+  }
+}
+
+/* Play / Pause */
+$("btn-oled-toggle").addEventListener("click", () => {
+  if (oledRunning) {
+    oledRunning = false;
+    clearInterval(oledTimer); oledTimer = null;
+    $("btn-oled-toggle").textContent = "▶ Play";
+  } else {
+    oledRunning = true;
+    oledSetFps(oledFps);
+    $("btn-oled-toggle").textContent = "⏸ Pause";
+  }
+});
+
+/* Speed slider */
+$("oled-speed").addEventListener("input", () => {
+  oledSetFps(parseInt($("oled-speed").value));
+});
+
+// ──────────────────────────────────────────────────────────────────
 //  Boot
 // ──────────────────────────────────────────────────────────────────
 (async function init() {
@@ -781,5 +1268,17 @@ btnUartFlash.addEventListener("click", async () => {
   try {
     const rows = await (await fetch("/api/boot_history")).json();
     renderBootHistory(rows);
+  } catch {}
+
+  try {
+    const t = await (await fetch("/api/tunnel_url")).json();
+    if (t.url && t.url.startsWith("https")) {
+      const el = document.createElement("a");
+      el.href        = t.url;
+      el.target      = "_blank";
+      el.textContent = "🌐 " + t.url;
+      el.style.cssText = "font-size:11px;color:var(--accent);font-family:var(--font-mono);text-decoration:none";
+      document.querySelector(".header-left").appendChild(el);
+    }
   } catch {}
 })();

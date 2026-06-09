@@ -121,8 +121,8 @@ void BootLoader_MainFunction(void)
         if (calculated_crc == received_crc)
         {
             UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC OK!\n", 9);
-            FlashDrv_EraseSector(2);
-            FlashDrv_EraseSector(3);
+            UART_SendSyncBuffer(UART1, (uint8 *)"\nCRC OK!\n", 9);
+            FlashDrv_EraseRange(APP_START_ADDRESS, ImageSize);
             Start_Flashing = 1;
         }
         else
@@ -132,6 +132,9 @@ void BootLoader_MainFunction(void)
             UART_SendSyncBuffer(UART2, (uint8 *)"\nCRC FAILED! Attempt ", 21);
             UART_voidSendNumber(UART2, retry_count);
             UART_SendSyncBuffer(UART2, (uint8 *)"/3\n", 3);
+            UART_SendSyncBuffer(UART1, (uint8 *)"\nCRC FAILED! Attempt ", 21);
+            UART_voidSendNumber(UART1, retry_count);
+            UART_SendSyncBuffer(UART1, (uint8 *)"/3\n", 3);
 
             if (retry_count >= MAX_RETRY)
             {

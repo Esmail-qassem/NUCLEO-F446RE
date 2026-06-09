@@ -28,6 +28,7 @@ STATIC_DIR   = BASE_DIR / "static"
 FIRMWARE_BIN = UPLOAD_DIR / "firmware.bin"
 VERSION_FILE = UPLOAD_DIR / "version.txt"
 DB_PATH      = BASE_DIR / "ecu_data.db"
+APP_BTLD_BIN = BASE_DIR.parent / "APP/Tools/APP_BTLD.bin"
 
 UPLOAD_DIR.mkdir(exist_ok=True)
 TELEMETRY_UDP_PORT = 5001
@@ -38,6 +39,10 @@ TELEMETRY_UDP_PORT = 5001
 app      = Flask(__name__, static_folder=str(STATIC_DIR))
 app.config["SECRET_KEY"] = "ecu-2024"
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+
+# Trust Cloudflare / reverse-proxy headers (X-Forwarded-Proto, etc.)
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # ──────────────────────────────────────────────────────────────────
 #  Database
@@ -176,10 +181,16 @@ def _check_alerts(temp_val=None, life_val=None):
 # ──────────────────────────────────────────────────────────────────
 #  Metrics storage (throttled to 1 insert / 60 s)
 # ──────────────────────────────────────────────────────────────────
-_last_metric_ts = 0
+_last_metric_ts  = 0
+_pending_metric  = {"temp": None, "life": None}
 
 def _store_metric(temp=None, life=None):
-    global _last_metric_ts
+    global _last_metric_ts, _pending_metric
+    # Accumulate latest values — temp and life arrive on separate UART lines
+    if temp is not None:
+        _pending_metric["temp"] = temp
+    if life is not None:
+        _pending_metric["life"] = life
     now = time.time()
     if now - _last_metric_ts < 60:
         return
@@ -189,7 +200,7 @@ def _store_metric(temp=None, life=None):
         with _db_lock, _db() as conn:
             conn.execute(
                 "INSERT INTO metrics (ts, temperature, life_counter) VALUES (?,?,?)",
-                (ts, temp, life)
+                (ts, _pending_metric["temp"], _pending_metric["life"])
             )
             conn.commit()
     except Exception as e:
@@ -255,6 +266,24 @@ def _parse_line(raw: str):
             print(f"[db] boot_history insert failed: {e}")
         socketio.emit("boot_history", _get_boot_history())
         print(f"[boot] reason={reason}  ver={version}")
+
+    # CPU load — "$CPU:T0:2% T1:0% T2:24% T3:0% T4:0% T5:1%"
+    m = re.search(r"\$CPU:\s*((?:T\d+:\d+%\s*)+)", line)
+    if m:
+        cpu = {}
+        for hit in re.finditer(r"T(\d+):(\d+)%", m.group(1)):
+            cpu[f"T{hit.group(1)}"] = int(hit.group(2))
+        if cpu:
+            socketio.emit("cpu_load", cpu)
+
+    # Stack usage — "Stack: T0:5% T1:8% T2:3% T3:12% T4:7% T5:15%"
+    m = re.search(r"Stack:\s*((?:T\d+:\d+%\s*)+)", line)
+    if m:
+        stack = {}
+        for hit in re.finditer(r"T(\d+):(\d+)%", m.group(1)):
+            stack[f"T{hit.group(1)}"] = int(hit.group(2))
+        if stack:
+            socketio.emit("stack_usage", stack)
 
     # Store metrics + check alerts
     if temp_val is not None or life_val is not None:
@@ -576,6 +605,34 @@ def route_uart_flash():
     threading.Thread(target=_do_uart_flash, args=(payload,), daemon=True).start()
     return jsonify(ok=True, size=len(payload))
 
+@app.route("/api/app_btld_info")
+def route_app_btld_info():
+    if not APP_BTLD_BIN.exists():
+        return jsonify(exists=False, path=str(APP_BTLD_BIN))
+    stat = APP_BTLD_BIN.stat()
+    return jsonify(
+        exists   = True,
+        size     = stat.st_size,
+        modified = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+        path     = "APP/Tools/APP_BTLD.bin",
+    )
+
+@app.route("/api/uart_flash_local", methods=["POST"])
+def route_uart_flash_local():
+    global _uart_flash_running
+    if _uart_flash_running:
+        return jsonify(error="Flash already in progress"), 409
+    if not (ser and ser.is_open):
+        return jsonify(error="ECU not connected via UART"), 503
+    if not APP_BTLD_BIN.exists():
+        return jsonify(error=f"APP_BTLD.bin not found at {APP_BTLD_BIN}"), 404
+    payload = APP_BTLD_BIN.read_bytes()
+    if len(payload) == 0:
+        return jsonify(error="APP_BTLD.bin is empty"), 400
+    _uart_flash_running = True
+    threading.Thread(target=_do_uart_flash, args=(payload,), daemon=True).start()
+    return jsonify(ok=True, size=len(payload), path="APP/Tools/APP_BTLD.bin")
+
 # ──────────────────────────────────────────────────────────────────
 #  Routes — Firmware History
 # ──────────────────────────────────────────────────────────────────
@@ -647,6 +704,35 @@ def route_rollback(version):
     socketio.emit("firmware_history", _get_history())
     print(f"[rollback] restored v{version}")
     return jsonify(ok=True, version=version)
+
+# ──────────────────────────────────────────────────────────────────
+#  Routes — OLED frame data
+# ──────────────────────────────────────────────────────────────────
+@app.route("/api/oled_frames")
+def route_oled_frames():
+    h_file = BASE_DIR.parent / "APP/HAL/OLED/OLED_NyanCat.h"
+    if not h_file.exists():
+        return jsonify(error="OLED_NyanCat.h not found"), 404
+    try:
+        text = h_file.read_text(encoding="utf-8", errors="replace")
+        frames = []
+        for m in re.finditer(r'NyanCat_Frame\d+\[512\]\s*=\s*\{([^}]+)\}', text):
+            nums = [int(x, 16) for x in re.findall(r'0x[0-9A-Fa-f]{2}', m.group(1))]
+            if len(nums) == 512:
+                frames.append(nums)
+        return jsonify(frames=frames, width=128, height=32, pages=4,
+                       total_height=64, y_offset_pages=2)
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
+# ──────────────────────────────────────────────────────────────────
+#  Routes — Cloudflare tunnel URL
+# ──────────────────────────────────────────────────────────────────
+@app.route("/api/tunnel_url")
+def route_tunnel_url():
+    f = BASE_DIR / "tunnel_url.txt"
+    url = f.read_text().strip() if f.exists() else ""
+    return jsonify(url=url)
 
 # ──────────────────────────────────────────────────────────────────
 #  Routes — Metrics

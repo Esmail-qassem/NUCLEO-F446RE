@@ -8,7 +8,7 @@
  *============================================================================*/
 
 #define TASK_NUMBER   6u
-#define TASK_STACK_SIZE    128u
+#define TASK_STACK_SIZE    256u
 
 /*==============================================================================
  *  Types
@@ -43,6 +43,8 @@ typedef struct
     Task_States  state;
     void       (*TaskFunc)(void);
     TCB_t        TCB;
+    uint32       exec_cycles;   /* cycles accumulated in current 1-s window */
+    uint8        cpu_load;      /* calculated CPU load % (0–100)            */
 } Task_t;
 
 /*==============================================================================
@@ -71,7 +73,8 @@ void RTOS_voidWaitEvent(uint8 Copy_priority);
  *============================================================================*/
 
 void  OS_IDLE_TASK(void);
-uint8 RTOS_u8GetCPULoad(void);
-uint8 RTOS_u8GetStackUsage(uint8 priority); /* % of stack used (0–100) */
+uint8 RTOS_u8GetCPULoad(void);              /* total system load % (0–100)      */
+uint8 RTOS_u8GetTaskCPULoad(uint8 priority);/* per-task CPU load % (0–100)      */
+uint8 RTOS_u8GetStackUsage(uint8 priority); /* stack high-water mark % (0–100)  */
 
 #endif /* RTOS_INTERFACE_H_ */

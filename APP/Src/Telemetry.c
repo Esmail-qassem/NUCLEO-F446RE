@@ -4,7 +4,7 @@
 #include "RTC.h"
 #include "ADC.h"
 #include "RTOS.h"
-
+#include "STD_TYPES.h"
 /*------------------------------------------------------------------
  *  RCC_CSR reset-cause register (used only by BOOT_REASON_REPORT)
  *------------------------------------------------------------------*/
@@ -47,6 +47,10 @@ void SW_VERSION(void)
     UART_SendSyncBuffer(UART2, (uint8 *)"STM Application Version: ", 25);
     UART_SendSyncBuffer(UART2, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION_STR) - 1U);
     UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+
+    UART_SendSyncBuffer(UART1, (uint8 *)"STM Application Version: ", 25);
+    UART_SendSyncBuffer(UART1, FIRMWARE_VERSION, sizeof(FIRMWARE_VERSION_STR) - 1U);
+    UART_SendSyncBuffer(UART1, (uint8 *)"\r\n", 2);
 }
 
 /*------------------------------------------------------------------
@@ -100,18 +104,27 @@ void INTERNAL_TEMP_TASK(void)
  *------------------------------------------------------------------*/
 void LDR_TASK(void)
 {
-    uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_0);
-    uint32 voltage_mV = ((uint32)raw * 3300) / 4096;
-    uint8  light      = (raw * 100) / 4095;
+    // uint16 raw        = ADC_ReadAveraged(ADC_CHANNEL_0);
+    // uint32 voltage_mV = ((uint32)raw * 3300) / 4096;
+    // uint8  light      = (raw * 100) / 4095;
 
-    UART_SendSyncBuffer(UART2, (uint8 *)"RAW: ",      5);
-    UART_voidSendNumber(UART2, raw);
-    UART_SendSyncBuffer(UART2, (uint8 *)" | V: ",     6);
-    UART_voidSendNumber(UART2, voltage_mV);
-    UART_SendSyncBuffer(UART2, (uint8 *)"mV | Light: ", 12);
-    UART_voidSendNumber(UART2, light);
-    UART_SendSyncBuffer(UART2, (uint8 *)"%\r\n", 3);
-    UART_SendSyncBuffer(UART2, (uint8 *)"\r\n",   2);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"RAW: ",      5);
+    // UART_voidSendNumber(UART2, raw);
+    // UART_SendSyncBuffer(UART2, (uint8 *)" | V: ",     6);
+    // UART_voidSendNumber(UART2, voltage_mV);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"mV | Light: ", 12);
+    // UART_voidSendNumber(UART2, light);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"%\r\n", 3);
+    // UART_SendSyncBuffer(UART2, (uint8 *)"\r\n",   2);
+
+    // UART_SendSyncBuffer(UART1, (uint8 *)"RAW: ",      5);
+    // UART_voidSendNumber(UART1, raw);
+    // UART_SendSyncBuffer(UART1, (uint8 *)" | V: ",     6);
+    // UART_voidSendNumber(UART1, voltage_mV);
+    // UART_SendSyncBuffer(UART1, (uint8 *)"mV | Light: ", 12);
+    // UART_voidSendNumber(UART1, light);
+    // UART_SendSyncBuffer(UART1, (uint8 *)"%\r\n", 3);
+    // UART_SendSyncBuffer(UART1, (uint8 *)"\r\n",   2);
 }
 
 /*------------------------------------------------------------------
@@ -145,6 +158,37 @@ void STACK_MONITOR(void)
 }
 
 /*------------------------------------------------------------------
+ *  CPU_LOAD_TASK — prints per-task CPU load every 10 s
+ *  Format: $CPU:T0:2% T1:0% T2:24% T3:0% T4:0% T5:1%
+ *------------------------------------------------------------------*/
+void CPU_LOAD_TASK(void)
+{
+    uint8 i;
+
+    UART_SendSyncBuffer(UART2, (uint8 *)"$CPU:", 5);
+    for (i = 0; i < TASK_NUMBER; i++)
+    {
+        UART_SendSyncBuffer(UART2, (uint8 *)"T", 1);
+        UART_voidSendNumber(UART2, i);
+        UART_SendSyncBuffer(UART2, (uint8 *)":", 1);
+        UART_voidSendNumber(UART2, RTOS_u8GetTaskCPULoad(i));
+        UART_SendSyncBuffer(UART2, (uint8 *)"% ", 2);
+    }
+    UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
+
+    UART_SendSyncBuffer(UART1, (uint8 *)"$CPU:", 5);
+    for (i = 0; i < TASK_NUMBER; i++)
+    {
+        UART_SendSyncBuffer(UART1, (uint8 *)"T", 1);
+        UART_voidSendNumber(UART1, i);
+        UART_SendSyncBuffer(UART1, (uint8 *)":", 1);
+        UART_voidSendNumber(UART1, RTOS_u8GetTaskCPULoad(i));
+        UART_SendSyncBuffer(UART1, (uint8 *)"% ", 2);
+    }
+    UART_SendSyncBuffer(UART1, (uint8 *)"\r\n", 2);
+}
+
+/*------------------------------------------------------------------
  *  BOOT_REASON_REPORT — call once right after UART init
  *------------------------------------------------------------------*/
 void BOOT_REASON_REPORT(void)
@@ -153,9 +197,11 @@ void BOOT_REASON_REPORT(void)
     const uint8  *reason;
     uint8         len;
 
-    if      (csr & RCC_CSR_IWDGRSTF) { reason = (uint8 *)"BOOT:IWDG\r\n"; len = 11U; }
+    /* SFT is checked first — an intentional software reset takes priority
+     * over a coincidental IWDG flag that may also be set in RCC_CSR.     */
+    if      (csr & RCC_CSR_SFTRSTF)  { reason = (uint8 *)"BOOT:SFT\r\n";  len = 10U; }
+    else if (csr & RCC_CSR_IWDGRSTF) { reason = (uint8 *)"BOOT:IWDG\r\n"; len = 11U; }
     else if (csr & RCC_CSR_WWDGRSTF) { reason = (uint8 *)"BOOT:WWDG\r\n"; len = 11U; }
-    else if (csr & RCC_CSR_SFTRSTF)  { reason = (uint8 *)"BOOT:SFT\r\n";  len = 10U; }
     else if (csr & RCC_CSR_PORRSTF)  { reason = (uint8 *)"BOOT:POR\r\n";  len = 10U; }
     else if (csr & RCC_CSR_PINRSTF)  { reason = (uint8 *)"BOOT:PIN\r\n";  len = 10U; }
     else                              { reason = (uint8 *)"BOOT:UNK\r\n";  len = 10U; }
