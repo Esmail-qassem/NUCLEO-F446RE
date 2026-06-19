@@ -16,7 +16,7 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(MCAL_path)/AFIO/src \
            $(MCAL_path)/UART/src \
            $(MCAL_path)/FPEC/src \
-           $(MCAL_path)/PwrMD/src \
+           $(MCAL_path)/Pwr/src \
            $(MCAL_path)/DMA/src \
            $(MCAL_path)/IWDG/src \
            $(MCAL_path)/WWDG/src \
@@ -32,8 +32,10 @@ SRC_DIRS +=$(MCAL_path)/RCC/src \
            $(HAL_path)/ESP\
            $(HAL_path)/OLED\
 		   $(HAL_path)/MPU_6050\
-           $(P1_path)/FLAPPY_Bird\
            $(P1_path)/Snake\
+           $(P1_path)/Gif\
+           $(P1_path)/OLEDH\
+           $(P1_path)/PwrMd\
 		   ../RTOS\
            ../Startup\
 		   ../Src\

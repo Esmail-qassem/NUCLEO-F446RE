@@ -14,6 +14,9 @@
 #define CMD_RUN_TIME    0x05
 #define CMD_RESET       0x06
 #define CMD_PWM_SET     0x07   /* followed by duty byte 0–100 */
+#define CMD_SLEEP       0x08
+#define CMD_STOP       0x09
+#define CMD_STANDBY       0x0A
 #define CMD_GET_VERSION 0xA1
 #define MOVE_UP    0x1
 #define MOVE_DOWN  0x2
@@ -26,6 +29,31 @@
 static volatile uint8 s_pwm_pending = 0;
 extern volatile uint8 move;
 extern volatile uint8 User_Option;
+extern volatile uint8 shutdown_request;
+
+/*------------------------------------------------------------------
+ *  NTP time receive buffer (UART1)
+ *  ISR accumulates "TIME:HH:MM:SS\r" → sets flag for task to apply
+ *------------------------------------------------------------------*/
+static char    s_ntp_buf[16];
+static uint8   s_ntp_idx = 0;
+volatile uint8 ntp_hh = 0, ntp_mm = 0, ntp_ss = 0;
+volatile uint8 ntp_time_ready = 0;
+
+static void NTP_ParseBuffer(void)
+{
+    /* expect "TIME:HH:MM:SS" exactly 13 chars */
+    if (s_ntp_idx < 13) return;
+    if (s_ntp_buf[0]!='T' || s_ntp_buf[1]!='I' ||
+        s_ntp_buf[2]!='M' || s_ntp_buf[3]!='E' || s_ntp_buf[4]!=':') return;
+
+    ntp_hh = (uint8)((s_ntp_buf[5]-'0')*10 + (s_ntp_buf[6]-'0'));
+    ntp_mm = (uint8)((s_ntp_buf[8]-'0')*10 + (s_ntp_buf[9]-'0'));
+    ntp_ss = (uint8)((s_ntp_buf[11]-'0')*10 + (s_ntp_buf[12]-'0'));
+
+    if (ntp_hh < 24 && ntp_mm < 60 && ntp_ss < 60)
+        ntp_time_ready = 1;
+}
 /*------------------------------------------------------------------
  *  UART1 startup lock — ESP8266 sends garbage bytes at 74880 baud
  *  during its boot sequence. Ignore all UART1 commands for the
@@ -59,6 +87,9 @@ void UART2_ISR(uint8 num)
         case CMD_RUN_TIME:    RUN_TIME();        break;
         case CMD_RESET:       SYS_Reset();       break;
         case CMD_PWM_SET:     s_pwm_pending = 1; break;
+        case CMD_SLEEP:     shutdown_request = 1; break;
+        case CMD_STOP:      shutdown_request = 2; break;
+        case CMD_STANDBY:   shutdown_request = 3; break;
         case CMD_GET_VERSION: SW_VERSION();      break;
         case 'w' :   move = MOVE_UP             ;break;
         case 'd' :   move =   MOVE_RIGHT        ;break;
@@ -102,6 +133,28 @@ void UART1_ISR(uint8 num)
             UART_SendSyncBuffer(UART1, (uint8 *)"\n", 1);
             SW_VERSION();   /* human-readable to both UARTs */
             break;
-        default: break;
+        case CMD_SLEEP:     shutdown_request = 1; break;
+        case CMD_STOP:      shutdown_request = 2; break;
+        case CMD_STANDBY:   shutdown_request = 3; break;
+        case 'w' :   move = MOVE_UP;    break;
+        case 'd' :   move = MOVE_RIGHT; break;
+        case 's' :   move = MOVE_DOWN;  break;
+        case 'a' :   move = MOVE_LEFT;  break;
+        case 'r' :   move = GAME_RESET; User_Option = GAME_RESET; break;
+        case 'i' :   User_Option = 'i'; break;
+        case 'j' :   User_Option = 'j'; break;
+        default:
+            if (num == '\r')
+            {
+                /* end of line — try to parse accumulated buffer */
+                s_ntp_buf[s_ntp_idx] = '\0';
+                NTP_ParseBuffer();
+                s_ntp_idx = 0;
+            }
+            else if (num >= 0x20 && s_ntp_idx < (uint8)(sizeof(s_ntp_buf) - 1))
+            {
+                s_ntp_buf[s_ntp_idx++] = (char)num;
+            }
+            break;
     }
 }

@@ -7,7 +7,7 @@ C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o: \
  ../MCAL/GP_TIMER/inc/GP_Timer.h ../MCAL/RCC/inc/RCC.h \
  ../MCAL/IWDG/inc/IWDG.h ../HAL/OLED/OLED.h ../Inc/Telemetry.h \
  ../Inc/ISR.h ../HAL/MPU_6050/MPU_6050.h ../MCAL/FPU/inc/FPU.h \
- ../P1/Snake/Snake.h
+ ../P1/Snake/Snake.h ../P1/PwrMd/PwrMd.h
 ../Inc/App_Config.h:
 ../Inc/STD_TYPES.h:
 ../MCAL/UART/inc/UART.h:
@@ -28,3 +28,4 @@ C:/Users/s_a_a/Desktop/NUCLEO-F446RE/APP/Build/Object/Src/App_Config.o: \
 ../HAL/MPU_6050/MPU_6050.h:
 ../MCAL/FPU/inc/FPU.h:
 ../P1/Snake/Snake.h:
+../P1/PwrMd/PwrMd.h:

@@ -11,6 +11,7 @@
 #include "MPU_6050.h"
 #include "FPU.h"
 #include "Snake.h"
+#include "PwrMd.h"
 /*------------------------------------------------------------------
  *  Firmware version — single definition, shared via App_Config.h
  *------------------------------------------------------------------*/
@@ -77,6 +78,7 @@ void APP_init(void)
     }
     I2C_Init(I2C1_PORT, &i2c1_cfg);
     OLED_Init(I2C1_PORT);
+    Stm_WakeUp();   /* detect Standby wake, restore state, print reason */
     //MPU_Init();
     /* wait 50 ms */
     //for(uint16 i = 0; i < 3000 ; i++)
@@ -100,14 +102,14 @@ void GPIO_PIN_CONFIG(void)
     GPIO_InitPin(GPIO_PORTA, PIN8,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
 
     /* UART1 — PA9 TX, PA10 RX */
-    GPIO_InitPin(GPIO_PORTA, PIN9,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
-    GPIO_InitPin(GPIO_PORTA, PIN10, GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
+    GPIO_InitPin(GPIO_PORTA, PIN9,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_PULL_UP);
+    GPIO_InitPin(GPIO_PORTA, PIN10, GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_PULL_UP);
     GPIO_SetAF(GPIO_PORTA, PIN9,  7);
     GPIO_SetAF(GPIO_PORTA, PIN10, 7);
 
     /* UART2 — PA2 TX, PA3 RX */
-    GPIO_InitPin(GPIO_PORTA, PIN2,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
-    GPIO_InitPin(GPIO_PORTA, PIN3,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
+    GPIO_InitPin(GPIO_PORTA, PIN2,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_PULL_UP);
+    GPIO_InitPin(GPIO_PORTA, PIN3,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_PULL_UP);
     GPIO_SetAF(GPIO_PORTA, PIN2, 7);
     GPIO_SetAF(GPIO_PORTA, PIN3, 7);
 
@@ -121,6 +123,9 @@ void GPIO_PIN_CONFIG(void)
 
     /* Bootloader trigger pin — PC3 input pull-up */
     GPIO_InitPin(GPIO_PORTC, PIN3,  GPIO_MODE_INPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+
+    /* B1 user button — PC13 input, no pull (4.7k external pull-up on Nucleo board) */
+    GPIO_InitPin(GPIO_PORTC, PIN13, GPIO_MODE_INPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_NO_PULL);
 
     /* I2C1 — PB8 SCL, PB9 SDA (AF4, open-drain) */
     GPIO_InitPin(GPIO_PORTB, PIN8,  GPIO_MODE_AF,     GPIO_OTYPE_OD, GPIO_SPEED_FAST, GPIO_PULL_UP);

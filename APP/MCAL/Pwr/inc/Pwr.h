@@ -1,5 +1,5 @@
-#ifndef LOW_POWER_H_
-#define LOW_POWER_H_
+#ifndef PWR_H_
+#define PWR_H_
 
 #include "STD_TYPES.h"
 

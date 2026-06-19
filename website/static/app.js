@@ -1102,12 +1102,13 @@ const snakeFeedback = $("snake-feedback");
 const chkSnakeKbd   = $("chk-snake-kbd");
 
 function sendSnakeByte(hex, label) {
-  if (!isConnected) {
-    snakeFeedback.textContent = "Not connected — open UART first";
+  if (!isConnected && !espIp) {
+    snakeFeedback.textContent = "Not connected — open UART or wait for ESP";
     return;
   }
-  socket.emit("send_raw", { byte: hex, channel: "wire" });
-  snakeFeedback.textContent = `→ ${label}  [0x${hex.toUpperCase()}]`;
+  const channel = isConnected ? "both" : "wifi";
+  socket.emit("send_raw", { byte: hex, channel });
+  snakeFeedback.textContent = `→ ${label}  [0x${hex.toUpperCase()}] [${channel}]`;
 }
 
 document.querySelectorAll(".dpad-btn").forEach(btn => {

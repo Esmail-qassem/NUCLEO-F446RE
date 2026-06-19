@@ -20,9 +20,11 @@ UART_Config_t Uart_configuration={
   UART_WORDLEN_8B,
   Polling
 };
-#define VTOR       *((volatile uint32*)0xE000ED08)
-#define PWR_CR     *((volatile uint32*)0x40007000)   /* PWR control register   */
-#define RTC_BKP0R  *((volatile uint32*)0x40002850)   /* RTC backup register 0  */
+#define VTOR           *((volatile uint32*)0xE000ED08)
+#define PWR_CR         *((volatile uint32*)0x40007000)
+#define PWR_CSR        *((volatile uint32*)0x40007004)  /* PWR status register    */
+#define PWR_CSR_SBF    (1U << 1)                        /* Standby flag           */
+#define RTC_BKP0R      *((volatile uint32*)0x40002850)  /* RTC backup register 0  */
 #define BTLD_MAGIC  0xB007B007U                       /* "boot-boot"            */
 void(*Jump_toApplication)(void)=NULL;
 void(*Jump_toBootLoader)(void)=NULL;
@@ -40,16 +42,17 @@ int main (void)
 {
 APP_init();
 GPIO_PIN_CONFIG();
- SwReset = GET_BIT(RCC_CSR, SFT_RSTF);
- PowerReset = GET_BIT(RCC_CSR,POR_RSTF);
- PinReset = GET_BIT(RCC_CSR,PIN_RSTF);
- uint8 IwdgReset = GET_BIT(RCC_CSR, IWDG_RSTF);
+ SwReset    = GET_BIT(RCC_CSR, SFT_RSTF);
+ PowerReset = GET_BIT(RCC_CSR, POR_RSTF);
+ PinReset   = GET_BIT(RCC_CSR, PIN_RSTF);
+ uint8 IwdgReset    = GET_BIT(RCC_CSR, IWDG_RSTF);
+ uint8 LpwrReset    = GET_BIT(RCC_CSR, LPWR_RSTF);
+ uint8 StandbyWake  = (PWR_CSR & PWR_CSR_SBF) ? 1U : 0U;  /* Standby wakeup */
 
- /* Do NOT clear RMVF here — APP's BOOT_REASON_REPORT() reads and clears flags */
-while(1) 
+while(1)
 {
 UART_SendSyncBuffer(UART2, (uint8 *)"\n BM \n",7);
-if(PowerReset || SwReset || IwdgReset)
+if(PowerReset || SwReset || IwdgReset || LpwrReset || StandbyWake)
 {
   VTOR=0x08008000;
   Jump_toApplication = (void (*)(void)) *((volatile uint32*)0x08008004);

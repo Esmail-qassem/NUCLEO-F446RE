@@ -1,0 +1,51 @@
+{
+    "configurations": [
+        {
+            "name": "STM32F446RE",
+            "includePath": [
+                "${workspaceFolder}/APP/Inc",
+                "${workspaceFolder}/APP/RTOS",
+                "${workspaceFolder}/APP/MCAL/ADC/inc",
+                "${workspaceFolder}/APP/MCAL/BASIC_TIMER/inc",
+                "${workspaceFolder}/APP/MCAL/CRC/inc",
+                "${workspaceFolder}/APP/MCAL/DMA/inc",
+                "${workspaceFolder}/APP/MCAL/FLASH/inc",
+                "${workspaceFolder}/APP/MCAL/FPU/inc",
+                "${workspaceFolder}/APP/MCAL/GPIO/inc",
+                "${workspaceFolder}/APP/MCAL/GP_TIMER/inc",
+                "${workspaceFolder}/APP/MCAL/I2C/inc",
+                "${workspaceFolder}/APP/MCAL/IWDG/inc",
+                "${workspaceFolder}/APP/MCAL/NVIC/inc",
+                "${workspaceFolder}/APP/MCAL/PendSV/inc",
+                "${workspaceFolder}/APP/MCAL/Pwr/inc",
+                "${workspaceFolder}/APP/MCAL/RCC/inc",
+                "${workspaceFolder}/APP/MCAL/RTC/inc",
+                "${workspaceFolder}/APP/MCAL/SPI/inc",
+                "${workspaceFolder}/APP/MCAL/SysTick/inc",
+                "${workspaceFolder}/APP/MCAL/UART/inc",
+                "${workspaceFolder}/APP/MCAL/WWDG/inc",
+                "${workspaceFolder}/APP/HAL/ESP",
+                "${workspaceFolder}/APP/HAL/MPU_6050",
+                "${workspaceFolder}/APP/HAL/OLED",
+                "${workspaceFolder}/APP/P1/Gif",
+                "${workspaceFolder}/APP/P1/OLEDH",
+                "${workspaceFolder}/APP/P1/PwrMd",
+                "${workspaceFolder}/APP/P1/Snake"
+            ],
+            "defines": [
+                "STM32F446xx"
+            ],
+            "compilerPath": "arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm",
+            "compilerArgs": [
+                "-mcpu=cortex-m4",
+                "-mthumb",
+                "-mfpu=fpv4-sp-d16",
+                "-mfloat-abi=hard"
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -52,6 +52,7 @@ typedef struct
  *============================================================================*/
 
 void RTOS_voidStart(void);
+void RTOS_voidRestartTick(void);  /* resume scheduler after Stop-mode wake */
 
 /*==============================================================================
  *  Task Management

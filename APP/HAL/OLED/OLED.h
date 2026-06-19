@@ -30,6 +30,5 @@ void OLED_DrawPixel(uint8 x, uint8 y, OLED_Color_t color);
 void OLED_UpdateScreen(I2C_Port_t PORT,uint8 startPage,uint8 EndPage);
 void OLED_DrawChar(uint8 x, uint8 y, char c);
 void OLED_DrawString(uint8 x, uint8 y, const char *str);
-void OLED_APP(void);
 
 #endif

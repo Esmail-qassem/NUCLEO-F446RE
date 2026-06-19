@@ -15,6 +15,8 @@
 #define RCC_CSR_SFTRSTF  (1U << 28)
 #define RCC_CSR_PORRSTF  (1U << 27)
 #define RCC_CSR_PINRSTF  (1U << 26)
+#define PWR_CSR_REG      (*((volatile uint32*)0x40007004U))
+#define PWR_CSR_SBF      (1U << 1)   /* Standby flag — set on any Standby wakeup */
 
 /*------------------------------------------------------------------
  *  Shared state
@@ -199,12 +201,13 @@ void BOOT_REASON_REPORT(void)
 
     /* SFT is checked first — an intentional software reset takes priority
      * over a coincidental IWDG flag that may also be set in RCC_CSR.     */
-    if      (csr & RCC_CSR_SFTRSTF)  { reason = (uint8 *)"BOOT:SFT\r\n";  len = 10U; }
-    else if (csr & RCC_CSR_IWDGRSTF) { reason = (uint8 *)"BOOT:IWDG\r\n"; len = 11U; }
-    else if (csr & RCC_CSR_WWDGRSTF) { reason = (uint8 *)"BOOT:WWDG\r\n"; len = 11U; }
-    else if (csr & RCC_CSR_PORRSTF)  { reason = (uint8 *)"BOOT:POR\r\n";  len = 10U; }
-    else if (csr & RCC_CSR_PINRSTF)  { reason = (uint8 *)"BOOT:PIN\r\n";  len = 10U; }
-    else                              { reason = (uint8 *)"BOOT:UNK\r\n";  len = 10U; }
+    if      (PWR_CSR_REG & PWR_CSR_SBF)   { reason = (uint8 *)"BOOT:STDBY\r\n";   len = 12U; } /* Standby wakeup — no RCC flag set */
+    else if (csr & RCC_CSR_SFTRSTF)      { reason = (uint8 *)"BOOT:SFT\r\n";     len = 10U; }
+    else if (csr & RCC_CSR_IWDGRSTF)     { reason = (uint8 *)"BOOT:IWDG\r\n";    len = 11U; }
+    else if (csr & RCC_CSR_WWDGRSTF)     { reason = (uint8 *)"BOOT:WWDG\r\n";    len = 11U; }
+    else if (csr & RCC_CSR_PORRSTF)      { reason = (uint8 *)"BOOT:POR\r\n";     len = 10U; }
+    else if (csr & RCC_CSR_PINRSTF)      { reason = (uint8 *)"BOOT:PIN\r\n";     len = 10U; }
+    else                                  { reason = (uint8 *)"BOOT:UNK\r\n";     len = 10U; }
 
     UART_SendSyncBuffer(UART2, (uint8 *)reason, len);
     UART_SendSyncBuffer(UART1, (uint8 *)reason, len);

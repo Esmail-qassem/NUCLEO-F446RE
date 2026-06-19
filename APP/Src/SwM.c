@@ -1,17 +1,20 @@
 #include "SwM.h"
 #include "Telemetry.h"
 #include "App_Ctrl.h"
-#include "OLED.h"
 #include "IWDG.h"
+#include "PwrMd.h"
 #include "MPU_6050.h"
 #include "UART.h"
-#include "Snake.h"
+#include "Oledh.h"
+#include "RTC.h"
+
+
 
 ACCEL_t accel_data;
 GYRO_t gyro_data;
 extern ACCEL_t Bias_accel_data;
 extern GYRO_t Bias_gyro_data;
-uint8 volatile User_Option=0;
+uint8 shutdown_request;
 /*------------------------------------------------------------------
  *  OS task wrappers — each function maps to one scheduler slot
  *------------------------------------------------------------------*/
@@ -27,67 +30,26 @@ void OS_10ms_Task(void)
 
 void OS_20ms_Task(void)
 {
-//     static int x=0;
-//     static int y=0;
-//         /* Read sensors at 20 Hz — safe rate for breadboard I2C */
-//     MPU_GetAccelerometer(&accel_data);
-//     MPU_GetGyroscope(&gyro_data);
-//     /* Machine-readable line for Python visualizer — prefix $DATA so parser can filter it */
-//     UART_SendSyncBuffer(UART2, (uint8 *)"$DATA:", 6);
-//     UART_voidSendNumber(UART2, accel_data.Accel_X);
-//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-//     UART_voidSendNumber(UART2, accel_data.Accel_Y);
-//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-//     UART_voidSendNumber(UART2, accel_data.Accel_Z);
-//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-//     UART_voidSendNumber(UART2, gyro_data.GYRO_X - Bias_gyro_data.GYRO_X);
-//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-//     UART_voidSendNumber(UART2, gyro_data.GYRO_Y - Bias_gyro_data.GYRO_Y);
-//     UART_SendSyncBuffer(UART2, (uint8 *)",", 1);
-//     UART_voidSendNumber(UART2, gyro_data.GYRO_Z - Bias_gyro_data.GYRO_Z);
-//     UART_SendSyncBuffer(UART2, (uint8 *)"\r\n", 2);
-
-// uint8 pixel_x = 64 - ((accel_data.Accel_Y - Bias_accel_data.Accel_Y) * 64) / 100;
-// uint8 pixel_y = 32 - ((accel_data.Accel_X - Bias_accel_data.Accel_X) * 32) / 100;
-//     OLED_Clear();
-//     OLED_DrawPixel(pixel_x, pixel_y, OLED_COLOR_WHITE);
-//     OLED_UpdateScreen(I2C1_PORT);
+    if(shutdown_request == 1u)
+    {
+        Stm_ShutDown(PWR_MODE_SLEEP);
+        shutdown_request=0;
+    }
+    else if (shutdown_request == 2u)
+    {
+        Stm_ShutDown(PWR_MODE_STOP);
+        shutdown_request=0;
+    }
+    else if (shutdown_request == 3u)
+    {
+        Stm_ShutDown(PWR_MODE_STANDBY);
+        shutdown_request=0;
+    }
 }
 
 void OS_50ms_Task(void)
 {
-    uint8 static counter=0;
-    uint8 static flag=0;
-    if(counter == 0 || User_Option == GAME_RESET)
-    {
-        OLED_Clear();
-        counter= 0;
-        OLED_DrawString(0, 0, "-----------------------");
-        OLED_DrawString(0, 8,  "i.  Gif");
-        OLED_DrawString(0, 16, "j.  Snake Game");
-        OLED_DrawString(0, 56, "------------------------");
-        OLED_UpdateScreen(I2C1_PORT,0,8);
-        flag=1;
-    }
-    if('i' == User_Option)
-    {
-       OLED_Clear();
-       if(flag == 1)
-       {
-        OLED_UpdateScreen(I2C1_PORT,0,8);
-       }
-       OLED_APP();
-       flag=0;
-       counter=1;
-    }
-    else if('j' == User_Option)
-    {
-       Snake_Game();
-       counter=1;
-       flag=1;
-    }
-    
-   
+   OLED_APP();
 }
 
 void OS_100ms_Task(void)
@@ -99,6 +61,16 @@ void OS_1000ms_Task(void)
 {
     static uint8 tick = 0;
     tick++;
+
+    /* Apply NTP time received from ESP via UART1 */
+    extern volatile uint8 ntp_time_ready, ntp_hh, ntp_mm, ntp_ss;
+    if (ntp_time_ready)
+    {
+        ntp_time_ready = 0;
+        RTC_Time_t ntp = { ntp_hh, ntp_mm, ntp_ss, RTC_AM };
+        RTC_SetTime(&ntp);
+        UART_SendSyncBuffer(UART2, (uint8*)"[NTP] RTC updated\r\n", 19);
+    }
 
     LifeCounter(); /* every 1 s */
 
@@ -117,11 +89,6 @@ void OS_1000ms_Task(void)
     if (tick == 1)
         UART1_Arm();  /* arm ESP commands after 3 s — ESP boot garbage is gone */
 
-    /* MPU display — every 1 s, same task as other prints so no interleaving */
-    // UART_SendSyncBuffer(UART2, (uint8 *)"=== MPU-6050 ===\r\n", 18);
-    // UART_SendSyncBuffer(UART2, (uint8 *)"Temp  : ", 8);
-    // UART_voidSendNumber(UART2, MPU_GetTemp());
-    // UART_SendSyncBuffer(UART2, (uint8 *)" (x100 C)\r\n", 11);
 }
 
 void OS_IDLE_TASK(void)

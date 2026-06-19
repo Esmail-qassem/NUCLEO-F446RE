@@ -291,6 +291,27 @@
               onclick="return confirm('Reset the ECU now?')">⟳ System Reset</button>
     </div>
     <div class="divider"></div>
+    <div class="btn-group" style="flex-direction:column;gap:6px">
+      <span class="ver-label">Power Mode</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-secondary cmd-btn" data-cmd="pwr_sleep"
+                onclick="return confirm('Enter Sleep mode?')"
+                title="CPU halts, RTOS keeps running. Wakes on next SysTick (1 ms).">
+          💤 Sleep
+        </button>
+        <button class="btn btn-secondary cmd-btn" data-cmd="pwr_stop"
+                onclick="return confirm('Enter Stop mode? All clocks stop — wake via EXTI/RTC.')"
+                title="All clocks off, SRAM kept. Wakes on EXTI or RTC alarm.">
+          ⏸ Stop
+        </button>
+        <button class="btn btn-danger cmd-btn" data-cmd="pwr_standby"
+                onclick="return confirm('Enter Standby mode? RAM is lost — ECU will reboot on wake (PA0).')"
+                title="Deepest sleep. RAM lost. Wake via PA0 rising edge — full reboot.">
+          ☽ Standby
+        </button>
+      </div>
+    </div>
+    <div class="divider"></div>
 
     <div class="pwm-row">
       <span class="ver-label">PWM duty (PC7)</span>
@@ -686,7 +707,7 @@
             </div>
             <div style="display:flex;justify-content:space-between">
               <span class="muted">ECU task</span>
-              <span style="font-family:var(--font-mono)">OS_20ms (OLED_APP)</span>
+              <span style="font-family:var(--font-mono)">OS_20ms (Gif_Application)</span>
             </div>
           </div>
         </div>

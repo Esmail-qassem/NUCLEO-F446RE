@@ -101,7 +101,7 @@ def _save_version(ver: str):
 #  Shared state
 # ──────────────────────────────────────────────────────────────────
 state = {
-    "serial_port"   : "COM5",
+    "serial_port"   : "/dev/ttyUSB0",
     "baud"          : 115200,
     "connected"     : False,
     "ecu_version"   : "–",
@@ -814,6 +814,9 @@ COMMANDS = {
     "btld_update": 0x04,
     "run_time"   : 0x05,
     "sys_reset"  : 0x06,
+    "pwr_sleep"  : 0x08,
+    "pwr_stop"   : 0x09,
+    "pwr_standby": 0x0A,
     "get_version": 0xA1,
 }
 

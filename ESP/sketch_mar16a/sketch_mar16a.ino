@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <WiFiClient.h>
 #include <WiFiUdp.h>
+#include <time.h>
 
 /*===========================================================================
                         CONFIGURATION
@@ -15,6 +16,12 @@
 #define POLL_INTERVAL_MS 30000
 #define RESET_PIN        D1
 #define STM32_BAUD       115200
+
+/* NTP — change offset to match your timezone (seconds)
+ * UTC+0=0  UTC+1=3600  UTC+2=7200  UTC+3=10800 */
+#define NTP_SERVER         "pool.ntp.org"
+#define NTP_TIMEZONE_OFFSET 7200        /* UTC+2 (Egypt) */
+#define NTP_SYNC_INTERVAL_MS 3600000UL  /* re-sync every 1 hour */
 
 #define CMD_LED_ON      0x01
 #define CMD_LED_OFF     0x02
@@ -38,6 +45,10 @@ bool     forceOTA       = false;
 
 /* Serial line accumulator — non-blocking */
 String   rxBuf = "";
+
+/* NTP */
+uint32_t lastNtpSync = 0;
+bool     ntpSynced   = false;
 
 /*===========================================================================
                         UDP TELEMETRY  — ~0 ms, no TCP handshake
@@ -69,6 +80,56 @@ static int httpPost(const String& url, const String& body,
     int code = http.POST(body);
     http.end();
     return code;
+}
+
+/*===========================================================================
+                        NTP TIME SYNC
+===========================================================================*/
+
+/* Sync ESP internal clock from NTP server.
+ * Waits up to 10 seconds for a valid timestamp. */
+void syncNTP()
+{
+    configTime(NTP_TIMEZONE_OFFSET, 0, NTP_SERVER, "time.nist.gov");
+
+    uint32_t deadline = millis() + 10000;
+    while (time(nullptr) < 1000000000UL && millis() < deadline)
+    {
+        delay(100);
+        yield();
+    }
+
+    if (time(nullptr) > 1000000000UL)
+    {
+        ntpSynced    = true;
+        lastNtpSync  = millis();
+        sendTelemetry("[NTP] synced: " + String(time(nullptr)));
+    }
+    else
+    {
+        sendTelemetry("[NTP] sync failed — will retry");
+    }
+}
+
+/* Send current time to STM32 over UART1 as "TIME:HH:MM:SS\n"
+ * STM32 UART1_ISR parses this and calls RTC_SetTime(). */
+void sendTimeToSTM32()
+{
+    if (!ntpSynced) return;
+
+    time_t    now = time(nullptr);
+    struct tm*  t = localtime(&now);
+
+    char buf[20];
+    snprintf(buf, sizeof(buf), "TIME:%02d:%02d:%02d",
+             t->tm_hour, t->tm_min, t->tm_sec);
+
+    if (!flashing)
+    {
+        Serial.print(buf);
+        Serial.print('\r');   /* use \r only — \n (0x0A) = CMD_STANDBY on STM32 */
+        sendTelemetry(String("[NTP] sent to STM32: ") + buf);
+    }
 }
 
 /*===========================================================================
@@ -301,7 +362,9 @@ void setup()
 
     connectWiFi();
     udp.begin(TELEMETRY_PORT);
+    syncNTP();          /* get real time from internet */
     registerWithServer();
+    sendTimeToSTM32();  /* set STM32 RTC on boot      */
 
     cmdServer.on("/cmd",    HTTP_POST, handleCmd);
     cmdServer.on("/health", HTTP_GET,  handleHealth);
@@ -354,6 +417,13 @@ void loop()
                 rxBuf += (char)b;
             }
         }
+    }
+
+    /* NTP re-sync every hour and resend to STM32 */
+    if (millis() - lastNtpSync >= NTP_SYNC_INTERVAL_MS)
+    {
+        syncNTP();
+        sendTimeToSTM32();
     }
 
     /* OTA check — only when triggered or poll interval elapsed */

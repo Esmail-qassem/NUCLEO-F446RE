@@ -329,6 +329,14 @@ uint8 RTOS_u8GetCPULoad(void)
 }
 
 /*==============================================================================
+ *  Tick restart — call after waking from Stop mode to resume the scheduler
+ *============================================================================*/
+void RTOS_voidRestartTick(void)
+{
+    SysTick_voidSetIntervalPeriodoc(TICKS_PER_MS, &RTOS_voidTickCallback);
+}
+
+/*==============================================================================
  *  ISR Handlers
  *============================================================================*/
 
