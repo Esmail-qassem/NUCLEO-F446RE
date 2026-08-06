@@ -88,6 +88,9 @@ void APP_init(void)
     //MPU_Calibrate(&Bias_accel_data, &Bias_gyro_data);
     IWDG_Init(IWDG_PRE_32, IWDG_CalcReload(150, IWDG_PRE_32, 32000));
     Snake_Init();
+    GP_Timer_Start(TIMER3);
+    GP_Timer_PWM_SetDuty(TIMER3, 1, 90);
+    GP_Timer_PWM_SetDuty(TIMER3, 2, 90);
 }
 
 /*------------------------------------------------------------------
@@ -120,9 +123,18 @@ void GPIO_PIN_CONFIG(void)
     /* PWM — TIM3 CH2 on PC7 (AF2) */
     GPIO_InitPin(GPIO_PORTC, PIN7,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
     GPIO_SetAF(GPIO_PORTC, PIN7, 2);
+    GPIO_InitPin(GPIO_PORTA, PIN6,  GPIO_MODE_AF,     GPIO_OTYPE_PP, GPIO_SPEED_HIGH, GPIO_NO_PULL);
+    GPIO_SetAF(GPIO_PORTA, PIN6, 2);
 
     /* Bootloader trigger pin — PC3 input pull-up */
     GPIO_InitPin(GPIO_PORTC, PIN3,  GPIO_MODE_INPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+
+    GPIO_InitPin(GPIO_PORTC, PIN2,  GPIO_MODE_OUTPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+    GPIO_InitPin(GPIO_PORTC, PIN1,  GPIO_MODE_OUTPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_PULL_UP);
+    GPIO_WritePin(GPIO_PORTC, PIN2, 1);
+    GPIO_WritePin(GPIO_PORTC, PIN1, 1);
+
+
 
     /* B1 user button — PC13 input, no pull (4.7k external pull-up on Nucleo board) */
     GPIO_InitPin(GPIO_PORTC, PIN13, GPIO_MODE_INPUT,  GPIO_OTYPE_PP, GPIO_SPEED_FAST, GPIO_NO_PULL);

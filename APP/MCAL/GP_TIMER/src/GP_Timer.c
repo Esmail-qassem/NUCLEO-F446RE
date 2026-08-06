@@ -79,7 +79,7 @@ void GP_Timer_PWM_Init(Timer_t timer)
     }
 
     /* Set frequency (example: 1 kHz PWM) */
-    TIM_PSC(Base) = 16 - 1;     // 1 MHz
+    TIM_PSC(Base) = 90 - 1;     // 1 MHz
     TIM_ARR(Base) = 1000 - 1;   // 1 kHz
 
     /* ===== CHANNEL 1 ===== */
